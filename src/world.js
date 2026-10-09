@@ -10,6 +10,8 @@
 import * as THREE from 'three';
 import { createPlanet, getSurfaceRadius, getBiome, isLand, latLonToDir, SEA_RADIUS } from './planet.js';
 import { SPOTS, LANDMARKS, DECOR, M, G, makeEmojiSprite } from './props.js';
+import './props-extra.js';
+import { rollTargets } from './clues.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const LANDMARK_SCALE = 1.45;
@@ -54,8 +56,10 @@ function nudgeToLand(dir, rand) {
  * 建立關卡世界
  * @param {object} level levels.js 的一筆資料
  */
-export function buildWorld(level) {
-  const rand = rng(level.theme.seed * 9973 + 7);
+export function buildWorld(level, seed = Math.floor(Math.random() * 1e9)) {
+  // 每局使用新的亂數種子：物品位置、線索、藏匿點與裝飾的配置都會不同
+  const rand = rng(seed);
+  const targets = rollTargets(level, rand);
   const { group, terrain, atmosphere } = createPlanet(level.theme);
   const clickables = [];   // 可點擊的紀錄（地標與藏匿點）
   const landmarks = new Map();
@@ -66,8 +70,12 @@ export function buildWorld(level) {
   const canPlace = (d, anywhere) => anywhere || isLand(d);
 
   /* ---------- 地標 ---------- */
+  // 地標位置也在陸地地標之間洗牌，每局地圖配置都不一樣
+  const landSlots = level.landmarks.filter((l) => !l.anywhere).map((l) => [l.lat, l.lon]).sort(() => rand() - 0.5);
+  let slot = 0;
   for (const lm of level.landmarks) {
-    let dir = latLonToDir(lm.lat, lm.lon);
+    const [lat, lon] = lm.anywhere ? [lm.lat, lm.lon] : landSlots[slot++];
+    let dir = latLonToDir(lat, lon);
     if (!lm.anywhere) dir = nudgeToLand(dir, rand);
     const root = new THREE.Group();
     const pivot = new THREE.Group();
@@ -109,7 +117,7 @@ export function buildWorld(level) {
   // 每個地標旁放 3 個不同種類的藏匿點，目標一定在其中
   for (const lm of level.landmarks) {
     const rec = landmarks.get(lm.id);
-    const required = level.targets.filter((t) => t.at === lm.id);
+    const required = targets.filter((t) => t.at === lm.id);
     const types = required.map((t) => t.spot);
     const pool = level.spotPool.filter((t) => !types.includes(t)).sort(() => rand() - 0.5);
     while (types.length < 3 && pool.length) types.push(pool.shift());
@@ -235,5 +243,5 @@ export function buildWorld(level) {
     beacon.visible = true;
   }
 
-  return { group, terrain, atmosphere, clickables, landmarks, spots, update, popItem, showBeacon, hideBeacon: () => (beacon.visible = false) };
+  return { group, terrain, atmosphere, targets, clickables, landmarks, spots, update, popItem, showBeacon, hideBeacon: () => (beacon.visible = false) };
 }

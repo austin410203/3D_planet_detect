@@ -24,7 +24,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     found: new Set(),
     hintLevel: new Map(), // 每個目標的提示階段
   };
-  const targets = level.targets;
+  const targets = world.targets; // 本局隨機產生的物品配置與線索
   const cleanup = [];
   const floats = [];
 

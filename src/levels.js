@@ -13,7 +13,9 @@
  *   stars      [三星秒數, 二星秒數]；超過二星秒數仍完成即為一星
  */
 
-export const LEVELS = [
+import { EXTRA_LEVELS } from './levels-extra.js';
+
+const BASE_LEVELS = [
   /* ======================= 1. 綠野星 ======================= */
   {
     id: 'verdant', name: '綠野星', emoji: '🌳', subtitle: '郵差的失物',
@@ -304,3 +306,6 @@ export const LEVELS = [
     stars: [90, 170],
   },
 ];
+
+/** 全部 28 關：原本 8 關 + 追加 20 關 */
+export const LEVELS = [...BASE_LEVELS, ...EXTRA_LEVELS];

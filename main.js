@@ -96,7 +96,10 @@ function lerpTheme(k) {
 const SPACING = 18;
 const previews = new THREE.Group();
 scene.add(previews);
-LEVELS.forEach((lv, i) => {
+/** 選關預覽只建立「目前選中星球的前後兩顆」，28 顆星球也不會拖慢載入 */
+const previewCache = new Map();
+function buildPreview(i) {
+  const lv = LEVELS[i];
   const { group } = createPlanet(lv.theme, { detail: 0.55 });
   // 預覽也放上地標，讓每顆星球一眼就有特色
   for (const lm of lv.landmarks) {
@@ -109,11 +112,22 @@ LEVELS.forEach((lv, i) => {
   }
   group.position.x = i * SPACING;
   group.rotation.x = 0.35;
+  group.scale.setScalar(0.7);
+  group.userData.index = i;
   previews.add(group);
-});
+  previewCache.set(i, group);
+}
+function ensurePreviews(center) {
+  for (let i = center - 2; i <= center + 2; i++) if (i >= 0 && i < LEVELS.length && !previewCache.has(i)) buildPreview(i);
+  // 離太遠的預覽釋放掉，節省記憶體
+  for (const [i, g] of previewCache) {
+    if (Math.abs(i - center) > 4) { previews.remove(g); disposeGroup(g); previewCache.delete(i); }
+  }
+}
 
 let selected = 0;
 function renderSelectCard() {
+  ensurePreviews(selected);
   const lv = LEVELS[selected];
   const p = progress.get(lv.id);
   const unlocked = progress.isUnlocked(LEVELS, selected);
@@ -129,6 +143,7 @@ function renderSelectCard() {
   $('pcLock').hidden = unlocked;
   $('planetDots').innerHTML = LEVELS.map((_, i) => `<span class="${i === selected ? 'on' : ''}" data-i="${i}"></span>`).join('');
   $('totalStars').textContent = progress.totalStars(LEVELS);
+  $('maxStars').textContent = LEVELS.length * 3;
   applyTheme(lv.theme);
 }
 function choose(i) {
@@ -282,7 +297,8 @@ renderer.setAnimationLoop(() => {
     camGoal.set(selected * SPACING, 1.2, portrait ? 26 : 19);
     camera.position.lerp(camGoal, Math.min(1, dt * 4));
     camera.lookAt(camera.position.x, portrait ? -1.5 : -0.8, 0);
-    previews.children.forEach((p, i) => {
+    previews.children.forEach((p) => {
+      const i = p.userData.index;
       p.rotation.y += dt * (i === selected ? 0.25 : 0.08);
       const s = i === selected ? 1 : 0.7;
       p.scale.setScalar(THREE.MathUtils.lerp(p.scale.x, s, Math.min(1, dt * 5)));
