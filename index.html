@@ -3,37 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>小星球探險 Tiny Planet Explorer</title>
+  <title>星球失物招領所</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <!-- Three.js 畫布容器 -->
+  <!-- Three.js 畫布 -->
   <div id="app"></div>
 
-  <!-- 標題 -->
-  <header class="title">
-    <h1>小星球探險</h1>
-    <p>已發現 <span id="found">0</span> / <span id="total">0</span></p>
-  </header>
+  <!-- ==================== 選關畫面 ==================== -->
+  <section id="select" class="screen">
+    <header class="logo">
+      <div class="logo-badge">🔍</div>
+      <div>
+        <h1>星球失物招領所</h1>
+        <p>Lost &amp; Found in Space</p>
+      </div>
+    </header>
 
-  <!-- 操作說明 -->
-  <aside class="help" id="help">
-    <button class="help-toggle" id="helpToggle" aria-label="切換說明">?</button>
-    <ul>
-      <li><b>拖曳</b> 旋轉星球</li>
-      <li><b>滾輪 / 雙指</b> 縮放</li>
-      <li><b>點擊</b> 物件互動</li>
-    </ul>
-  </aside>
+    <button class="nav nav-prev" id="prevPlanet" aria-label="上一顆星球">◀</button>
+    <button class="nav nav-next" id="nextPlanet" aria-label="下一顆星球">▶</button>
 
-  <!-- 物件資訊卡片彈窗 -->
-  <div class="card-mask" id="cardMask" hidden>
-    <div class="card" role="dialog" aria-modal="true">
-      <button class="card-close" id="cardClose" aria-label="關閉">×</button>
-      <div class="card-emoji" id="cardEmoji"></div>
-      <div class="card-cat" id="cardCat"></div>
-      <h2 id="cardName"></h2>
-      <p id="cardDesc"></p>
+    <article class="planet-card" id="planetCard">
+      <div class="pc-top">
+        <span class="pc-num" id="pcNum">1</span>
+        <span class="pc-emoji" id="pcEmoji">🌳</span>
+        <div>
+          <h2 id="pcName">綠野星</h2>
+          <p class="pc-sub" id="pcSub">郵差的失物</p>
+        </div>
+      </div>
+      <div class="pc-stars" id="pcStars"></div>
+      <dl class="pc-info">
+        <div><dt>要找的物品</dt><dd id="pcItems">3 件</dd></div>
+        <div><dt>最佳時間</dt><dd id="pcBest">--</dd></div>
+        <div><dt>三星目標</dt><dd id="pcGoal">60 秒</dd></div>
+      </dl>
+      <button class="btn btn-go" id="startBtn">出發！</button>
+      <p class="pc-lock" id="pcLock" hidden>🔒 先在上一顆星球拿到 1 顆星才能解鎖</p>
+    </article>
+
+    <div class="dots" id="planetDots"></div>
+    <p class="total-stars">⭐ <span id="totalStars">0</span> / 24</p>
+  </section>
+
+  <!-- ==================== 委託說明 ==================== -->
+  <div class="modal" id="intro" hidden>
+    <div class="dialog">
+      <div class="npc">
+        <div class="npc-face" id="introNpc">🐦</div>
+        <div class="npc-name" id="introNpcName">藍鵲郵差 Pip</div>
+      </div>
+      <div class="speech" id="introStory"></div>
+      <h3 class="need-title">要找的東西</h3>
+      <ul class="need" id="introItems"></ul>
+      <p class="tip">💡 閱讀左邊的<strong>線索手冊</strong>，找出物品藏在哪個地標旁的哪種東西裡。翻錯地方會加時間喔！</p>
+      <button class="btn btn-go" id="introGo">接下委託！</button>
+    </div>
+  </div>
+
+  <!-- ==================== 倒數 ==================== -->
+  <div class="countdown" id="countdown" hidden></div>
+
+  <!-- ==================== 遊戲 HUD ==================== -->
+  <div id="hud" hidden>
+    <button class="btn btn-small btn-back" id="backBtn">◀ 選關</button>
+
+    <!-- 計時與星星門檻條 -->
+    <div class="timer-box">
+      <div class="timer" id="timer">0:00</div>
+      <div class="star-track">
+        <div class="star-fill" id="starFill"></div>
+        <span class="star-mark" id="mark3">⭐⭐⭐</span>
+        <span class="star-mark" id="mark2">⭐⭐</span>
+      </div>
+    </div>
+
+    <!-- 物品欄 -->
+    <ul class="items" id="itemSlots"></ul>
+
+    <!-- 線索手冊 -->
+    <aside class="journal" id="journal">
+      <button class="journal-tab" id="journalTab">📖 線索手冊</button>
+      <div class="journal-body" id="journalBody"></div>
+    </aside>
+
+    <button class="btn btn-hint" id="hintBtn">💡 提示 <small>+15 秒</small></button>
+    <p class="controls-tip">拖曳旋轉・滾輪縮放・點擊搜尋</p>
+  </div>
+
+  <!-- 浮動訊息 -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ==================== 結算 ==================== -->
+  <div class="modal" id="result" hidden>
+    <div class="dialog result">
+      <h2 class="result-title">委託完成！</h2>
+      <div class="result-stars" id="resultStars">
+        <span class="rs">⭐</span><span class="rs">⭐</span><span class="rs">⭐</span>
+      </div>
+      <div class="result-time"><span id="resultTime">0:00</span><small id="resultBest"></small></div>
+      <div class="speech small" id="resultOutro"></div>
+      <div class="result-btns">
+        <button class="btn btn-small" id="retryBtn">↻ 再玩一次</button>
+        <button class="btn btn-small" id="menuBtn">🪐 選關</button>
+        <button class="btn btn-go btn-small" id="nextBtn">下一顆星球 ▶</button>
+      </div>
     </div>
   </div>
 

@@ -1,178 +1,308 @@
 /**
- * main.js — 程式進入點
+ * main.js — 程式進入點與畫面流程
  * --------------------------------------------------
- * 建立 Scene / Camera / Renderer、燈光、後處理，
- * 並串接星球、物件、控制、互動、粒子、UI 各模組與主迴圈。
+ * 流程：選關（星球輪播） → 委託說明 → 3-2-1 倒數 → 解謎 → 結算（1~3 星）
+ * 共用：Renderer、Bloom 後處理、星空、燈光（依星球主題變色）、OrbitControls
  */
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
-import { createPlanet, PLANET_RADIUS } from './src/planet.js';
-import { createInteractiveObjects, updateInteractiveObjects, createDecorations, createClouds } from './src/objects.js';
-import { createControls } from './src/controls.js';
-import { setupInteractions } from './src/interactions.js';
+import { LEVELS } from './src/levels.js';
+import { createPlanet, getSurfaceRadius, latLonToDir, disposeGroup } from './src/planet.js';
+import { LANDMARKS } from './src/props.js';
+import { buildWorld, placeOnSurface } from './src/world.js';
+import { createGame } from './src/game.js';
 import { createStarfield, ParticleBurst } from './src/particles.js';
-import { createUI } from './src/ui.js';
+import { progress, fmtTime } from './src/progress.js';
 
-/* ---------- 裝置判斷：行動裝置降低畫質以維持 30fps ---------- */
-const isMobile = matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
-let pixelRatio = Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2);
+const $ = (id) => document.getElementById(id);
+const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
 
-/* ---------- 基本三件套 ---------- */
-const container = document.getElementById('app');
+/* =========================================================
+ * Renderer / Scene / Camera
+ * ======================================================= */
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1.5 : 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+$('app').appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+Object.assign(labelRenderer.domElement.style, { position: 'fixed', inset: '0', pointerEvents: 'none' });
+$('app').appendChild(labelRenderer.domElement);
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#070b1a');
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 500);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 400);
-// 手機直式畫面較窄，相機拉遠一點才能看到整顆星球
-camera.position.set(0, 4, window.innerWidth < window.innerHeight ? 21 : 16);
+/* ---------- 燈光（依主題調整顏色） ---------- */
+const ambient = new THREE.AmbientLight('#b8c4ff', 0.35);
+const hemi = new THREE.HemisphereLight('#dff3ff', '#3a2f5a', 0.9);
+const sun = new THREE.DirectionalLight('#fff1d6', 2.6);
+sun.castShadow = true;
+sun.shadow.mapSize.set(isMobile ? 1024 : 2048, isMobile ? 1024 : 2048);
+Object.assign(sun.shadow.camera, { left: -7.5, right: 7.5, top: 7.5, bottom: -7.5, near: 1, far: 50 });
+sun.shadow.normalBias = 0.03;
+scene.add(ambient, hemi, sun, sun.target);
 
-const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
-renderer.setPixelRatio(pixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
-container.appendChild(renderer.domElement);
-
-/* ---------- 燈光：環境光 + 半球光 + 太陽方向光（含陰影） ---------- */
-scene.add(new THREE.AmbientLight('#b8c4ff', 0.35));
-scene.add(new THREE.HemisphereLight('#dff3ff', '#3a2f5a', 0.9));
-
-const sunLight = new THREE.DirectionalLight('#fff1d6', 2.6);
-sunLight.position.set(14, 9, 10);
-sunLight.castShadow = true;
-const shadowSize = isMobile ? 1024 : 2048;
-sunLight.shadow.mapSize.set(shadowSize, shadowSize);
-// 陰影相機只需涵蓋星球範圍，提高陰影解析度
-const sc = sunLight.shadow.camera;
-sc.left = sc.bottom = -7.5;
-sc.right = sc.top = 7.5;
-sc.near = 1; sc.far = 40;
-sunLight.shadow.bias = -0.0005;
-sunLight.shadow.normalBias = 0.03;
-scene.add(sunLight);
-
-/* ---------- 太陽與月亮（裝飾，太陽會被 Bloom 照亮） ---------- */
-const sun = new THREE.Mesh(
-  new THREE.IcosahedronGeometry(1.3, 2),
-  new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffd76a').multiplyScalar(3) })
-);
-sun.position.copy(sunLight.position).normalize().multiplyScalar(26);
-scene.add(sun);
-
-const moonPivot = new THREE.Group();
-const moon = new THREE.Mesh(
-  new THREE.DodecahedronGeometry(0.7, 0),
-  new THREE.MeshStandardMaterial({ color: '#4a5aa8', flatShading: true, roughness: 1 })
-);
-moon.position.set(9.5, 1.5, 0);
-moon.castShadow = true;
-moonPivot.add(moon);
-moonPivot.rotation.z = 0.25;
-scene.add(moonPivot);
-
-/* ---------- 星空 ---------- */
 const stars = createStarfield(isMobile ? 1500 : 2800);
 scene.add(stars);
-
-/* ---------- 星球 + 物件 ---------- */
-const { group: planetGroup, terrain, atmosphere } = createPlanet();
-planetGroup.rotation.x = 0.25; // 微微傾斜，更有立體感
-scene.add(planetGroup);
-scene.add(atmosphere);
-
-const objects = createInteractiveObjects(planetGroup);
-createDecorations(planetGroup, objects);
-const clouds = createClouds(scene);
-
-/* ---------- 後處理：Bloom 發光 ---------- */
-const composer = new EffectComposer(renderer);
-composer.setPixelRatio(pixelRatio);
-composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.55,  // 強度
-  0.5,   // 半徑
-  0.85   // 閾值：只有夠亮的部分（太陽、燈塔、窗戶）才發光
-);
-composer.addPass(bloom);
-composer.addPass(new OutputPass()); // 色調映射與色彩空間轉換
-
-/* ---------- 各模組 ---------- */
-// 簡易計時器（以 performance.now 計算 dt 與經過時間）
-const clock = (() => {
-  const start = performance.now();
-  let last = start;
-  return {
-    getDelta() { const now = performance.now(); const d = (now - last) / 1000; last = now; return d; },
-    getElapsedTime() { return (performance.now() - start) / 1000; },
-  };
-})();
-const ui = createUI(container, objects);
 const particles = new ParticleBurst(scene);
-const ctrl = createControls(camera, renderer.domElement, planetGroup);
-setupInteractions({
-  camera, domElement: renderer.domElement, terrain, objects,
-  particles, ui, controls: ctrl, clock,
-});
-ui.resize(window.innerWidth, window.innerHeight);
 
-/* ---------- 響應式：視窗大小改變 ---------- */
-function onResize() {
-  const w = window.innerWidth, h = window.innerHeight;
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-  renderer.setSize(w, h);
-  composer.setSize(w, h);
-  bloom.setSize(w, h);
-  ui.resize(w, h);
+/* ---------- Bloom 後處理 ---------- */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.5, 0.85);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+/* ---------- 視角控制（解謎時使用） ---------- */
+const controls = new OrbitControls(camera, renderer.domElement);
+Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, minDistance: 7.5, maxDistance: 22, rotateSpeed: 0.6, zoomSpeed: 0.8 });
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
+controls.enabled = false;
+
+/* =========================================================
+ * 主題燈光（平滑過渡）
+ * ======================================================= */
+const themeTarget = { bg: new THREE.Color(), amb: new THREE.Color(), sky: new THREE.Color(), ground: new THREE.Color(), sun: 2.6 };
+function applyTheme(theme, instant = false) {
+  const L = theme.light;
+  themeTarget.bg.set(theme.background);
+  themeTarget.amb.set(L.ambient);
+  themeTarget.sky.set(L.sky);
+  themeTarget.ground.set(L.ground);
+  themeTarget.sun = L.sun;
+  if (instant) lerpTheme(1);
 }
-window.addEventListener('resize', onResize);
+function lerpTheme(k) {
+  scene.background.lerp(themeTarget.bg, k);
+  ambient.color.lerp(themeTarget.amb, k);
+  hemi.color.lerp(themeTarget.sky, k);
+  hemi.groundColor.lerp(themeTarget.ground, k);
+  sun.intensity += (themeTarget.sun - sun.intensity) * k;
+}
 
-/* ---------- 自適應畫質：持續低於目標 FPS 時降低解析度 ---------- */
-const targetFps = isMobile ? 30 : 55;
-let fpsFrames = 0, fpsTime = 0, lowStreak = 0;
-function adaptQuality(dt) {
-  fpsFrames++; fpsTime += dt;
-  if (fpsTime < 1) return;
-  const fps = fpsFrames / fpsTime;
-  fpsFrames = 0; fpsTime = 0;
-  lowStreak = fps < targetFps ? lowStreak + 1 : 0;
-  if (lowStreak >= 3 && pixelRatio > 0.75) {
-    pixelRatio = Math.max(0.75, pixelRatio - 0.25);
-    renderer.setPixelRatio(pixelRatio);
-    composer.setPixelRatio(pixelRatio);
-    onResize();
-    lowStreak = 0;
+/* =========================================================
+ * 選關：星球輪播
+ * ======================================================= */
+const SPACING = 18;
+const previews = new THREE.Group();
+scene.add(previews);
+LEVELS.forEach((lv, i) => {
+  const { group } = createPlanet(lv.theme, { detail: 0.55 });
+  // 預覽也放上地標，讓每顆星球一眼就有特色
+  for (const lm of lv.landmarks) {
+    const d = latLonToDir(lm.lat, lm.lon);
+    const g = new THREE.Group();
+    LANDMARKS[lm.model](g);
+    placeOnSurface(g, d, getSurfaceRadius(d) - 0.03);
+    g.scale.setScalar(1.6);
+    group.add(g);
   }
+  group.position.x = i * SPACING;
+  group.rotation.x = 0.35;
+  previews.add(group);
+});
+
+let selected = 0;
+function renderSelectCard() {
+  const lv = LEVELS[selected];
+  const p = progress.get(lv.id);
+  const unlocked = progress.isUnlocked(LEVELS, selected);
+  $('pcNum').textContent = selected + 1;
+  $('pcEmoji').textContent = lv.emoji;
+  $('pcName').textContent = lv.name;
+  $('pcSub').textContent = lv.subtitle;
+  $('pcStars').innerHTML = [1, 2, 3].map((n) => `<span class="${p.stars >= n ? '' : 'off'}">⭐</span>`).join('');
+  $('pcItems').textContent = `${lv.targets.length} 件`;
+  $('pcBest').textContent = p.best !== null ? fmtTime(p.best) : '--';
+  $('pcGoal').textContent = `${lv.stars[0]} 秒`;
+  $('planetCard').classList.toggle('locked', !unlocked);
+  $('pcLock').hidden = unlocked;
+  $('planetDots').innerHTML = LEVELS.map((_, i) => `<span class="${i === selected ? 'on' : ''}" data-i="${i}"></span>`).join('');
+  $('totalStars').textContent = progress.totalStars(LEVELS);
+  applyTheme(lv.theme);
+}
+function choose(i) {
+  selected = (i + LEVELS.length) % LEVELS.length;
+  renderSelectCard();
+}
+$('prevPlanet').onclick = () => choose(selected - 1);
+$('nextPlanet').onclick = () => choose(selected + 1);
+$('planetDots').onclick = (e) => e.target.dataset.i && choose(Number(e.target.dataset.i));
+$('startBtn').onclick = () => startLevel(selected);
+addEventListener('keydown', (e) => {
+  if (mode !== 'select') return;
+  if (e.key === 'ArrowLeft') choose(selected - 1);
+  if (e.key === 'ArrowRight') choose(selected + 1);
+  if (e.key === 'Enter' && progress.isUnlocked(LEVELS, selected)) startLevel(selected);
+});
+
+/* =========================================================
+ * 畫面流程
+ * ======================================================= */
+let mode = 'select';   // select | intro | play | result
+let world = null;
+let game = null;
+let levelIndex = 0;
+
+function showSelect() {
+  teardown();
+  mode = 'select';
+  $('select').hidden = false;
+  $('hud').hidden = true;
+  $('intro').hidden = true;
+  $('result').hidden = true;
+  previews.visible = true;
+  controls.enabled = false;
+  camera.up.set(0, 1, 0);
+  renderSelectCard();
 }
 
-/* ---------- 主迴圈 ---------- */
+function teardown() {
+  game?.dispose();
+  game = null;
+  if (world) { scene.remove(world.group); disposeGroup(world.group); world = null; }
+}
+
+function startLevel(i) {
+  if (!progress.isUnlocked(LEVELS, i)) return;
+  teardown();
+  levelIndex = i;
+  const lv = LEVELS[i];
+  mode = 'intro';
+  $('select').hidden = true;
+  $('result').hidden = true;
+  previews.visible = false;
+  applyTheme(lv.theme, true);
+
+  world = buildWorld(lv);
+  scene.add(world.group);
+  game = createGame({
+    level: lv, world, camera, domElement: renderer.domElement, particles,
+    onFinish: (r) => showResult(r),
+  });
+  window.__dbg = { world, game, camera, controls }; // 除錯用
+
+  // 相機從第一個地標的方向看過去
+  const first = world.landmarks.values().next().value.dir;
+  camera.position.copy(first).multiplyScalar(14).add(new THREE.Vector3(0, 3, 0));
+  camera.up.set(0, 1, 0);
+  controls.target.set(0, 0, 0);
+  controls.enabled = true;
+  controls.update();
+
+  // 委託說明
+  $('introNpc').textContent = lv.npc.emoji;
+  $('introNpcName').textContent = lv.npc.name;
+  $('introStory').textContent = lv.story;
+  $('introItems').innerHTML = lv.targets.map((t) => `<li><b>${t.emoji}</b>${t.name}</li>`).join('');
+  $('intro').hidden = false;
+  $('hud').hidden = false;
+  $('journal').classList.toggle('closed', innerWidth < 700);
+}
+
+$('introGo').onclick = () => {
+  $('intro').hidden = true;
+  countdown(() => { mode = 'play'; game.start(); });
+};
+
+/** 3、2、1、出發！ */
+function countdown(done) {
+  const el = $('countdown');
+  el.hidden = false;
+  const seq = ['3', '2', '1', '出發！'];
+  let i = 0;
+  const step = () => {
+    if (i >= seq.length) { el.hidden = true; return; }
+    el.className = `countdown${i === 3 ? ' go' : ''}`;
+    el.innerHTML = `<span>${seq[i]}</span>`;
+    if (i === 3) done();
+    i++;
+    setTimeout(step, i === 4 ? 600 : 700);
+  };
+  step();
+}
+
+function showResult({ time, stars }) {
+  mode = 'result';
+  const lv = LEVELS[levelIndex];
+  const isBest = progress.save(lv.id, stars, time);
+  $('resultTime').textContent = fmtTime(time);
+  $('resultBest').textContent = isBest ? '🏆 新紀錄！' : `最佳 ${fmtTime(progress.get(lv.id).best)}`;
+  $('resultOutro').textContent = `${lv.npc.emoji} ${lv.outro}`;
+  const starEls = [...document.querySelectorAll('#resultStars .rs')];
+  starEls.forEach((s) => s.classList.remove('on'));
+  starEls.slice(0, stars).forEach((s, k) => setTimeout(() => s.classList.add('on'), 400 + k * 350));
+  const hasNext = levelIndex + 1 < LEVELS.length;
+  $('nextBtn').hidden = !hasNext;
+  $('result').hidden = false;
+}
+$('retryBtn').onclick = () => startLevel(levelIndex);
+$('menuBtn').onclick = () => { selected = levelIndex; showSelect(); };
+$('nextBtn').onclick = () => { selected = levelIndex + 1; startLevel(levelIndex + 1); };
+$('backBtn').onclick = () => { selected = levelIndex; showSelect(); };
+$('journalTab').onclick = () => $('journal').classList.toggle('closed');
+
+/* =========================================================
+ * 主迴圈
+ * ======================================================= */
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+  labelRenderer.setSize(innerWidth, innerHeight);
+});
+
+const camGoal = new THREE.Vector3();
+let last = performance.now();
 renderer.setAnimationLoop(() => {
-  const dt = Math.min(clock.getDelta(), 0.05); // 避免切換分頁回來時 dt 過大
-  const t = clock.getElapsedTime();
+  const now = performance.now();
+  const rawDt = Math.min((now - last) / 1000, 1); // 計時用真實時間（不受低幀率影響）
+  const dt = Math.min(rawDt, 0.05);                // 動畫用，避免跳幀
+  last = now;
+  const t = now / 1000;
 
-  if (ui.isCardOpen()) ctrl.hold(); // 看卡片時暫停自轉
-  ctrl.update(dt);
-  updateInteractiveObjects(objects, t, dt);
-  particles.update(dt);
-
+  lerpTheme(Math.min(1, dt * 3));
   stars.material.uniforms.uTime.value = t;
   stars.rotation.y += dt * 0.004;
-  clouds.rotation.y += dt * 0.05;   // 雲朵以不同速度飄移
-  clouds.rotation.x = Math.sin(t * 0.1) * 0.1;
-  moonPivot.rotation.y += dt * 0.15;
-  moon.rotation.x += dt * 0.3;
 
+  if (mode === 'select') {
+    // 輪播：相機滑到選中的星球，星球緩慢自轉
+    const portrait = innerWidth < innerHeight;
+    camGoal.set(selected * SPACING, 1.2, portrait ? 26 : 19);
+    camera.position.lerp(camGoal, Math.min(1, dt * 4));
+    camera.lookAt(camera.position.x, portrait ? -1.5 : -0.8, 0);
+    previews.children.forEach((p, i) => {
+      p.rotation.y += dt * (i === selected ? 0.25 : 0.08);
+      const s = i === selected ? 1 : 0.7;
+      p.scale.setScalar(THREE.MathUtils.lerp(p.scale.x, s, Math.min(1, dt * 5)));
+    });
+    sun.position.set(camera.position.x + 14, 9, 10);
+    sun.target.position.set(camera.position.x, 0, 0);
+  } else {
+    controls.update();
+    // 太陽從相機右上方照過來，玩家看的那一面永遠是亮的
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+    sun.position.copy(camera.position).normalize().multiplyScalar(14).addScaledVector(camera.up, 6).addScaledVector(right, 6);
+    sun.target.position.set(0, 0, 0);
+    world?.update(t, dt);
+    game?.update(dt, t, rawDt);
+  }
+
+  particles.update(dt);
   composer.render();
-  ui.render(scene, camera);
-  adaptQuality(dt);
+  labelRenderer.render(scene, camera);
 });
 
-// 方便除錯
-window.__planet = { scene, camera, objects, PLANET_RADIUS };
+showSelect();
+applyTheme(LEVELS[0].theme, true);

@@ -1,72 +1,64 @@
-# 小星球探險 Tiny Planet Explorer
+# 星球失物招領所 Lost & Found in Space
 
-以 Three.js + Vite 打造的互動式 low-poly 3D 星球探索遊戲。拖曳旋轉星球、找出 16 個藏在草原、沙漠、雪地與海洋裡的互動物件。
+用 Three.js + Vite 製作的 3D 星球解謎遊戲。每顆星球都有居民遇到麻煩、弄丟了東西，
+玩家要讀懂線索、傳說與八卦，推理出物品藏在「哪個地標旁的哪種東西裡」，越快找齊星星越多。
+介面風格參考 Overcooked / Moving Out：粗描邊、硬陰影、倒數開場、星星門檻計時條。
 
-## 功能一覽
+## 玩法
 
-| 項目 | 實作方式 |
-|------|----------|
-| 星球地形 | `SphereGeometry` 頂點位移 + 逐面上色（草地／沙漠／雪地／海洋／沙灘），low-poly 平面著色 |
-| 海洋 | 半透明海面球殼，海床低於海平面 |
-| 大氣層 | Fresnel ShaderMaterial（背面渲染 + 加法混合） |
-| 視角控制 | OrbitControls：拖曳旋轉、滾輪／雙指縮放（8.5～24）、阻尼慣性、閒置 2.5 秒後自轉 |
-| 互動物件 | 16 個幾何體組合模型（動物 4、建築 4、植物 4、道具 4），法線對齊球面 |
-| 動畫 | idle 浮動、hover 放大 1.25 倍、點擊跳躍／旋轉／搖擺，另有專屬動畫（風車加速、寶箱開蓋、信箱舉旗、石碑發光、魚躍出水面…） |
-| 標籤 | `CSS2DRenderer`，hover 時淡入；觸控點擊時短暫顯示 |
-| 粒子 | 閃爍星空（自訂 shader）、點擊彩色粒子爆發（物件池重複使用） |
-| 後處理 | `EffectComposer` + `UnrealBloomPass` + `OutputPass` |
-| 裝飾 | `InstancedMesh` 散布約 100 棵樹、松樹、岩石、小仙人掌（少量 draw call） |
-| 效能 | 行動裝置降低像素比／陰影解析度／星星數量；FPS 持續低於目標時自動降解析度 |
+1. **選關**：左右切換 8 顆星球（鍵盤 ← → 也可以），上一關拿到 1 顆星即解鎖下一關。
+2. **委託**：委託人說明狀況，列出要找的物品。
+3. **推理**：左側「線索手冊」每條線索都會提到一個**地標**和一種**藏匿點**（例如「燈塔腳下的石頭縫」）。
+   地標名稱會標在星球上，每個地標旁都有 3 個不同的藏匿點。
+4. **搜尋**：點擊藏匿點翻找。翻錯（空的或翻出雜物）**+3 秒**。
+5. **提示**：💡 第一次會標出地標並打光柱，第二次直接說出藏匿點種類，每次 **+15 秒**。
+6. **評等**：依完成時間給 1～3 顆星（各關門檻顯示在計時條上），最佳成績存在瀏覽器裡。
+
+操作：拖曳旋轉星球、滾輪／雙指縮放、點擊搜尋；點地標可看介紹。
+
+## 八顆星球
+
+| # | 星球 | 委託 | 物品數 | 三星 / 二星 |
+|---|------|------|-------|-----------|
+| 1 | 🌳 綠野星 | 藍鵲郵差弄丟的信 | 3 | 60 / 120 秒 |
+| 2 | 🌋 熔岩星 | 火焰祭典的四件聖物 | 4 | 80 / 150 |
+| 3 | 🌊 汪洋星 | 海龜奶奶的生日派對道具（部分在海底） | 4 | 90 / 170 |
+| 4 | 🍭 糖果星 | 甜點大賽的秘方材料 | 4 | 80 / 150 |
+| 5 | ❄️ 冰晶星 | 企鵝探險隊被吹散的裝備 | 4 | 85 / 160 |
+| 6 | 🏜️ 沙丘星 | 駱駝商隊的貨物 | 4 | 85 / 160 |
+| 7 | 🍄 蘑菇星 | 夜光森林的寶物 | 4 | 90 / 170 |
+| 8 | ⚙️ 齒輪星 | 主機重新開機的零件 | 4 | 90 / 170 |
+
+測試時可在網址加上 `?unlock=all` 解鎖全部關卡。
 
 ## 專案結構
 
 ```
-planet-explorer/
-├── index.html          # 頁面骨架與 UI 元素
-├── main.js             # 進入點：場景、燈光、後處理、主迴圈
-├── style.css           # UI 樣式（含 RWD）
-├── src/
-│   ├── planet.js       # 星球地形、海面、大氣層、球面座標工具
-│   ├── objects.js      # 互動物件模型、貼附球面、動畫、裝飾與雲朵
-│   ├── controls.js     # OrbitControls 與閒置自轉
-│   ├── interactions.js # Raycaster hover / click（區分拖曳）
-│   ├── particles.js    # 星空與粒子爆發
-│   └── ui.js           # CSS2D 標籤、卡片彈窗、探索進度
-├── assets/textures/    # 預留貼圖資料夾（目前地形為程式生成）
-├── vite.config.js
-├── vercel.json
-└── package.json
+├── index.html          # 選關、委託、HUD、結算等畫面
+├── main.js             # 畫面流程、Renderer、Bloom、燈光、選關輪播、主迴圈
+├── style.css           # Overcooked 風格介面
+└── src/
+    ├── levels.js       # 8 關資料：主題、故事、地標、物品、線索、星星門檻
+    ├── planet.js       # 依主題生成星球地形、海面（水／熔岩／巧克力…）、大氣層
+    ├── props.js        # 藏匿點、地標、裝飾、物品 emoji 的模型庫
+    ├── world.js        # 依關卡資料擺放地標、藏匿點、裝飾
+    ├── game.js         # 計時、搜尋、提示、線索手冊、評星
+    ├── particles.js    # 星空與粒子爆發
+    └── progress.js     # 進度存檔（localStorage）
 ```
 
-## 本地開發
+## 新增一顆星球
 
-需要 Node.js 18 以上。
+在 `src/levels.js` 加一筆資料即可：設定 `theme`（生態區、配色、海面、燈光、裝飾）、
+`landmarks`（地標模型與經緯度）、`targets`（物品藏在哪個地標旁的哪種藏匿點 + 線索文字）。
+地標與藏匿點模型在 `src/props.js` 的 `LANDMARKS` / `SPOTS` 裡新增。
+
+## 開發與部署
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173（同網段手機可用區網 IP 測試）
-npm run build      # 輸出至 dist/
-npm run preview    # 預覽 build 結果
+npm run dev      # 本地開發
+npm run build    # 輸出至 dist/
 ```
 
-## 部署到 Vercel
-
-**方法 A：GitHub 連動（推薦）**
-1. 將專案推到 GitHub（`node_modules`、`dist` 已在 `.gitignore`）
-2. 到 Vercel →「Add New… → Project」→ 匯入該 repo
-3. Vercel 會讀取 `vercel.json`（Framework: Vite、Build: `npm run build`、Output: `dist`），直接按 Deploy
-4. 之後每次 push 到 main 自動重新部署
-
-**方法 B：Vercel CLI**
-```bash
-npm i -g vercel
-vercel          # 第一次會引導連結專案，產生預覽網址
-vercel --prod   # 部署到正式網址
-```
-
-## 自訂與擴充
-
-- **新增物件**：在 `src/objects.js` 寫一個 `buildXxx()` 函式，並於 `OBJECT_DEFS` 加一筆（`lat`／`lon` 決定位置，`anim` 選 `jump`／`spin`／`wiggle`）。如需專屬動畫，在 `SPECIAL` 加上 `update`／`click`。
-- **調整地形**：`src/planet.js` 的 `BIOME_CENTERS` 決定各生態區的中心位置，`PALETTE` 決定配色，`getSurfaceRadius()` 決定起伏高度。
-- **換成 GLTF 模型**：用 `GLTFLoader` 載入後，把模型放進對應物件的 `pivot` 即可沿用所有動畫與互動。
-- **Bloom 強度**：`main.js` 中 `UnrealBloomPass` 的強度／半徑／閾值。
+部署到 Vercel：匯入此 repo 即可，`vercel.json` 已設定好建置指令與輸出資料夾。
