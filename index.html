@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>小星球探險 Tiny Planet Explorer</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- Three.js 畫布容器 -->
+  <div id="app"></div>
+
+  <!-- 標題 -->
+  <header class="title">
+    <h1>小星球探險</h1>
+    <p>已發現 <span id="found">0</span> / <span id="total">0</span></p>
+  </header>
+
+  <!-- 操作說明 -->
+  <aside class="help" id="help">
+    <button class="help-toggle" id="helpToggle" aria-label="切換說明">?</button>
+    <ul>
+      <li><b>拖曳</b> 旋轉星球</li>
+      <li><b>滾輪 / 雙指</b> 縮放</li>
+      <li><b>點擊</b> 物件互動</li>
+    </ul>
+  </aside>
+
+  <!-- 物件資訊卡片彈窗 -->
+  <div class="card-mask" id="cardMask" hidden>
+    <div class="card" role="dialog" aria-modal="true">
+      <button class="card-close" id="cardClose" aria-label="關閉">×</button>
+      <div class="card-emoji" id="cardEmoji"></div>
+      <div class="card-cat" id="cardCat"></div>
+      <h2 id="cardName"></h2>
+      <p id="cardDesc"></p>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
