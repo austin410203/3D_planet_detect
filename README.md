@@ -15,6 +15,8 @@
 6. **每局都不一樣**：每次開局（含重玩）物品會隨機藏到不同地標、不同藏匿點，
    地標位置也會互換，線索會依新位置重新產生（線索／傳說／八卦三種語氣）。
 7. **評等**：依完成時間給 1～3 顆星（各關門檻顯示在計時條上），最佳成績存在瀏覽器裡。
+8. **每日挑戰** 📅：每天一顆星球、全世界同一張地圖，只有第一次的成績會記錄，累積連續天數。
+9. **音效與配樂**：全部由程式即時合成，每顆星球有自己的旋律；iOS App 另有震動回饋與 Game Center 排行榜。
 
 操作：拖曳旋轉星球、滾輪／雙指縮放、點擊搜尋；點地標可看介紹。
 
@@ -57,7 +59,12 @@
     ├── world.js        # 依關卡資料擺放地標、藏匿點、裝飾
     ├── game.js         # 計時、搜尋、提示、線索手冊、評星
     ├── particles.js    # 星空與粒子爆發
-    └── progress.js     # 進度存檔（Capacitor Preferences）
+    ├── progress.js     # 進度存檔（Capacitor Preferences）
+    ├── settings.js     # 配樂／音效／震動開關
+    ├── audio.js        # Web Audio 合成音效與配樂
+    ├── haptics.js      # 觸覺回饋（iOS）
+    ├── gamecenter.js   # Game Center 排行榜（iOS）
+    └── daily.js        # 每日挑戰
 ├── scripts/subset-fonts.mjs  # 縮減字型（只保留遊戲用到的字）
 ├── public/fonts/       # 打包在本地的字型（自動產生）
 ├── capacitor.config.json
@@ -89,3 +96,5 @@ npm install
 npm run ios        # build 並同步到 ios/
 npm run ios:open   # 用 Xcode 開啟，選裝置後執行或 Archive 上傳
 ```
+
+Game Center 排行榜要先在 App Store Connect 建立，ID 與設定見 [docs/game-center.md](docs/game-center.md)。

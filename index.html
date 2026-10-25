@@ -46,6 +46,13 @@
 
     <div class="dots" id="planetDots"></div>
     <p class="total-stars">⭐ <span id="totalStars">0</span> / <span id="maxStars">84</span></p>
+
+    <!-- 左側：每日挑戰、排行榜（只在 iOS App 顯示）、設定 -->
+    <div class="side-btns">
+      <button class="icon-btn" id="dailyBtn" aria-label="每日挑戰">📅<small>每日</small></button>
+      <button class="icon-btn" id="lbBtn" aria-label="排行榜" hidden>🏆<small>排行</small></button>
+      <button class="icon-btn" id="settingsBtn" aria-label="設定">⚙️<small>設定</small></button>
+    </div>
   </section>
 
   <!-- ==================== 委託說明 ==================== -->
@@ -55,11 +62,42 @@
         <div class="npc-face" id="introNpc">🐦</div>
         <div class="npc-name" id="introNpcName">藍鵲郵差 Pip</div>
       </div>
+      <p class="daily-tag" id="introDaily" hidden></p>
       <div class="speech" id="introStory"></div>
       <h3 class="need-title">要找的東西</h3>
       <ul class="need" id="introItems"></ul>
       <p class="tip">💡 閱讀左邊的<strong>線索手冊</strong>，找出物品藏在哪個地標旁的哪種東西裡。翻錯地方會加時間喔！</p>
       <button class="btn btn-go" id="introGo">接下委託！</button>
+    </div>
+  </div>
+
+  <!-- ==================== 每日挑戰 ==================== -->
+  <div class="modal" id="daily" hidden>
+    <div class="dialog">
+      <p class="daily-tag">📅 每日挑戰・<span id="dailyDate"></span></p>
+      <h2 class="daily-planet" id="dailyPlanet"></h2>
+      <p class="pc-sub" id="dailySub"></p>
+      <p class="tip">全世界今天都玩同一張地圖！<br />只有<strong>第一次</strong>的成績會記錄並上傳排行榜。</p>
+      <p class="daily-status" id="dailyStatus"></p>
+      <p class="daily-streak" id="dailyStreak"></p>
+      <div class="result-btns">
+        <button class="btn btn-small" id="dailyClose">關閉</button>
+        <button class="btn btn-small" id="dailyLb" hidden>🏆 今日排行</button>
+        <button class="btn btn-go btn-small" id="dailyGo">開始挑戰！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 設定 ==================== -->
+  <div class="modal" id="settings" hidden>
+    <div class="dialog">
+      <h2 class="result-title">⚙️ 設定</h2>
+      <ul class="settings-list">
+        <li>🎵 配樂 <button class="toggle" id="set-music"></button></li>
+        <li>🔊 音效 <button class="toggle" id="set-sfx"></button></li>
+        <li id="hapticsRow">📳 震動 <button class="toggle" id="set-haptics"></button></li>
+      </ul>
+      <button class="btn btn-go btn-small" id="settingsClose">完成</button>
     </div>
   </div>
 
@@ -108,6 +146,7 @@
       <div class="result-btns">
         <button class="btn btn-small" id="retryBtn">↻ 再玩一次</button>
         <button class="btn btn-small" id="menuBtn">🪐 選關</button>
+        <button class="btn btn-small" id="resultLbBtn" hidden>🏆 排行榜</button>
         <button class="btn btn-go btn-small" id="nextBtn">下一顆星球 ▶</button>
       </div>
     </div>

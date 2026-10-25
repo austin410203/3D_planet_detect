@@ -19,7 +19,9 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `ios/`：Xcode 專案（SPM，不用 CocoaPods）。iPhone 鎖直式、iPad 四個方向；隱藏狀態列。`ios/App/App/public` 是同步產物，不進 git。
 - 介面貼邊元素一律加上 `--sa-t/--sa-r/--sa-b/--sa-l`（safe-area-inset）避開瀏海與 Home 指示條。
 - 不可依賴外部網路資源（字型、CDN），App 必須離線可玩。
-- App 切到背景時 `main.js` 會停止渲染迴圈，計時不會繼續跑。
+- App 切到背景時 `main.js` 會停止渲染迴圈與音訊，計時不會繼續跑。
+- Game Center 用自己寫的本地外掛 `ios/App/App/GameCenterPlugin.swift`（由 `MainViewController` 註冊，Main.storyboard 指向它）。新增 Swift 檔時要手動登記到 `project.pbxproj`（PBXBuildFile、PBXFileReference、App 群組、Sources）。排行榜 ID 與 App Store Connect 設定見 `docs/game-center.md`。
+- 網頁版沒有 Game Center 與震動：相關按鈕、設定列自動隱藏。
 
 ## 架構
 - `main.js`：畫面流程（選關 → 委託 → 倒數 → 解謎 → 結算）、Renderer、Bloom、主題燈光、選關輪播（只建立選中星球前後兩顆預覽）。
@@ -30,6 +32,11 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `src/props.js`、`src/props-extra.js`：藏匿點（`SPOTS`）、地標（`LANDMARKS`）、裝飾（`DECOR`）模型庫。
 - `src/game.js`：計時、搜尋、提示、線索手冊、評星。翻錯 +3 秒、提示 +15 秒。
 - `src/progress.js`：進度存在 Capacitor Preferences（iOS 為 UserDefaults，網頁為 localStorage），啟動時需先 `await loadProgress()`；舊版 localStorage 進度會自動搬移。
+- `src/settings.js`：配樂／音效／震動開關（Preferences）。
+- `src/audio.js`：Web Audio 即時合成音效與配樂，不使用音檔。配樂依星球 id 產生固定的 8 小節循環，`MINOR` 清單裡的星球用小調；第一次觸控才解鎖發聲（iOS 規定）。
+- `src/haptics.js`：觸覺回饋（只在原生 App）。按鈕的點擊音效與震動由 `main.js` 的 document click 統一處理，不用每顆按鈕各自加。
+- `src/gamecenter.js`：Game Center 登入、上傳分數、開啟排行榜。時間以 1/100 秒上傳。
+- `src/daily.js`：每日挑戰。以 UTC+8 日期算出星球與 seed（全世界同一張地圖），只記錄當天第一次的成績、計算連續天數；不影響一般關卡進度與解鎖，也不受解鎖限制。
 
 ## 關卡設計規則
 - 同一個地標旁的藏匿點種類不可重複，確保每條線索只有一個正確答案。

@@ -11,6 +11,8 @@ import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { getSurfaceRadius } from './planet.js';
 import { SPOTS } from './props.js';
 import { fmtTime } from './progress.js';
+import { sfx } from './audio.js';
+import { haptic } from './haptics.js';
 
 const WRONG_PENALTY = 3;   // 翻錯地方 +3 秒
 const HINT_PENALTY = 15;   // 使用提示 +15 秒
@@ -122,7 +124,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     const r = pick(e.clientX, e.clientY);
     if (!r) return;
     if (e.pointerType !== 'mouse') setHover(r);
-    if (r.kind === 'landmark') toast(`📍 ${r.name}：${r.lore}`);
+    if (r.kind === 'landmark') { sfx.pop(); toast(`📍 ${r.name}：${r.lore}`); }
     else search(r);
   };
   domElement.addEventListener('pointermove', onMove);
@@ -139,6 +141,8 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     if (spot.searched) { toast(`這個${spot.name}已經翻過了`); return; }
     spot.searched = true;
     spot.shakeT = state.clock;
+    sfx.search();
+    haptic.search();
     const top = spot.dir.clone().multiplyScalar(getSurfaceRadius(spot.dir) + spot.height);
     particles.emit(top, spot.dir.clone());
     hoverEl.textContent = `${spot.name}（翻過了）`;
@@ -147,6 +151,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     if (c?.target) {
       const i = targets.indexOf(c.target);
       state.found.add(i);
+      setTimeout(() => { sfx.found(); haptic.found(); }, 120); // 翻找聲之後再響
       world.popItem(spot, c.target.emoji, 0.8);
       particles.emit(top, spot.dir.clone());
       floatText(spot.dir, spot.height + 0.5, `找到 ${c.target.name}！`, 'good');
@@ -158,6 +163,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
       if (state.found.size === targets.length) finish();
     } else {
       addPenalty(WRONG_PENALTY);
+      setTimeout(() => { sfx.wrong(); haptic.wrong(); }, 120);
       floatText(spot.dir, spot.height + 0.3, `+${WRONG_PENALTY}秒`, 'bad');
       if (c?.junk) {
         world.popItem(spot, c.junk[0], 0.55);
@@ -175,6 +181,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     const lv = (state.hintLevel.get(i) ?? 0) + 1;
     state.hintLevel.set(i, lv);
     addPenalty(HINT_PENALTY);
+    sfx.hint();
     world.showBeacon(t.at);
     state.beaconFor = i;
     const lm = world.landmarks.get(t.at);

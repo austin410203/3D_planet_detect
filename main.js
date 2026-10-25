@@ -21,6 +21,11 @@ import { createStarfield, ParticleBurst } from './src/particles.js';
 import { progress, fmtTime, loadProgress } from './src/progress.js';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import { settings, loadSettings, setSetting } from './src/settings.js';
+import { sfx, playMusic, setAudioPaused } from './src/audio.js';
+import { haptic, hasHaptics } from './src/haptics.js';
+import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitScore, LEADERBOARD } from './src/gamecenter.js';
+import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
 
 const $ = (id) => document.getElementById(id);
 const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
@@ -166,12 +171,12 @@ function choose(i) {
 }
 $('prevPlanet').onclick = () => choose(selected - 1);
 $('nextPlanet').onclick = () => choose(selected + 1);
-$('planetDots').onclick = (e) => e.target.dataset.i && choose(Number(e.target.dataset.i));
+$('planetDots').onclick = (e) => { if (e.target.dataset.i) { sfx.swipe(); choose(Number(e.target.dataset.i)); } };
 $('startBtn').onclick = () => startLevel(selected);
 addEventListener('keydown', (e) => {
-  if (mode !== 'select') return;
-  if (e.key === 'ArrowLeft') choose(selected - 1);
-  if (e.key === 'ArrowRight') choose(selected + 1);
+  if (mode !== 'select' || !$('daily').hidden || !$('settings').hidden) return;
+  if (e.key === 'ArrowLeft') { sfx.swipe(); choose(selected - 1); }
+  if (e.key === 'ArrowRight') { sfx.swipe(); choose(selected + 1); }
   if (e.key === 'Enter' && progress.isUnlocked(LEVELS, selected)) startLevel(selected);
 });
 
@@ -182,10 +187,22 @@ let mode = 'select';   // select | intro | play | result
 let world = null;
 let game = null;
 let levelIndex = 0;
+let dailyRun = null; // 每日挑戰進行中：{ key（日期）, first（是否為當天第一次） }
+
+/* ---------- 按鈕音效與震動（所有按鈕共用） ---------- */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b || b.disabled) return;
+  if (b.classList.contains('nav')) sfx.swipe(); else sfx.tap();
+  haptic.tap();
+});
 
 function showSelect() {
   teardown();
   mode = 'select';
+  dailyRun = null;
+  playMusic('menu');
+  $('dailyBtn').classList.toggle('done', !!daily.result());
   $('select').hidden = false;
   $('hud').hidden = true;
   $('intro').hidden = true;
@@ -202,8 +219,12 @@ function teardown() {
   if (world) { scene.remove(world.group); disposeGroup(world.group); world = null; }
 }
 
-function startLevel(i) {
-  if (!progress.isUnlocked(LEVELS, i)) return;
+/**
+ * 開始關卡
+ * @param {string|null} dailyKey 每日挑戰的日期；有值時用當天固定的 seed，且不受解鎖限制
+ */
+function startLevel(i, dailyKey = null) {
+  if (!dailyKey && !progress.isUnlocked(LEVELS, i)) return;
   teardown();
   levelIndex = i;
   const lv = LEVELS[i];
@@ -212,8 +233,13 @@ function startLevel(i) {
   $('result').hidden = true;
   previews.visible = false;
   applyTheme(lv.theme, true);
+  playMusic(lv);
 
-  world = buildWorld(lv);
+  dailyRun = dailyKey ? { key: dailyKey, first: !daily.result(dailyKey) } : null;
+  $('introDaily').hidden = !dailyRun;
+  if (dailyRun) $('introDaily').textContent = dailyRun.first ? '📅 每日挑戰・只有這一次會記錄成績' : '📅 每日挑戰・練習模式（不記錄成績）';
+
+  world = buildWorld(lv, dailyKey ? dailyPick(LEVELS, dailyKey).seed : undefined);
   scene.add(world.group);
   game = createGame({
     level: lv, world, camera, domElement: renderer.domElement, particles,
@@ -254,6 +280,7 @@ function countdown(done) {
     if (i >= seq.length) { el.hidden = true; return; }
     el.className = `countdown${i === 3 ? ' go' : ''}`;
     el.innerHTML = `<span>${seq[i]}</span>`;
+    if (i < 3) { sfx.tick(); haptic.tap(); } else { sfx.go(); haptic.search(); }
     if (i === 3) done();
     i++;
     setTimeout(step, i === 4 ? 600 : 700);
@@ -264,22 +291,80 @@ function countdown(done) {
 function showResult({ time, stars }) {
   mode = 'result';
   const lv = LEVELS[levelIndex];
-  const isBest = progress.save(lv.id, stars, time);
+  if (dailyRun) {
+    // 每日挑戰：只記錄當天第一次，不影響一般關卡的進度與解鎖
+    const recorded = dailyRun.first && daily.record(dailyRun.key, time, stars);
+    dailyRun.first = false;
+    if (recorded) submitTime(LEADERBOARD.daily, time);
+    $('resultBest').textContent = recorded
+      ? `📅 今日成績已記錄・🔥 連續 ${daily.streak()} 天`
+      : `📅 練習模式・今日成績 ${fmtTime(daily.result(dailyRun.key).time)}`;
+  } else {
+    const isBest = progress.save(lv.id, stars, time);
+    submitTime(LEADERBOARD.best(lv.id), time);
+    submitScore(LEADERBOARD.stars, progress.totalStars(LEVELS));
+    $('resultBest').textContent = isBest ? '🏆 新紀錄！' : `最佳 ${fmtTime(progress.get(lv.id).best)}`;
+  }
   $('resultTime').textContent = fmtTime(time);
-  $('resultBest').textContent = isBest ? '🏆 新紀錄！' : `最佳 ${fmtTime(progress.get(lv.id).best)}`;
   $('resultOutro').textContent = `${lv.npc.emoji} ${lv.outro}`;
+  sfx.fanfare();
   const starEls = [...document.querySelectorAll('#resultStars .rs')];
   starEls.forEach((s) => s.classList.remove('on'));
-  starEls.slice(0, stars).forEach((s, k) => setTimeout(() => s.classList.add('on'), 400 + k * 350));
+  starEls.slice(0, stars).forEach((s, k) => setTimeout(() => { s.classList.add('on'); sfx.star(k); haptic.star(); }, 700 + k * 350));
   const hasNext = levelIndex + 1 < LEVELS.length;
-  $('nextBtn').hidden = !hasNext;
+  $('nextBtn').hidden = !hasNext || !!dailyRun;
+  $('resultLbBtn').hidden = !hasGameCenter;
   $('result').hidden = false;
 }
-$('retryBtn').onclick = () => startLevel(levelIndex);
+$('retryBtn').onclick = () => startLevel(levelIndex, dailyRun?.key);
+$('resultLbBtn').onclick = () => showLeaderboard(dailyRun ? LEADERBOARD.daily : LEADERBOARD.best(LEVELS[levelIndex].id));
 $('menuBtn').onclick = () => { selected = levelIndex; showSelect(); };
 $('nextBtn').onclick = () => { selected = levelIndex + 1; startLevel(levelIndex + 1); };
 $('backBtn').onclick = () => { selected = levelIndex; showSelect(); };
 $('journalTab').onclick = () => $('journal').classList.toggle('closed');
+
+/* =========================================================
+ * 每日挑戰
+ * ======================================================= */
+$('dailyBtn').onclick = () => {
+  const key = todayKey();
+  const lv = LEVELS[dailyPick(LEVELS, key).index];
+  const r = daily.result(key);
+  $('dailyDate').textContent = key;
+  $('dailyPlanet').textContent = `${lv.emoji} ${lv.name}`;
+  $('dailySub').textContent = lv.subtitle;
+  $('dailyStatus').innerHTML = r ? `今日成績<b>${fmtTime(r.time)}</b>${'⭐'.repeat(r.stars)}` : '今天還沒挑戰';
+  const streak = daily.streak(key);
+  $('dailyStreak').textContent = streak ? `🔥 連續 ${streak} 天` : '🔥 完成今天的挑戰，開始累積連續天數！';
+  $('dailyGo').textContent = r ? '再練習一次' : '開始挑戰！';
+  $('dailyLb').hidden = !hasGameCenter;
+  $('daily').hidden = false;
+};
+$('dailyGo').onclick = () => {
+  $('daily').hidden = true;
+  const key = todayKey();
+  startLevel(dailyPick(LEVELS, key).index, key);
+};
+$('dailyLb').onclick = () => showLeaderboard(LEADERBOARD.daily);
+$('dailyClose').onclick = () => { $('daily').hidden = true; };
+
+/* =========================================================
+ * 排行榜與設定
+ * ======================================================= */
+$('lbBtn').hidden = !hasGameCenter;
+$('lbBtn').onclick = () => showLeaderboard();
+
+const TOGGLES = ['music', 'sfx', 'haptics'];
+function renderSettings() {
+  for (const k of TOGGLES) {
+    $(`set-${k}`).classList.toggle('on', settings[k]);
+    $(`set-${k}`).textContent = settings[k] ? '開' : '關';
+  }
+}
+for (const k of TOGGLES) $(`set-${k}`).onclick = () => { setSetting(k, !settings[k]); renderSettings(); };
+$('hapticsRow').hidden = !hasHaptics;
+$('settingsBtn').onclick = () => { renderSettings(); $('settings').hidden = false; };
+$('settingsClose').onclick = () => { $('settings').hidden = true; };
 
 /* =========================================================
  * 主迴圈
@@ -301,6 +386,7 @@ function setPaused(p) {
   paused = p;
   if (!p) last = performance.now(); // 回到前景時重設時間基準，背景期間不計入
   renderer.setAnimationLoop(p ? null : loop);
+  setAudioPaused(p);
 }
 document.addEventListener('visibilitychange', () => setPaused(document.hidden));
 if (Capacitor.isNativePlatform()) App.addListener('appStateChange', ({ isActive }) => setPaused(!isActive));
@@ -348,6 +434,8 @@ function loop() {
 }
 renderer.setAnimationLoop(loop);
 
-await loadProgress(); // 先讀完存檔，選關畫面的星數與解鎖狀態才正確
+// 先讀完存檔與設定，選關畫面的星數、解鎖狀態、每日挑戰標記才正確
+await Promise.all([loadProgress(), loadSettings(), loadDaily()]);
+signInGameCenter();
 showSelect();
 applyTheme(LEVELS[0].theme, true);
