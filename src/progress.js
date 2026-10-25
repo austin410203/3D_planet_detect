@@ -1,14 +1,34 @@
 /**
- * progress.js — 關卡進度（存在瀏覽器 localStorage）
+ * progress.js — 關卡進度存檔
  * 記錄每顆星球的最佳星數與最佳時間；上一關拿到至少 1 星才解鎖下一關。
- * 網址加上 ?unlock=all 可解鎖全部關卡（測試用）。
+ * - 存在 Capacitor Preferences：iOS App 內存在原生 UserDefaults（不會被系統清掉），
+ *   網頁版則由 Preferences 自動改用 localStorage。
+ * - 舊版直接存在 localStorage 的進度，第一次啟動時會自動搬過來。
+ * - 網址加上 ?unlock=all 可解鎖全部關卡（測試用；App 正式版無效）。
  */
-const KEY = 'planetLostFound.v1';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 
-function load() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
+const KEY = 'planetLostFound.v1';
+let data = {};
+
+/** 啟動時讀取存檔（必須在顯示選關畫面前 await） */
+export async function loadProgress() {
+  try {
+    const { value } = await Preferences.get({ key: KEY });
+    if (value) data = JSON.parse(value) || {};
+    else {
+      const legacy = localStorage.getItem(KEY);
+      if (legacy) { data = JSON.parse(legacy) || {}; persist(); }
+    }
+  } catch { data = {}; }
 }
-let data = load();
+function persist() {
+  Preferences.set({ key: KEY, value: JSON.stringify(data) }).catch(() => { /* 無痕模式等情況忽略 */ });
+}
+
+const unlockAll = (!Capacitor.isNativePlatform() || import.meta.env.DEV)
+  && new URLSearchParams(location.search).get('unlock') === 'all';
 
 export const progress = {
   get(id) { return data[id] || { stars: 0, best: null }; },
@@ -17,11 +37,11 @@ export const progress = {
     const prev = this.get(id);
     const isBest = prev.best === null || time < prev.best;
     data[id] = { stars: Math.max(prev.stars, stars), best: isBest ? time : prev.best };
-    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { /* 無痕模式等情況忽略 */ }
+    persist();
     return isBest;
   },
   isUnlocked(levels, index) {
-    if (index === 0 || new URLSearchParams(location.search).get('unlock') === 'all') return true;
+    if (index === 0 || unlockAll) return true;
     return this.get(levels[index - 1].id).stars > 0;
   },
   totalStars(levels) { return levels.reduce((s, l) => s + this.get(l.id).stars, 0); },

@@ -1,0 +1,6 @@
+/* 由 scripts/subset-fonts.mjs 自動產生，請勿手動修改 */
+@font-face { font-family: "Noto Sans TC"; font-weight: 500; font-style: normal; font-display: swap; src: url("./noto-sans-tc-500.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans TC"; font-weight: 700; font-style: normal; font-display: swap; src: url("./noto-sans-tc-700.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans TC"; font-weight: 900; font-style: normal; font-display: swap; src: url("./noto-sans-tc-900.woff2") format("woff2"); }
+@font-face { font-family: "Baloo 2"; font-weight: 600; font-style: normal; font-display: swap; src: url("./baloo-2-600.woff2") format("woff2"); }
+@font-face { font-family: "Baloo 2"; font-weight: 800; font-style: normal; font-display: swap; src: url("./baloo-2-800.woff2") format("woff2"); }

@@ -1,0 +1,11 @@
+{
+  "appId": "com.austin410203.planetlostfound",
+  "appName": "星球失物招領所",
+  "webDir": "dist",
+  "backgroundColor": "#070b1a",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#070b1a",
+    "scrollEnabled": false
+  }
+}

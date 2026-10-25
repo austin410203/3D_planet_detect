@@ -57,7 +57,11 @@
     ├── world.js        # 依關卡資料擺放地標、藏匿點、裝飾
     ├── game.js         # 計時、搜尋、提示、線索手冊、評星
     ├── particles.js    # 星空與粒子爆發
-    └── progress.js     # 進度存檔（localStorage）
+    └── progress.js     # 進度存檔（Capacitor Preferences）
+├── scripts/subset-fonts.mjs  # 縮減字型（只保留遊戲用到的字）
+├── public/fonts/       # 打包在本地的字型（自動產生）
+├── capacitor.config.json
+└── ios/                # iOS App 的 Xcode 專案
 ```
 
 ## 新增一顆星球
@@ -75,3 +79,13 @@ npm run build    # 輸出至 dist/
 ```
 
 部署到 Vercel：匯入此 repo 即可，`vercel.json` 已設定好建置指令與輸出資料夾。
+
+## iOS App
+
+使用 Capacitor 8 把網頁版包成 iOS App（字型打包在本地，可離線遊玩）。建置與上架需要一台裝有 Xcode 的 Mac：
+
+```bash
+npm install
+npm run ios        # build 並同步到 ios/
+npm run ios:open   # 用 Xcode 開啟，選裝置後執行或 Archive 上傳
+```

@@ -18,16 +18,24 @@ import { LANDMARKS } from './src/props.js';
 import { buildWorld, placeOnSurface } from './src/world.js';
 import { createGame } from './src/game.js';
 import { createStarfield, ParticleBurst } from './src/particles.js';
-import { progress, fmtTime } from './src/progress.js';
+import { progress, fmtTime, loadProgress } from './src/progress.js';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
 const $ = (id) => document.getElementById(id);
 const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
+
+/** 解析度倍率：手機最多 1.5 倍，且總像素不超過約 260 萬（iPad 大螢幕才不會發燙） */
+function pixelRatio() {
+  if (!isMobile) return Math.min(devicePixelRatio, 2);
+  return Math.min(devicePixelRatio, 1.5, Math.sqrt(2.6e6 / (innerWidth * innerHeight)));
+}
 
 /* =========================================================
  * Renderer / Scene / Camera
  * ======================================================= */
 const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1.5 : 2));
+renderer.setPixelRatio(pixelRatio());
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -61,6 +69,12 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.5, 0.85);
 composer.addPass(bloom);
+if (isMobile) {
+  // 手機上 Bloom 用一半解析度計算，光暈看起來差不多，GPU 負擔少很多
+  const setBloomSize = bloom.setSize.bind(bloom);
+  bloom.setSize = (w, h) => setBloomSize(Math.ceil(w / 2), Math.ceil(h / 2));
+  bloom.setSize(innerWidth * renderer.getPixelRatio(), innerHeight * renderer.getPixelRatio());
+}
 composer.addPass(new OutputPass());
 
 /* ---------- 視角控制（解謎時使用） ---------- */
@@ -273,14 +287,27 @@ $('journalTab').onclick = () => $('journal').classList.toggle('closed');
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
+  renderer.setPixelRatio(pixelRatio());
   renderer.setSize(innerWidth, innerHeight);
+  composer.setPixelRatio(renderer.getPixelRatio());
   composer.setSize(innerWidth, innerHeight);
   labelRenderer.setSize(innerWidth, innerHeight);
 });
 
+/* ---------- App 切到背景時暫停：停止渲染，計時也不會繼續跑 ---------- */
+let paused = false;
+function setPaused(p) {
+  if (p === paused) return;
+  paused = p;
+  if (!p) last = performance.now(); // 回到前景時重設時間基準，背景期間不計入
+  renderer.setAnimationLoop(p ? null : loop);
+}
+document.addEventListener('visibilitychange', () => setPaused(document.hidden));
+if (Capacitor.isNativePlatform()) App.addListener('appStateChange', ({ isActive }) => setPaused(!isActive));
+
 const camGoal = new THREE.Vector3();
 let last = performance.now();
-renderer.setAnimationLoop(() => {
+function loop() {
   const now = performance.now();
   const rawDt = Math.min((now - last) / 1000, 1); // 計時用真實時間（不受低幀率影響）
   const dt = Math.min(rawDt, 0.05);                // 動畫用，避免跳幀
@@ -318,7 +345,9 @@ renderer.setAnimationLoop(() => {
   particles.update(dt);
   composer.render();
   labelRenderer.render(scene, camera);
-});
+}
+renderer.setAnimationLoop(loop);
 
+await loadProgress(); // 先讀完存檔，選關畫面的星數與解鎖狀態才正確
 showSelect();
 applyTheme(LEVELS[0].theme, true);

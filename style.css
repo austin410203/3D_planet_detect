@@ -12,6 +12,11 @@
   --blue: #4f8ef7;
   --font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
   --num: "Baloo 2", var(--font);
+  /* 安全區域：避開瀏海／動態島與底部 Home 指示條（網頁版為 0） */
+  --sa-t: env(safe-area-inset-top, 0px);
+  --sa-r: env(safe-area-inset-right, 0px);
+  --sa-b: env(safe-area-inset-bottom, 0px);
+  --sa-l: env(safe-area-inset-left, 0px);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
@@ -41,7 +46,7 @@ html, body {
 .screen { position: fixed; inset: 0; pointer-events: none; }
 .screen > * { pointer-events: auto; }
 .logo {
-  position: absolute; top: 18px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+  position: absolute; top: calc(18px + var(--sa-t)); left: 50%; transform: translateX(-50%) rotate(-2deg);
   display: flex; align-items: center; gap: 12px;
   background: var(--yellow); border: 4px solid var(--ink); border-radius: 18px;
   padding: 8px 22px 8px 10px; box-shadow: 0 6px 0 var(--ink);
@@ -59,11 +64,11 @@ html, body {
   background: var(--paper); border: 4px solid var(--ink); box-shadow: 0 5px 0 var(--ink);
 }
 .nav:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
-.nav-prev { left: max(16px, 8vw); }
-.nav-next { right: max(16px, 8vw); }
+.nav-prev { left: max(16px + var(--sa-l), 8vw); }
+.nav-next { right: max(16px + var(--sa-r), 8vw); }
 
 .planet-card {
-  position: absolute; left: 50%; bottom: 70px; transform: translateX(-50%) rotate(1deg);
+  position: absolute; left: 50%; bottom: calc(70px + var(--sa-b)); transform: translateX(-50%) rotate(1deg);
   width: min(420px, calc(100vw - 32px));
   background: var(--paper); border: 4px solid var(--ink); border-radius: 22px;
   padding: 16px 20px 18px; box-shadow: 0 8px 0 var(--ink); text-align: center;
@@ -85,11 +90,11 @@ html, body {
 .pc-lock { margin-top: 10px; font-weight: 700; font-size: 14px; }
 .planet-card.locked .btn-go { display: none; }
 
-.dots { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; width: min(520px, 92vw); }
+.dots { position: absolute; bottom: calc(22px + var(--sa-b)); left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; width: min(520px, 92vw); }
 .dots span { width: 11px; height: 11px; border-radius: 50%; background: #ffffff40; border: 2px solid #ffffff80; cursor: pointer; }
 .dots span.on { background: var(--yellow); border-color: var(--yellow); transform: scale(1.3); }
 .total-stars {
-  position: absolute; top: 22px; right: 20px; font: 800 20px var(--num); color: var(--ink);
+  position: absolute; top: calc(22px + var(--sa-t)); right: calc(20px + var(--sa-r)); font: 800 20px var(--num); color: var(--ink);
   background: var(--paper); border: 3px solid var(--ink); border-radius: 999px; padding: 4px 14px;
   box-shadow: 0 4px 0 var(--ink);
 }
@@ -97,7 +102,7 @@ html, body {
 /* =========================================================
  * 對話框（委託／結算）
  * ======================================================= */
-.modal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(10, 8, 30, .55); padding: 16px; z-index: 20; }
+.modal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(10, 8, 30, .55); padding: calc(16px + var(--sa-t)) calc(16px + var(--sa-r)) calc(16px + var(--sa-b)) calc(16px + var(--sa-l)); z-index: 20; }
 .dialog {
   width: min(480px, 100%); max-height: calc(100vh - 32px); overflow: auto;
   background: var(--paper); border: 4px solid var(--ink); border-radius: 24px;
@@ -151,10 +156,10 @@ html, body {
  * 遊戲 HUD
  * ======================================================= */
 #hud > * { position: fixed; z-index: 5; }
-.btn-back { top: 14px; left: 14px; }
+.btn-back { top: calc(14px + var(--sa-t)); left: calc(14px + var(--sa-l)); }
 
 .timer-box {
-  top: 12px; left: 50%; transform: translateX(-50%);
+  top: calc(12px + var(--sa-t)); left: 50%; transform: translateX(-50%);
   background: var(--paper); border: 4px solid var(--ink); border-radius: 18px;
   padding: 4px 16px 10px; box-shadow: 0 6px 0 var(--ink); text-align: center; min-width: 220px;
 }
@@ -167,7 +172,7 @@ html, body {
 .star-mark::before { content: ''; position: absolute; left: 50%; top: -14px; width: 3px; height: 14px; background: var(--ink); }
 
 .items {
-  top: 14px; right: 14px; list-style: none; display: flex; gap: 6px;
+  top: calc(14px + var(--sa-t)); right: calc(14px + var(--sa-r)); list-style: none; display: flex; gap: 6px;
   background: var(--paper); border: 4px solid var(--ink); border-radius: 16px; padding: 6px; box-shadow: 0 6px 0 var(--ink);
 }
 .items li {
@@ -179,7 +184,7 @@ html, body {
 .items li.found span { filter: none; }
 
 /* 線索手冊 */
-.journal { top: 92px; left: 14px; width: min(310px, calc(100vw - 28px)); max-height: calc(100vh - 180px); display: flex; flex-direction: column; }
+.journal { top: calc(92px + var(--sa-t)); left: calc(14px + var(--sa-l)); width: min(310px, calc(100vw - 28px - var(--sa-l) - var(--sa-r))); max-height: calc(100vh - 180px - var(--sa-t) - var(--sa-b)); display: flex; flex-direction: column; }
 .journal-tab {
   align-self: flex-start; font: 900 15px var(--font); cursor: pointer; color: var(--ink);
   background: var(--yellow); border: 3px solid var(--ink); border-bottom: none; border-radius: 12px 12px 0 0; padding: 6px 14px;
@@ -206,10 +211,10 @@ html, body {
   font-weight: 900; font-size: 20px; color: #e2434b; border: 3px solid #e2434b; border-radius: 8px; padding: 0 8px; background: #ffffffd0;
 }
 
-.btn-hint { bottom: 18px; left: 14px; background: var(--mint); }
+.btn-hint { bottom: calc(18px + var(--sa-b)); left: calc(14px + var(--sa-l)); background: var(--mint); }
 .btn-hint small { font-size: 12px; opacity: .8; }
 .controls-tip {
-  bottom: 22px; right: 16px; font-size: 13px; font-weight: 700; color: #fff;
+  bottom: calc(22px + var(--sa-b)); right: calc(16px + var(--sa-r)); font-size: 13px; font-weight: 700; color: #fff;
   background: rgba(16, 22, 48, .7); padding: 6px 12px; border-radius: 999px;
 }
 
@@ -234,7 +239,7 @@ html, body {
 
 /* 吐司訊息 */
 .toast {
-  position: fixed; left: 50%; bottom: 80px; z-index: 30; transform: translateX(-50%);
+  position: fixed; left: 50%; bottom: calc(80px + var(--sa-b)); z-index: 30; transform: translateX(-50%);
   max-width: calc(100vw - 32px); text-align: center;
   background: var(--paper); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 5px 0 var(--ink);
   padding: 8px 18px; font-size: 16px; font-weight: 900; opacity: 0; pointer-events: none;
@@ -250,14 +255,14 @@ html, body {
 
 /* ---------- 手機 ---------- */
 @media (max-width: 700px) {
-  .timer-box { min-width: 150px; top: 60px; padding: 2px 10px 8px; }
+  .timer-box { min-width: 150px; top: calc(60px + var(--sa-t)); padding: 2px 10px 8px; }
   .timer { font-size: 28px; }
-  .items { top: 8px; right: 8px; padding: 4px; }
+  .items { top: calc(8px + var(--sa-t)); right: calc(8px + var(--sa-r)); padding: 4px; }
   .items li { width: 36px; height: 36px; font-size: 20px; }
-  .btn-back { top: 8px; left: 8px; }
-  .journal { top: auto; bottom: 70px; max-height: 42vh; }
+  .btn-back { top: calc(8px + var(--sa-t)); left: calc(8px + var(--sa-l)); }
+  .journal { top: auto; bottom: calc(70px + var(--sa-b)); max-height: 42vh; }
   .controls-tip { display: none; }
   .nav { width: 46px; height: 46px; }
-  .logo { top: 10px; }
+  .logo { top: calc(10px + var(--sa-t)); }
   .logo-badge { width: 40px; height: 40px; font-size: 22px; }
 }
