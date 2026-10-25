@@ -39,13 +39,13 @@ export async function runDemo({ LEVELS, choose, startLevel, progress }) {
   // 假的進度：前 8 關有星星，畫面比較熱鬧
   [3, 3, 2, 3, 3, 2, 3, 1].forEach((s, i) => progress.save(LEVELS[i].id, s, 40 + i * 9));
 
-  // 1. 選關（糖果星）
-  choose(3);
+  // 1. 選關（第一關：綠野星）
+  choose(0);
   await sleep(2500);
   await shot('select');
 
-  // 2. 委託（熔岩星）
-  startLevel(1);
+  // 2. 委託（同一關）
+  startLevel(0);
   await sleep(1500);
   await shot('intro');
 
