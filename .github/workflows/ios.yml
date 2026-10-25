@@ -1,0 +1,112 @@
+# iOS 建置：在 GitHub 的 macOS 機器上編譯 iOS App，並在 iPhone 模擬器啟動、截圖
+# 結果（編譯錯誤、截圖、App 紀錄）推到 ci-results 分支，沒有 Mac 也能用 git 取回查看：
+#   git fetch origin ci-results && git show origin/ci-results:summary.txt
+name: iOS 建置
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'main.js'
+      - 'index.html'
+      - 'style.css'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # 推送 ci-results 分支
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 建置網頁並同步到 iOS
+        run: |
+          npm ci
+          npm run build
+          npx cap sync ios
+
+      - name: 編譯（iOS 模擬器，不簽章）
+        id: build
+        run: |
+          mkdir -p ci-out
+          xcodebuild -version | tee ci-out/xcode.txt
+          set +e
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > ci-out/build-full.log 2>&1
+          STATUS=$?
+          set -e
+          echo "$STATUS" > ci-out/build-status.txt
+          grep -E -B2 -A4 "error:|fatal error" ci-out/build-full.log | head -400 > ci-out/errors.txt || true
+          grep -E "warning:.*\.swift" ci-out/build-full.log | sort -u | head -100 > ci-out/swift-warnings.txt || true
+          tail -150 ci-out/build-full.log > ci-out/build-tail.log
+          rm ci-out/build-full.log
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          if [ -s ci-out/errors.txt ]; then while read -r line; do echo "::error::$line"; done < <(grep -E "error:" ci-out/errors.txt | head -20); fi
+
+      - name: 在 iPhone 模擬器啟動並截圖
+        if: steps.build.outputs.status == '0'
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          devs = json.load(sys.stdin)['devices']
+          for rt in sorted(devs, reverse=True):
+              if 'iOS' in rt:
+                  for d in devs[rt]:
+                      if d['name'].startswith('iPhone'):
+                          print(d['udid']); sys.exit()
+          ")
+          xcrun simctl list devices available | grep "$UDID" | tee ci-out/simulator.txt
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/App.app
+          xcrun simctl spawn "$UDID" log stream --level debug --style compact --predicate 'process == "App"' > ci-out/app-full.log 2>&1 &
+          LOGPID=$!
+          xcrun simctl launch "$UDID" com.austin410203.planetlostfound
+          sleep 20
+          xcrun simctl io "$UDID" screenshot ci-out/launch-20s.png
+          sleep 15
+          xcrun simctl io "$UDID" screenshot ci-out/launch-35s.png
+          kill $LOGPID || true
+          # Capacitor 的 JS console 與外掛呼叫紀錄（⚡️ 開頭）、錯誤訊息
+          grep -E "⚡️|rror|Exception|GameCenter|Store|Preferences|Haptics" ci-out/app-full.log | head -400 > ci-out/app.log || true
+          rm ci-out/app-full.log
+
+      - name: 推送結果到 ci-results 分支
+        if: always()
+        run: |
+          mkdir -p ci-out && cd ci-out
+          {
+            echo "sha: $GITHUB_SHA"
+            echo "run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "build-status: $(cat build-status.txt 2>/dev/null || echo 未執行)"
+            cat xcode.txt 2>/dev/null
+            cat simulator.txt 2>/dev/null
+          } > summary.txt
+          git init -q
+          git checkout -q -b ci-results
+          git add -A
+          git -c user.name=ios-ci -c user.email=ios-ci@users.noreply.github.com commit -qm "iOS CI ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-results
+
+      - name: 編譯失敗時讓工作失敗
+        if: steps.build.outputs.status != '0'
+        run: exit 1
