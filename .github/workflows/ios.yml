@@ -78,17 +78,17 @@ jobs:
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
           xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/App.app
-          xcrun simctl spawn "$UDID" log stream --level debug --style compact --predicate 'process == "App"' > ci-out/app-full.log 2>&1 &
-          LOGPID=$!
-          xcrun simctl launch "$UDID" com.austin410203.planetlostfound
+          # Capacitor 用 print() 輸出 JS console 與外掛呼叫（⚡️ 開頭），要收 App 的 stdout 才看得到
+          xcrun simctl launch --terminate-running-process --stdout="$PWD/ci-out/app-stdout.log" --stderr="$PWD/ci-out/app-stderr.log" "$UDID" com.austin410203.planetlostfound
           sleep 20
           xcrun simctl io "$UDID" screenshot ci-out/launch-20s.png
           sleep 15
           xcrun simctl io "$UDID" screenshot ci-out/launch-35s.png
-          kill $LOGPID || true
-          # Capacitor 的 JS console 與外掛呼叫紀錄（⚡️ 開頭）、錯誤訊息
-          grep -E "⚡️|rror|Exception|GameCenter|Store|Preferences|Haptics" ci-out/app-full.log | head -400 > ci-out/app.log || true
-          rm ci-out/app-full.log
+          xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
+          # 只保留外掛呼叫、JS console 與錯誤
+          cat ci-out/app-stdout.log ci-out/app-stderr.log 2>/dev/null \
+            | grep -E "⚡️|rror|xception|GameCenter|Store|Haptics|Preferences|App " | cut -c1-400 | head -300 > ci-out/app.log || true
+          rm -f ci-out/app-stdout.log ci-out/app-stderr.log
 
       - name: 推送結果到 ci-results 分支
         if: always()
