@@ -2,5 +2,11 @@
 @font-face { font-family: "Noto Sans TC"; font-weight: 500; font-style: normal; font-display: swap; src: url("./noto-sans-tc-500.woff2") format("woff2"); }
 @font-face { font-family: "Noto Sans TC"; font-weight: 700; font-style: normal; font-display: swap; src: url("./noto-sans-tc-700.woff2") format("woff2"); }
 @font-face { font-family: "Noto Sans TC"; font-weight: 900; font-style: normal; font-display: swap; src: url("./noto-sans-tc-900.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans JP"; font-weight: 500; font-style: normal; font-display: swap; src: url("./noto-sans-jp-500.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans JP"; font-weight: 700; font-style: normal; font-display: swap; src: url("./noto-sans-jp-700.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans JP"; font-weight: 900; font-style: normal; font-display: swap; src: url("./noto-sans-jp-900.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans KR"; font-weight: 500; font-style: normal; font-display: swap; src: url("./noto-sans-kr-500.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans KR"; font-weight: 700; font-style: normal; font-display: swap; src: url("./noto-sans-kr-700.woff2") format("woff2"); }
+@font-face { font-family: "Noto Sans KR"; font-weight: 900; font-style: normal; font-display: swap; src: url("./noto-sans-kr-900.woff2") format("woff2"); }
 @font-face { font-family: "Baloo 2"; font-weight: 600; font-style: normal; font-display: swap; src: url("./baloo-2-600.woff2") format("woff2"); }
 @font-face { font-family: "Baloo 2"; font-weight: 800; font-style: normal; font-display: swap; src: url("./baloo-2-800.woff2") format("woff2"); }

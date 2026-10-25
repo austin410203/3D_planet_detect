@@ -26,13 +26,13 @@
     <header class="logo">
       <div class="logo-badge">🔍</div>
       <div>
-        <h1>星球失物<span class="nowrap">招領所</span></h1>
-        <p>Lost &amp; Found in Space</p>
+        <h1 data-i18n="title">星球失物<span class="nowrap">招領所</span></h1>
+        <p data-i18n="subtitle">Lost &amp; Found in Space</p>
       </div>
     </header>
 
-    <button class="nav nav-prev" id="prevPlanet" aria-label="上一顆星球">◀</button>
-    <button class="nav nav-next" id="nextPlanet" aria-label="下一顆星球">▶</button>
+    <button class="nav nav-prev" id="prevPlanet" aria-label="上一顆星球" data-i18n-aria="prev">◀</button>
+    <button class="nav nav-next" id="nextPlanet" aria-label="下一顆星球" data-i18n-aria="next">▶</button>
 
     <article class="planet-card" id="planetCard">
       <div class="pc-top">
@@ -45,14 +45,14 @@
       </div>
       <div class="pc-stars" id="pcStars"></div>
       <dl class="pc-info">
-        <div><dt>要找的物品</dt><dd id="pcItems">3 件</dd></div>
-        <div><dt>最佳時間</dt><dd id="pcBest">--</dd></div>
-        <div><dt>三星目標</dt><dd id="pcGoal">60 秒</dd></div>
+        <div><dt data-i18n="card.items">要找的物品</dt><dd id="pcItems">3 件</dd></div>
+        <div><dt data-i18n="card.best">最佳時間</dt><dd id="pcBest">--</dd></div>
+        <div><dt data-i18n="card.goal">三星目標</dt><dd id="pcGoal">60 秒</dd></div>
       </dl>
-      <button class="btn btn-go" id="startBtn">出發！</button>
-      <p class="pc-lock" id="pcLock" hidden>🔒 先在上一顆星球拿到 1 顆星才能解鎖</p>
+      <button class="btn btn-go" id="startBtn" data-i18n="start">出發！</button>
+      <p class="pc-lock" id="pcLock" data-i18n="lockStars" hidden>🔒 先在上一顆星球拿到 1 顆星才能解鎖</p>
       <div class="pc-paid" id="pcPaid" hidden>
-        <p class="pc-lock">💎 第 9～28 顆星球屬於完整版</p>
+        <p class="pc-lock" data-i18n="lockPaid">💎 第 9～28 顆星球屬於完整版</p>
         <button class="btn btn-go btn-small" id="unlockBtn">🔓 解鎖完整版</button>
       </div>
     </article>
@@ -62,9 +62,9 @@
 
     <!-- 左側：每日挑戰、排行榜（只在 iOS App 顯示）、設定 -->
     <div class="side-btns">
-      <button class="icon-btn" id="dailyBtn" aria-label="每日挑戰">📅<small>每日</small></button>
-      <button class="icon-btn" id="lbBtn" aria-label="排行榜" hidden>🏆<small>排行</small></button>
-      <button class="icon-btn" id="settingsBtn" aria-label="設定">⚙️<small>設定</small></button>
+      <button class="icon-btn" id="dailyBtn" aria-label="每日挑戰" data-i18n-aria="daily">📅<small data-i18n="dailyShort">每日</small></button>
+      <button class="icon-btn" id="lbBtn" aria-label="排行榜" data-i18n-aria="leaderboard" hidden>🏆<small data-i18n="lbShort">排行</small></button>
+      <button class="icon-btn" id="settingsBtn" aria-label="設定" data-i18n-aria="settings">⚙️<small data-i18n="settingsShort">設定</small></button>
     </div>
   </section>
 
@@ -77,25 +77,25 @@
       </div>
       <p class="daily-tag" id="introDaily" hidden></p>
       <div class="speech" id="introStory"></div>
-      <h3 class="need-title">要找的東西</h3>
+      <h3 class="need-title" data-i18n="needTitle">要找的東西</h3>
       <ul class="need" id="introItems"></ul>
-      <p class="tip">💡 閱讀左邊的<strong>線索手冊</strong>，找出物品藏在哪個地標旁的哪種東西裡。翻錯地方會加時間喔！</p>
-      <button class="btn btn-go" id="introGo">接下委託！</button>
+      <p class="tip" data-i18n="introTip">💡 閱讀左邊的<strong>線索手冊</strong>，找出物品藏在哪個地標旁的哪種東西裡。翻錯地方會加時間喔！</p>
+      <button class="btn btn-go" id="introGo" data-i18n="accept">接下委託！</button>
     </div>
   </div>
 
   <!-- ==================== 每日挑戰 ==================== -->
   <div class="modal" id="daily" hidden>
     <div class="dialog">
-      <p class="daily-tag">📅 每日挑戰・<span id="dailyDate"></span></p>
+      <p class="daily-tag"><span data-i18n="dailyTag">📅 每日挑戰・</span><span id="dailyDate"></span></p>
       <h2 class="daily-planet" id="dailyPlanet"></h2>
       <p class="pc-sub" id="dailySub"></p>
-      <p class="tip">全世界今天都玩同一張地圖！<br />只有<strong>第一次</strong>的成績會記錄並上傳排行榜。</p>
+      <p class="tip" data-i18n="dailyTip">全世界今天都玩同一張地圖！<br />只有<strong>第一次</strong>的成績會記錄並上傳排行榜。</p>
       <p class="daily-status" id="dailyStatus"></p>
       <p class="daily-streak" id="dailyStreak"></p>
       <div class="result-btns">
-        <button class="btn btn-small" id="dailyClose">關閉</button>
-        <button class="btn btn-small" id="dailyLb" hidden>🏆 今日排行</button>
+        <button class="btn btn-small" id="dailyClose" data-i18n="close">關閉</button>
+        <button class="btn btn-small" id="dailyLb" data-i18n="dailyLb" hidden>🏆 今日排行</button>
         <button class="btn btn-go btn-small" id="dailyGo">開始挑戰！</button>
       </div>
     </div>
@@ -104,32 +104,33 @@
   <!-- ==================== 設定 ==================== -->
   <div class="modal" id="settings" hidden>
     <div class="dialog">
-      <h2 class="result-title">⚙️ 設定</h2>
+      <h2 class="result-title" data-i18n="settingsTitle">⚙️ 設定</h2>
       <ul class="settings-list">
-        <li>🎵 配樂 <button class="toggle" id="set-music"></button></li>
-        <li>🔊 音效 <button class="toggle" id="set-sfx"></button></li>
-        <li id="hapticsRow">📳 震動 <button class="toggle" id="set-haptics"></button></li>
-        <li id="restoreRow">💎 完整版 <button class="toggle" id="restoreBtn2">恢復購買</button></li>
+        <li><span data-i18n="music">🎵 配樂</span> <button class="toggle" id="set-music"></button></li>
+        <li><span data-i18n="sfx">🔊 音效</span> <button class="toggle" id="set-sfx"></button></li>
+        <li id="hapticsRow"><span data-i18n="haptics">📳 震動</span> <button class="toggle" id="set-haptics"></button></li>
+        <li id="restoreRow"><span data-i18n="fullVersion">💎 完整版</span> <button class="toggle" id="restoreBtn2">恢復購買</button></li>
+        <li><span data-i18n="language">🌐 語言</span> <select class="toggle lang-select" id="langSelect"></select></li>
       </ul>
-      <button class="btn btn-go btn-small" id="settingsClose">完成</button>
+      <button class="btn btn-go btn-small" id="settingsClose" data-i18n="done">完成</button>
     </div>
   </div>
 
   <!-- ==================== 完整版（App 內購買） ==================== -->
   <div class="modal" id="store" hidden>
     <div class="dialog">
-      <h2 class="result-title">💎 完整版</h2>
+      <h2 class="result-title" data-i18n="storeTitle">💎 完整版</h2>
       <ul class="store-perks">
-        <li>🪐 再解鎖 <b>20 顆</b>傳說與科幻主題星球（第 9～28 關）</li>
-        <li>🏴‍☠️ 海盜灣、亞特蘭提斯、巨龍之巢、聖誕北極星……</li>
-        <li>✨ 一次購買、永久擁有，沒有廣告</li>
+        <li data-i18n="perk1">🪐 再解鎖 <b>20 顆</b>傳說與科幻主題星球（第 9～28 關）</li>
+        <li data-i18n="perk2">🏴‍☠️ 海盜灣、亞特蘭提斯、巨龍之巢、聖誕北極星……</li>
+        <li data-i18n="perk3">✨ 一次購買、永久擁有，沒有廣告</li>
       </ul>
       <p class="store-msg" id="storeMsg"></p>
       <div class="result-btns">
-        <button class="btn btn-small" id="storeClose">之後再說</button>
+        <button class="btn btn-small" id="storeClose" data-i18n="later">之後再說</button>
         <button class="btn btn-go btn-small" id="buyBtn">購買</button>
       </div>
-      <button class="link-btn" id="restoreBtn">已經買過了？恢復購買</button>
+      <button class="link-btn" id="restoreBtn" data-i18n="restoreLink">已經買過了？恢復購買</button>
     </div>
   </div>
 
@@ -138,7 +139,7 @@
 
   <!-- ==================== 遊戲 HUD ==================== -->
   <div id="hud" hidden>
-    <button class="btn btn-small btn-back" id="backBtn">◀ 選關</button>
+    <button class="btn btn-small btn-back" id="backBtn" data-i18n="back">◀ 選關</button>
 
     <!-- 計時與星星門檻條 -->
     <div class="timer-box">
@@ -155,12 +156,12 @@
 
     <!-- 線索手冊 -->
     <aside class="journal" id="journal">
-      <button class="journal-tab" id="journalTab">📖 線索手冊</button>
+      <button class="journal-tab" id="journalTab" data-i18n="journal">📖 線索手冊</button>
       <div class="journal-body" id="journalBody"></div>
     </aside>
 
-    <button class="btn btn-hint" id="hintBtn">💡 提示 <small>+15 秒</small></button>
-    <p class="controls-tip">拖曳旋轉・滾輪縮放・點擊搜尋</p>
+    <button class="btn btn-hint" id="hintBtn" data-i18n="hint">💡 提示 <small>+15 秒</small></button>
+    <p class="controls-tip" data-i18n="controls">拖曳旋轉・滾輪縮放・點擊搜尋</p>
   </div>
 
   <!-- 浮動訊息 -->
@@ -169,17 +170,17 @@
   <!-- ==================== 結算 ==================== -->
   <div class="modal" id="result" hidden>
     <div class="dialog result">
-      <h2 class="result-title">委託完成！</h2>
+      <h2 class="result-title" data-i18n="resultTitle">委託完成！</h2>
       <div class="result-stars" id="resultStars">
         <span class="rs">⭐</span><span class="rs">⭐</span><span class="rs">⭐</span>
       </div>
       <div class="result-time"><span id="resultTime">0:00</span><small id="resultBest"></small></div>
       <div class="speech small" id="resultOutro"></div>
       <div class="result-btns">
-        <button class="btn btn-small" id="retryBtn">↻ 再玩一次</button>
-        <button class="btn btn-small" id="menuBtn">🪐 選關</button>
-        <button class="btn btn-small" id="resultLbBtn" hidden>🏆 排行榜</button>
-        <button class="btn btn-go btn-small" id="nextBtn">下一顆星球 ▶</button>
+        <button class="btn btn-small" id="retryBtn" data-i18n="retry">↻ 再玩一次</button>
+        <button class="btn btn-small" id="menuBtn" data-i18n="menu">🪐 選關</button>
+        <button class="btn btn-small" id="resultLbBtn" data-i18n="lbBtn" hidden>🏆 排行榜</button>
+        <button class="btn btn-go btn-small" id="nextBtn" data-i18n="nextPlanet">下一顆星球 ▶</button>
       </div>
     </div>
   </div>

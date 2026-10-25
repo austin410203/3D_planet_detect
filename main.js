@@ -28,6 +28,9 @@ import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitSco
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
 import { store, hasStore, loadStore, purchaseFull, restorePurchases, onStoreChange } from './src/store.js';
 import { startIconSwap } from './src/icons.js';
+import { t, lang, LANGS, initLang, applyStaticText, localizeLevels } from './src/i18n.js';
+import { UI } from './src/locales/ui.js';
+import { SPOTS } from './src/props.js';
 
 const $ = (id) => document.getElementById(id);
 const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
@@ -157,13 +160,13 @@ function renderSelectCard() {
   $('pcName').textContent = lv.name;
   $('pcSub').textContent = lv.subtitle;
   $('pcStars').innerHTML = [1, 2, 3].map((n) => `<span class="${p.stars >= n ? '' : 'off'}">⭐</span>`).join('');
-  $('pcItems').textContent = `${lv.targets.length} 件`;
+  $('pcItems').textContent = t('itemsCount', { n: lv.targets.length });
   $('pcBest').textContent = p.best !== null ? fmtTime(p.best) : '--';
-  $('pcGoal').textContent = `${lv.stars[0]} 秒`;
+  $('pcGoal').textContent = t('seconds', { n: lv.stars[0] });
   $('planetCard').classList.toggle('locked', !!lock);
   $('pcLock').hidden = lock !== 'stars';
   $('pcPaid').hidden = lock !== 'paid';
-  $('unlockBtn').textContent = store.price ? `🔓 解鎖完整版 ${store.price}` : '🔓 解鎖完整版';
+  $('unlockBtn').textContent = store.price ? t('unlockPrice', { price: store.price }) : t('unlock');
   $('planetDots').innerHTML = LEVELS.map((_, i) => `<span class="${i === selected ? 'on' : ''}" data-i="${i}"></span>`).join('');
   $('totalStars').textContent = progress.totalStars(LEVELS);
   $('maxStars').textContent = LEVELS.length * 3;
@@ -241,7 +244,7 @@ function startLevel(i, dailyKey = null) {
 
   dailyRun = dailyKey ? { key: dailyKey, first: !daily.result(dailyKey) } : null;
   $('introDaily').hidden = !dailyRun;
-  if (dailyRun) $('introDaily').textContent = dailyRun.first ? '📅 每日挑戰・只有這一次會記錄成績' : '📅 每日挑戰・練習模式（不記錄成績）';
+  if (dailyRun) $('introDaily').textContent = t(dailyRun.first ? 'introDailyFirst' : 'introDailyPractice');
 
   world = buildWorld(lv, dailyKey ? dailyPick(LEVELS, dailyKey).seed : undefined);
   scene.add(world.group);
@@ -278,7 +281,7 @@ $('introGo').onclick = () => {
 function countdown(done) {
   const el = $('countdown');
   el.hidden = false;
-  const seq = ['3', '2', '1', '出發！'];
+  const seq = ['3', '2', '1', t('go')];
   let i = 0;
   const step = () => {
     if (i >= seq.length) { el.hidden = true; return; }
@@ -301,13 +304,13 @@ function showResult({ time, stars }) {
     dailyRun.first = false;
     if (recorded) submitTime(LEADERBOARD.daily, time);
     $('resultBest').textContent = recorded
-      ? `📅 今日成績已記錄・🔥 連續 ${daily.streak()} 天`
-      : `📅 練習模式・今日成績 ${fmtTime(daily.result(dailyRun.key).time)}`;
+      ? t('dailyRecorded', { n: daily.streak() })
+      : t('dailyPracticeResult', { time: fmtTime(daily.result(dailyRun.key).time) });
   } else {
     const isBest = progress.save(lv.id, stars, time);
     submitTime(LEADERBOARD.best(lv.id), time);
     submitScore(LEADERBOARD.stars, progress.totalStars(LEVELS));
-    $('resultBest').textContent = isBest ? '🏆 新紀錄！' : `最佳 ${fmtTime(progress.get(lv.id).best)}`;
+    $('resultBest').textContent = isBest ? t('newBest') : t('bestTime', { time: fmtTime(progress.get(lv.id).best) });
   }
   $('resultTime').textContent = fmtTime(time);
   $('resultOutro').textContent = `${lv.npc.emoji} ${lv.outro}`;
@@ -342,10 +345,10 @@ $('dailyBtn').onclick = () => {
   $('dailyDate').textContent = key;
   $('dailyPlanet').textContent = `${lv.emoji} ${lv.name}`;
   $('dailySub').textContent = lv.subtitle;
-  $('dailyStatus').innerHTML = r ? `今日成績<b>${fmtTime(r.time)}</b>${'⭐'.repeat(r.stars)}` : '今天還沒挑戰';
+  $('dailyStatus').innerHTML = r ? t('dailyResult', { time: fmtTime(r.time), stars: '⭐'.repeat(r.stars) }) : t('dailyNone');
   const streak = daily.streak(key);
-  $('dailyStreak').textContent = streak ? `🔥 連續 ${streak} 天` : '🔥 完成今天的挑戰，開始累積連續天數！';
-  $('dailyGo').textContent = r ? '再練習一次' : '開始挑戰！';
+  $('dailyStreak').textContent = streak ? t('streak', { n: streak }) : t('streakStart');
+  $('dailyGo').textContent = t(r ? 'dailyPractice' : 'dailyStart');
   $('dailyLb').hidden = !hasGameCenter;
   $('daily').hidden = false;
 };
@@ -361,27 +364,22 @@ $('dailyClose').onclick = () => { $('daily').hidden = true; };
  * 完整版（App 內購買）
  * ======================================================= */
 function openStore() {
-  $('storeMsg').textContent = hasStore ? '' : '完整版請下載 iOS App 購買';
+  $('storeMsg').textContent = hasStore ? '' : t('storeWeb');
   $('buyBtn').hidden = !hasStore;
   $('restoreBtn').hidden = !hasStore;
   $('buyBtn').disabled = false;
-  $('buyBtn').textContent = store.price ? `購買 ${store.price}` : '購買';
+  $('buyBtn').textContent = store.price ? t('buyPrice', { price: store.price }) : t('buy');
   $('store').hidden = false;
 }
-const STORE_MSG = {
-  purchased: '🎉 感謝購買！全部星球都解鎖了',
-  cancelled: '',
-  pending: '⏳ 等待核准（例如家長同意）後就會自動解鎖',
-  failed: '購買沒有完成，請稍後再試',
-};
+const storeMsg = (status) => (status === 'cancelled' ? '' : t(`store.${status}`) ?? t('store.failed'));
 $('unlockBtn').onclick = openStore;
 $('storeClose').onclick = () => { $('store').hidden = true; };
 $('buyBtn').onclick = async () => {
   $('buyBtn').disabled = true;
-  $('storeMsg').textContent = '連線到 App Store…';
+  $('storeMsg').textContent = t('storeConnecting');
   const status = await purchaseFull();
   $('buyBtn').disabled = false;
-  $('storeMsg').textContent = STORE_MSG[status] ?? STORE_MSG.failed;
+  $('storeMsg').textContent = ['purchased', 'pending', 'cancelled'].includes(status) ? storeMsg(status) : t('store.failed');
   if (status === 'purchased') {
     sfx.fanfare();
     haptic.found();
@@ -389,17 +387,17 @@ $('buyBtn').onclick = async () => {
   }
 };
 $('restoreBtn').onclick = async () => {
-  $('storeMsg').textContent = '正在向 App Store 確認…';
+  $('storeMsg').textContent = t('restoreChecking');
   const ok = await restorePurchases();
-  $('storeMsg').textContent = ok ? '✅ 已恢復完整版' : '這個 Apple ID 沒有完整版的購買紀錄';
+  $('storeMsg').textContent = t(ok ? 'restoreOk' : 'restoreNone');
   if (ok) { haptic.found(); setTimeout(() => { $('store').hidden = true; }, 1500); }
 };
 // 設定裡的恢復購買（按鈕空間小，只顯示簡短結果）
 $('restoreBtn2').onclick = async () => {
   const b = $('restoreBtn2');
-  b.textContent = '確認中…';
+  b.textContent = t('checking');
   const ok = await restorePurchases();
-  b.textContent = ok ? '已擁有' : '查無紀錄';
+  b.textContent = t(ok ? 'owned' : 'notFound');
   b.classList.toggle('on', ok);
 };
 // 購買、退款、家人共享等狀態改變時更新畫面
@@ -415,7 +413,7 @@ const TOGGLES = ['music', 'sfx', 'haptics'];
 function renderSettings() {
   for (const k of TOGGLES) {
     $(`set-${k}`).classList.toggle('on', settings[k]);
-    $(`set-${k}`).textContent = settings[k] ? '開' : '關';
+    $(`set-${k}`).textContent = t(settings[k] ? 'on' : 'off');
   }
 }
 for (const k of TOGGLES) $(`set-${k}`).onclick = () => { setSetting(k, !settings[k]); renderSettings(); };
@@ -423,7 +421,7 @@ $('hapticsRow').hidden = !hasHaptics;
 $('restoreRow').hidden = !hasStore;
 $('settingsBtn').onclick = () => {
   renderSettings();
-  $('restoreBtn2').textContent = store.owned ? '已擁有' : '恢復購買';
+  $('restoreBtn2').textContent = t(store.owned ? 'owned' : 'restore');
   $('restoreBtn2').classList.toggle('on', store.owned);
   $('settings').hidden = false;
 };
@@ -502,6 +500,14 @@ renderer.setAnimationLoop(loop);
 
 // 先讀完存檔與設定，選關畫面的星數、解鎖狀態、每日挑戰標記才正確
 await Promise.all([loadProgress(), loadSettings(), loadDaily(), loadStore()]);
+// 語言：設定 → 裝置語言；關卡文字與藏匿點名稱換成目前語言，再套用 HTML 上的固定文字
+initLang(settings.lang);
+await localizeLevels(LEVELS, SPOTS);
+applyStaticText();
+// 設定裡的語言選單：切換後存檔並重新載入，整個畫面一次換好
+$('langSelect').innerHTML = LANGS.map((l) => `<option value="${l}">${UI[l]['lang.name']}</option>`).join('');
+$('langSelect').value = lang;
+$('langSelect').onchange = async (e) => { await setSetting('lang', e.target.value); location.reload(); };
 signInGameCenter();
 startIconSwap(); // 畫面上的 emoji 換成遊戲自己的圖示
 showSelect();

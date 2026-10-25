@@ -30,6 +30,14 @@ def cut_background(cell: Image.Image) -> Image.Image:
     labels, _ = ndimage.label(near_white)
     edge = np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))
     bg = np.isin(labels, edge[edge > 0])
+    # 被物品圍住的大塊「幾乎純白」區域（項鍊、眼罩帶子圍出的空洞）也是背景；
+    # 紙張、書頁有陰影與紋理，不會整塊都這麼白，所以不受影響
+    pure = (255 - rgb).max(axis=2) <= 8
+    holes, n = ndimage.label(pure & ~bg)
+    if n:
+        sizes = ndimage.sum(np.ones_like(holes), holes, index=range(1, n + 1))
+        big = [i + 1 for i, s in enumerate(sizes) if s > holes.size * 0.012]
+        bg |= np.isin(holes, big)
     alpha = Image.fromarray(np.where(bg, 0, 255).astype(np.uint8))
     alpha = alpha.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))
     out = cell.convert("RGBA")

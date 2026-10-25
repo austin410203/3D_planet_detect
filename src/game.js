@@ -13,10 +13,10 @@ import { SPOTS } from './props.js';
 import { fmtTime } from './progress.js';
 import { sfx } from './audio.js';
 import { haptic } from './haptics.js';
+import { t as tr } from './i18n.js';
 
 const WRONG_PENALTY = 3;   // 翻錯地方 +3 秒
 const HINT_PENALTY = 15;   // 使用提示 +15 秒
-const EMPTY_LINES = ['空空如也……', '只有一些灰塵。', '什麼都沒有！', '這裡沒有喔～', '只有一隻螞蟻在搬家。'];
 
 const $ = (id) => document.getElementById(id);
 
@@ -51,7 +51,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
   $('itemSlots').innerHTML = targets.map((t, i) => `<li data-i="${i}" title="${t.name}"><span>${t.emoji}</span></li>`).join('');
   $('journalBody').innerHTML = targets.map((t, i) => `
     <div class="clue" data-i="${i}">
-      <div class="clue-head"><b>${t.emoji}</b><strong>${t.name}</strong><span class="tag tag-${t.type}">${t.type}</span></div>
+      <div class="clue-head"><b>${t.emoji}</b><strong>${t.name}</strong><span class="tag tag-${t.type}">${tr(`clue.${t.type}`)}</span></div>
       <p>${t.clue}</p>
     </div>`).join('');
   const [t3, t2] = level.stars;
@@ -104,7 +104,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     if (r) {
       r.hovered = true;
       if (r.kind === 'spot') {
-        hoverEl.textContent = r.searched ? `${r.name}（翻過了）` : `🔍 ${r.name}`;
+        hoverEl.textContent = tr(r.searched ? 'hoverSearched' : 'hoverSpot', { name: r.name });
         hoverObj.position.copy(r.dir).multiplyScalar(getSurfaceRadius(r.dir) + r.height + 0.18);
         hoverEl.classList.add('show');
       } else hoverEl.classList.remove('show');
@@ -124,7 +124,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     const r = pick(e.clientX, e.clientY);
     if (!r) return;
     if (e.pointerType !== 'mouse') setHover(r);
-    if (r.kind === 'landmark') { sfx.pop(); toast(`📍 ${r.name}：${r.lore}`); }
+    if (r.kind === 'landmark') { sfx.pop(); toast(tr('landmarkInfo', { name: r.name, lore: r.lore })); }
     else search(r);
   };
   domElement.addEventListener('pointermove', onMove);
@@ -138,14 +138,14 @@ export function createGame({ level, world, camera, domElement, particles, onFini
 
   /* ---------- 搜尋藏匿點 ---------- */
   function search(spot) {
-    if (spot.searched) { toast(`這個${spot.name}已經翻過了`); return; }
+    if (spot.searched) { toast(tr('alreadySearched', { name: spot.name })); return; }
     spot.searched = true;
     spot.shakeT = state.clock;
     sfx.search();
     haptic.search();
     const top = spot.dir.clone().multiplyScalar(getSurfaceRadius(spot.dir) + spot.height);
     particles.emit(top, spot.dir.clone());
-    hoverEl.textContent = `${spot.name}（翻過了）`;
+    hoverEl.textContent = tr('hoverSearched', { name: spot.name });
 
     const c = spot.content;
     if (c?.target) {
@@ -154,8 +154,8 @@ export function createGame({ level, world, camera, domElement, particles, onFini
       setTimeout(() => { sfx.found(); haptic.found(); }, 120); // 翻找聲之後再響
       world.popItem(spot, c.target.emoji, 0.8);
       particles.emit(top, spot.dir.clone());
-      floatText(spot.dir, spot.height + 0.5, `找到 ${c.target.name}！`, 'good');
-      toast(`🎉 找到了 ${c.target.emoji} ${c.target.name}！（${state.found.size} / ${targets.length}）`);
+      floatText(spot.dir, spot.height + 0.5, tr('floatFound', { name: c.target.name }), 'good');
+      toast(tr('toastFound', { emoji: c.target.emoji, name: c.target.name, found: state.found.size, total: targets.length }));
       document.querySelector(`#itemSlots li[data-i="${i}"]`)?.classList.add('found');
       document.querySelector(`#journalBody .clue[data-i="${i}"]`)?.classList.add('found');
       // 這個目標的提示已完成，收起光柱
@@ -164,11 +164,11 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     } else {
       addPenalty(WRONG_PENALTY);
       setTimeout(() => { sfx.wrong(); haptic.wrong(); }, 120);
-      floatText(spot.dir, spot.height + 0.3, `+${WRONG_PENALTY}秒`, 'bad');
+      floatText(spot.dir, spot.height + 0.3, tr('penalty', { n: WRONG_PENALTY }), 'bad');
       if (c?.junk) {
         world.popItem(spot, c.junk[0], 0.55);
-        toast(`翻出了 ${c.junk[0]} ${c.junk[1]}……不是這個啦！`);
-      } else toast(EMPTY_LINES[Math.floor(Math.random() * EMPTY_LINES.length)]);
+        toast(tr('junkFound', { emoji: c.junk[0], name: c.junk[1] }));
+      } else { const lines = tr('emptyLines'); toast(lines[Math.floor(Math.random() * lines.length)]); }
     }
   }
 
@@ -186,8 +186,8 @@ export function createGame({ level, world, camera, domElement, particles, onFini
     state.beaconFor = i;
     const lm = world.landmarks.get(t.at);
     lmLabels.forEach((l) => l.el.classList.toggle('hint', l.lm === lm));
-    if (lv === 1) toast(`💡 ${t.emoji} ${t.name} 就在「${lm.name}」附近！（+${HINT_PENALTY}秒）`);
-    else toast(`💡 ${t.emoji} ${t.name} 藏在「${lm.name}」旁邊的「${SPOTS[t.spot].name}」裡！（+${HINT_PENALTY}秒）`);
+    if (lv === 1) toast(tr('hint1', { emoji: t.emoji, name: t.name, lm: lm.name, n: HINT_PENALTY }));
+    else toast(tr('hint2', { emoji: t.emoji, name: t.name, lm: lm.name, spot: SPOTS[t.spot].name, n: HINT_PENALTY }));
   };
   $('hintBtn').addEventListener('click', onHint);
   cleanup.push(() => $('hintBtn').removeEventListener('click', onHint));

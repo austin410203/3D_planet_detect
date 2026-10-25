@@ -58,6 +58,15 @@ html, body {
 .logo h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 900; letter-spacing: .06em; line-height: 1.1; }
 .logo p { font: 800 13px var(--num); letter-spacing: .12em; opacity: .7; }
 .nowrap { white-space: nowrap; } /* 窄螢幕換行時「招領所」不拆開 */
+/* 日文、韓文改用對應的字型（i18n.js 設定 <html lang>） */
+html[lang="ja"] { --font: "Noto Sans JP", "Noto Sans TC", "Hiragino Sans", system-ui, sans-serif; }
+html[lang="ko"] { --font: "Noto Sans KR", "Noto Sans TC", "Apple SD Gothic Neo", system-ui, sans-serif; }
+/* 英文標題較長：縮小字距與字級，避免標誌撐太高 */
+html[lang="en"] .logo h1 { font-size: clamp(20px, 3.6vw, 28px); letter-spacing: .01em; }
+html[lang="en"] .logo p { letter-spacing: .02em; }
+html[lang="en"] .icon-btn small { font-size: 9px; letter-spacing: -.02em; }
+/* 設定裡的語言選單（外觀同開關按鈕） */
+.lang-select { appearance: none; -webkit-appearance: none; text-align: center; background: #fff; padding-right: 12px; }
 /* 取代 emoji 的遊戲圖示（src/icons.js），大小跟著文字走 */
 img.gi { height: 1.2em; width: auto; vertical-align: -0.25em; pointer-events: none; user-select: none; }
 

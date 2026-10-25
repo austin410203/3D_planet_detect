@@ -28,6 +28,8 @@
   "devDependencies": {
     "@capacitor/cli": "^8.5.3",
     "@expo-google-fonts/baloo-2": "^0.4.2",
+    "@expo-google-fonts/noto-sans-jp": "^0.4.4",
+    "@expo-google-fonts/noto-sans-kr": "^0.4.4",
     "@expo-google-fonts/noto-sans-tc": "^0.4.4",
     "@resvg/resvg-js": "^2.6.2",
     "@types/three": "^0.186.0",

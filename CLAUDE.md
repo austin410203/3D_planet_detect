@@ -6,6 +6,13 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - 所有說明、程式註解、文件一律使用**繁體中文**。
 - 純 HTML + ES Module，不使用框架；模型全部用 Three.js 基本幾何體組合，沒有外部模型或貼圖檔。
 - 各功能分檔撰寫，改動時維持模組化。
+- 遊戲內支援四種語言（繁中／日本語／한국어／English）：玩家看得到的文字不可寫死在程式裡。
+  - 介面文字：`src/locales/ui.js`（四種語言都要加），程式用 `t('key', vars)`；HTML 用 `data-i18n` / `data-i18n-aria`。
+  - 關卡文字：繁中寫在 levels 檔，其他語言在 `src/locales/levels-{en,ja,ko}.js`（同一個關卡 id，物品與雜物依順序對應）。新增關卡時三個檔都要補。
+  - 自動線索：`src/locales/clue-text.js`（模板、藏匿點名稱與說法、愛八卦的居民）。新增藏匿點種類時四種語言都要補。
+  - 韓文助詞寫成「이(가)／을(를)／은(는)／(으)로」，`fixJosa()` 會依收尾子音換成正確的一個。
+  - 字型：日文、韓文用 Noto Sans JP／KR 子集（`scripts/subset-fonts.mjs` 從 locales 收集字元），CSS 依 `<html lang>` 切換。
+- 遊戲中的圖示用 Gemini 生成的低多邊形圖示取代 emoji：`public/icons/game/<emoji 碼位>.webp`，`src/icons.js` 會自動把畫面上的 emoji 換成圖片；沒有圖示的維持 emoji。流程：`scripts/icon-catalog.mjs` 產生清單 → Gemini 4×4 圖示表 → `python scripts/slice_icons.py <圖> <第幾張>` 切圖去背。
 
 ## 指令
 - `npm install`、`npm run dev`（本地開發）、`npm run build`（輸出到 `dist/`，部署前必須無錯誤）
