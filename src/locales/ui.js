@@ -51,6 +51,12 @@ export const UI = {
     hint1: '💡 {emoji} {name} 就在「{lm}」附近！（+{n}秒）',
     hint2: '💡 {emoji} {name} 藏在「{lm}」旁邊的「{spot}」裡！（+{n}秒）',
     'clue.線索': '線索', 'clue.傳說': '傳說', 'clue.八卦': '八卦',
+    tapToStart: '點一下開始', tutorialRow: '📖 新手教學', replay: '再看一次',
+    tutSkip: '跳過教學', tutNext: '下一步', tutGo: '開始找！',
+    tut1: '👆 <b>拖曳</b>就能轉動星球，兩指可以縮放。先轉一圈看看吧！',
+    tut2: '📖 打開<b>線索手冊</b>：每條線索都會說出一個<b>地標</b>和一種<b>藏匿點</b>。',
+    tut3: '📍 發光的是線索提到的地標。<b>點它旁邊的藏匿點</b>翻找看看！教學中翻錯不會加時間。',
+    tutDone: '🎉 做得好！計時開始，剩下的物品靠你自己囉！',
   },
 
   en: {
@@ -101,6 +107,12 @@ export const UI = {
     hint1: '💡 The {emoji} {name} is near "{lm}"! (+{n}s)',
     hint2: '💡 The {emoji} {name} is in the {spot} next to "{lm}"! (+{n}s)',
     'clue.線索': 'Clue', 'clue.傳說': 'Legend', 'clue.八卦': 'Gossip',
+    tapToStart: 'Tap to start', tutorialRow: '📖 Tutorial', replay: 'Replay',
+    tutSkip: 'Skip tutorial', tutNext: 'Next', tutGo: 'Let\'s go!',
+    tut1: '👆 <b>Drag</b> to spin the planet, pinch to zoom. Give it a spin!',
+    tut2: '📖 Open the <b>Clue Book</b>: every clue names a <b>landmark</b> and a <b>hiding spot</b>.',
+    tut3: '📍 The glowing landmark is the one the clue mentions. <b>Tap a hiding spot next to it</b>! Wrong guesses are free during the tutorial.',
+    tutDone: '🎉 Nice work! The timer is on — find the rest yourself!',
   },
 
   ja: {
@@ -151,6 +163,12 @@ export const UI = {
     hint1: '💡 {emoji} {name}は「{lm}」の近くにあるよ！（+{n}秒）',
     hint2: '💡 {emoji} {name}は「{lm}」のそばの「{spot}」の中！（+{n}秒）',
     'clue.線索': '手がかり', 'clue.傳說': '伝説', 'clue.八卦': 'うわさ',
+    tapToStart: 'タップしてスタート', tutorialRow: '📖 チュートリアル', replay: 'もう一度見る',
+    tutSkip: 'スキップ', tutNext: '次へ', tutGo: '探しはじめる！',
+    tut1: '👆 <b>ドラッグ</b>で星を回せるよ。2本指でズームもできる。まずは回してみよう！',
+    tut2: '📖 <b>手がかり帳</b>を開こう：手がかりには<b>ランドマーク</b>と<b>隠れ場所</b>が書いてあるよ。',
+    tut3: '📍 光っているのが手がかりのランドマーク。<b>そばの隠れ場所をタップ</b>して調べよう！チュートリアル中はまちがえてもタイムは増えないよ。',
+    tutDone: '🎉 よくできました！タイマースタート、残りは自分で探してね！',
   },
 
   ko: {
@@ -201,5 +219,11 @@ export const UI = {
     hint1: '💡 {emoji} {name}은(는) "{lm}" 근처에 있어요! (+{n}초)',
     hint2: '💡 {emoji} {name}은(는) "{lm}" 옆의 "{spot}" 안에 있어요! (+{n}초)',
     'clue.線索': '단서', 'clue.傳說': '전설', 'clue.八卦': '소문',
+    tapToStart: '탭해서 시작', tutorialRow: '📖 튜토리얼', replay: '다시 보기',
+    tutSkip: '건너뛰기', tutNext: '다음', tutGo: '찾으러 가자!',
+    tut1: '👆 <b>드래그</b>하면 행성이 돌아가요. 두 손가락으로 확대도 돼요. 한번 돌려 보세요!',
+    tut2: '📖 <b>단서 수첩</b>을 열어 보세요. 단서마다 <b>랜드마크</b>와 <b>숨는 곳</b>이 적혀 있어요.',
+    tut3: '📍 빛나는 곳이 단서에 나온 랜드마크예요. <b>옆에 있는 숨는 곳을 탭</b>해서 뒤져 보세요! 튜토리얼 중에는 틀려도 시간이 늘지 않아요.',
+    tutDone: '🎉 잘했어요! 이제 타이머 시작, 나머지는 직접 찾아보세요!',
   },
 };

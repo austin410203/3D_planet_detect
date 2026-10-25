@@ -7,7 +7,7 @@ import { Preferences } from '@capacitor/preferences';
 
 const KEY = 'planetLostFound.settings';
 const listeners = new Set();
-export const settings = { music: true, sfx: true, haptics: true, lang: null };
+export const settings = { music: true, sfx: true, haptics: true, lang: null, tutorialDone: false };
 
 export async function loadSettings() {
   try {

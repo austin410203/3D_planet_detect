@@ -68,6 +68,28 @@
     </div>
   </section>
 
+  <!-- ==================== 標題畫面（開啟 App 第一個畫面，點一下開始） ==================== -->
+  <section id="title" class="screen title-screen" hidden>
+    <header class="logo title-logo">
+      <div class="logo-badge">🔍</div>
+      <div>
+        <h1 data-i18n="title">星球失物<span class="nowrap">招領所</span></h1>
+        <p data-i18n="subtitle">Lost &amp; Found in Space</p>
+      </div>
+    </header>
+    <p class="title-tap" data-i18n="tapToStart">點一下開始</p>
+  </section>
+
+  <!-- ==================== 新手教學提示框 ==================== -->
+  <div class="tutorial" id="tutorial" hidden>
+    <div class="tut-head">
+      <span class="tut-step" id="tutStep"></span>
+      <button class="link-btn" id="tutSkip" data-i18n="tutSkip">跳過教學</button>
+    </div>
+    <p class="tut-text" id="tutText"></p>
+    <button class="btn btn-go btn-small" id="tutNext"></button>
+  </div>
+
   <!-- ==================== 委託說明 ==================== -->
   <div class="modal" id="intro" hidden>
     <div class="dialog">
@@ -110,6 +132,7 @@
         <li><span data-i18n="sfx">🔊 音效</span> <button class="toggle" id="set-sfx"></button></li>
         <li id="hapticsRow"><span data-i18n="haptics">📳 震動</span> <button class="toggle" id="set-haptics"></button></li>
         <li id="restoreRow"><span data-i18n="fullVersion">💎 完整版</span> <button class="toggle" id="restoreBtn2">恢復購買</button></li>
+        <li><span data-i18n="tutorialRow">📖 新手教學</span> <button class="toggle" id="replayTutorial" data-i18n="replay">再看一次</button></li>
         <li><span data-i18n="language">🌐 語言</span> <select class="toggle lang-select" id="langSelect"></select></li>
       </ul>
       <button class="btn btn-go btn-small" id="settingsClose" data-i18n="done">完成</button>

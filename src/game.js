@@ -20,7 +20,7 @@ const HINT_PENALTY = 15;   // 使用提示 +15 秒
 
 const $ = (id) => document.getElementById(id);
 
-export function createGame({ level, world, camera, domElement, particles, onFinish }) {
+export function createGame({ level, world, camera, domElement, particles, onFinish, onSearch }) {
   const state = {
     time: 0, penalty: 0, running: false, done: false,
     found: new Set(),
@@ -162,14 +162,17 @@ export function createGame({ level, world, camera, domElement, particles, onFini
       if (state.beaconFor === i) { world.hideBeacon(); state.beaconFor = null; lmLabels.forEach((l) => l.el.classList.remove('hint')); }
       if (state.found.size === targets.length) finish();
     } else {
-      addPenalty(WRONG_PENALTY);
       setTimeout(() => { sfx.wrong(); haptic.wrong(); }, 120);
-      floatText(spot.dir, spot.height + 0.3, tr('penalty', { n: WRONG_PENALTY }), 'bad');
+      if (!state.paused) { // 教學中翻錯不加秒
+        addPenalty(WRONG_PENALTY);
+        floatText(spot.dir, spot.height + 0.3, tr('penalty', { n: WRONG_PENALTY }), 'bad');
+      }
       if (c?.junk) {
         world.popItem(spot, c.junk[0], 0.55);
         toast(tr('junkFound', { emoji: c.junk[0], name: c.junk[1] }));
       } else { const lines = tr('emptyLines'); toast(lines[Math.floor(Math.random() * lines.length)]); }
     }
+    onSearch?.(!!c?.target); // 教學用：通知翻找了一次（是否找到）
   }
 
   /* ---------- 提示 ---------- */
@@ -205,9 +208,17 @@ export function createGame({ level, world, camera, domElement, particles, onFini
   return {
     state,
     start() { state.running = true; },
+    /** 教學用：標出第 i 件物品所在的地標（光柱＋名稱標籤閃動），不加秒 */
+    guide(i) {
+      const lm = world.landmarks.get(targets[i].at);
+      world.showBeacon(targets[i].at);
+      state.beaconFor = i;
+      lmLabels.forEach((l) => l.el.classList.toggle('hint', l.lm === lm));
+      return lm;
+    },
     update(dt, t, rawDt = dt) {
       state.clock = t;
-      if (state.running) state.time += rawDt;
+      if (state.running && !state.paused) state.time += rawDt; // 教學進行中（paused）不計時
       const total = state.time + state.penalty;
       $('timer').textContent = fmtTime(total);
       $('starFill').style.width = `${Math.min(100, (total / span) * 100)}%`;

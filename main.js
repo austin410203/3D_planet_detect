@@ -28,6 +28,7 @@ import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitSco
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
 import { store, hasStore, loadStore, purchaseFull, restorePurchases, onStoreChange } from './src/store.js';
 import { startIconSwap } from './src/icons.js';
+import { runTutorial } from './src/tutorial.js';
 import { t, lang, LANGS, initLang, applyStaticText, localizeLevels } from './src/i18n.js';
 import { UI } from './src/locales/ui.js';
 import { SPOTS } from './src/props.js';
@@ -181,6 +182,7 @@ $('nextPlanet').onclick = () => choose(selected + 1);
 $('planetDots').onclick = (e) => { if (e.target.dataset.i) { sfx.swipe(); choose(Number(e.target.dataset.i)); } };
 $('startBtn').onclick = () => startLevel(selected);
 addEventListener('keydown', (e) => {
+  if (mode === 'title' && (e.key === 'Enter' || e.key === ' ')) { leaveTitle(); return; }
   if (mode !== 'select' || !$('daily').hidden || !$('settings').hidden || !$('store').hidden) return;
   if (e.key === 'ArrowLeft') { sfx.swipe(); choose(selected - 1); }
   if (e.key === 'ArrowRight') { sfx.swipe(); choose(selected + 1); }
@@ -190,7 +192,9 @@ addEventListener('keydown', (e) => {
 /* =========================================================
  * 畫面流程
  * ======================================================= */
-let mode = 'select';   // select | intro | play | result
+let mode = 'title';    // title | select | intro | play | result
+let tutorialRun = false; // 這一局是否要跑新手教學
+let searchHook = null;   // 教學用：翻找時通知
 let world = null;
 let game = null;
 let levelIndex = 0;
@@ -204,9 +208,33 @@ document.addEventListener('click', (e) => {
   haptic.tap();
 });
 
+/** 標題畫面：大標誌＋慢慢自轉的第一顆星球，點一下開始（同時解鎖 iOS 的音訊） */
+function showTitle() {
+  teardown();
+  mode = 'title';
+  selected = 0;
+  playMusic('menu');
+  $('select').hidden = true;
+  $('hud').hidden = true;
+  $('title').hidden = false;
+  previews.visible = true;
+  controls.enabled = false;
+  camera.up.set(0, 1, 0);
+  renderSelectCard();
+}
+/** 離開標題畫面：第一次玩（沒看過教學、第一關也還沒星星）直接進第一關教學，否則到選關 */
+function leaveTitle() {
+  if (mode !== 'title') return;
+  $('title').hidden = true;
+  if (!settings.tutorialDone && !progress.get(LEVELS[0].id).stars) startLevel(0, null, { tutorial: true });
+  else showSelect();
+}
+$('title').onclick = leaveTitle;
+
 function showSelect() {
   teardown();
   mode = 'select';
+  $('title').hidden = true;
   dailyRun = null;
   playMusic('menu');
   $('dailyBtn').classList.toggle('done', !!daily.result());
@@ -223,6 +251,8 @@ function showSelect() {
 function teardown() {
   game?.dispose();
   game = null;
+  $('tutorial').hidden = true; // 教學中途離開關卡，提示框一起收起（下次開啟會再出現）
+  searchHook = null;
   if (world) { scene.remove(world.group); disposeGroup(world.group); world = null; }
 }
 
@@ -230,7 +260,7 @@ function teardown() {
  * 開始關卡
  * @param {string|null} dailyKey 每日挑戰的日期；有值時用當天固定的 seed，且不受解鎖限制
  */
-function startLevel(i, dailyKey = null) {
+function startLevel(i, dailyKey = null, { tutorial = false } = {}) {
   if (!dailyKey && !progress.isUnlocked(LEVELS, i)) return;
   teardown();
   levelIndex = i;
@@ -243,6 +273,7 @@ function startLevel(i, dailyKey = null) {
   playMusic(lv);
 
   dailyRun = dailyKey ? { key: dailyKey, first: !daily.result(dailyKey) } : null;
+  tutorialRun = tutorial;
   $('introDaily').hidden = !dailyRun;
   if (dailyRun) $('introDaily').textContent = t(dailyRun.first ? 'introDailyFirst' : 'introDailyPractice');
 
@@ -251,6 +282,7 @@ function startLevel(i, dailyKey = null) {
   game = createGame({
     level: lv, world, camera, domElement: renderer.domElement, particles,
     onFinish: (r) => showResult(r),
+    onSearch: (found) => searchHook?.(found),
   });
   window.__dbg = { world, game, camera, controls }; // 除錯用
 
@@ -274,7 +306,14 @@ function startLevel(i, dailyKey = null) {
 
 $('introGo').onclick = () => {
   $('intro').hidden = true;
-  countdown(() => { mode = 'play'; game.start(); });
+  countdown(() => {
+    mode = 'play';
+    game.start();
+    if (tutorialRun) {
+      runTutorial({ game, controls, onSearchHook: (fn) => { searchHook = fn; } })
+        .then(() => { tutorialRun = false; setSetting('tutorialDone', true); });
+    }
+  });
 };
 
 /** 3、2、1、出發！ */
@@ -426,6 +465,8 @@ $('settingsBtn').onclick = () => {
   $('settings').hidden = false;
 };
 $('settingsClose').onclick = () => { $('settings').hidden = true; };
+// 再看一次新手教學：直接開第一關並跑教學
+$('replayTutorial').onclick = () => { $('settings').hidden = true; startLevel(0, null, { tutorial: true }); };
 
 /* =========================================================
  * 主迴圈
@@ -465,15 +506,17 @@ function loop() {
   stars.material.uniforms.uTime.value = t;
   stars.rotation.y += dt * 0.004;
 
-  if (mode === 'select') {
-    // 輪播：相機滑到選中的星球，星球緩慢自轉
+  if (mode === 'select' || mode === 'title') {
+    // 輪播：相機滑到選中的星球，星球緩慢自轉（標題畫面時星球放在畫面下半，讓出標誌的位置）
     const portrait = innerWidth < innerHeight;
     // 直式時依螢幕寬度拉遠相機，讓整顆星球（含大氣層，半寬約 6.3）都放得進畫面
     const fit = 6.3 / (camera.aspect * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
-    const dist = portrait ? Math.max(26, fit) : 19;
+    // 標題畫面拉遠一點，整顆星球放在畫面下半部
+    const dist = (portrait ? Math.max(26, fit) : 19) * (mode === 'title' ? 1.3 : 1);
     camGoal.set(selected * SPACING, 1.2, dist);
     camera.position.lerp(camGoal, Math.min(1, dt * 4));
-    camera.lookAt(camera.position.x, portrait ? -1.5 * (dist / 26) : -0.8, 0);
+    const lookY = mode === 'title' ? dist * 0.11 : portrait ? -1.5 * (dist / 26) : -0.8;
+    camera.lookAt(camera.position.x, lookY, 0);
     previews.children.forEach((p) => {
       const i = p.userData.index;
       p.rotation.y += dt * (i === selected ? 0.25 : 0.08);
@@ -510,7 +553,8 @@ $('langSelect').value = lang;
 $('langSelect').onchange = async (e) => { await setSetting('lang', e.target.value); location.reload(); };
 signInGameCenter();
 startIconSwap(); // 畫面上的 emoji 換成遊戲自己的圖示
-showSelect();
+// 開啟時先顯示標題畫面；商店截圖的展示模式直接從選關開始
+if (import.meta.env.VITE_SCREENSHOT === '1') showSelect(); else showTitle();
 applyTheme(LEVELS[0].theme, true);
 
 // 商店截圖用的自動展示模式：只在 VITE_SCREENSHOT=1 建置時打包，正式版會被整段移除

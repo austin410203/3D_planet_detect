@@ -32,7 +32,7 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - 網頁版沒有 Game Center 與震動：相關按鈕、設定列自動隱藏。
 
 ## 架構
-- `main.js`：畫面流程（選關 → 委託 → 倒數 → 解謎 → 結算）、Renderer、Bloom、主題燈光、選關輪播（只建立選中星球前後兩顆預覽）。
+- `main.js`：畫面流程（標題畫面 → 選關 → 委託 → 倒數 → 解謎 → 結算；第一次遊玩從標題直接進第一關並跑新手教學）、Renderer、Bloom、主題燈光、選關輪播（只建立選中星球前後兩顆預覽）。
 - `src/levels.js`（第 1～8 關）、`src/levels-extra.js`（第 9～28 關）：關卡資料。每關 4 個地標、3～4 件物品、`spotPool`、`stars: [三星秒數, 二星秒數]`。
 - `src/clues.js`：每局隨機把物品分配到地標與藏匿點，並以線索／傳說／八卦模板產生線索；隨機結果與關卡預設劇本相同時沿用手寫線索。
 - `src/world.js`：`buildWorld(level, seed)` 依關卡擺放地標、藏匿點、裝飾（InstancedMesh）。
@@ -40,7 +40,8 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `src/props.js`、`src/props-extra.js`：藏匿點（`SPOTS`）、地標（`LANDMARKS`）、裝飾（`DECOR`）模型庫。
 - `src/game.js`：計時、搜尋、提示、線索手冊、評星。翻錯 +3 秒、提示 +15 秒。
 - `src/progress.js`：進度存在 Capacitor Preferences（iOS 為 UserDefaults，網頁為 localStorage），啟動時需先 `await loadProgress()`；舊版 localStorage 進度會自動搬移。
-- `src/settings.js`：配樂／音效／震動開關（Preferences）。
+- `src/settings.js`：配樂／音效／震動開關、語言、是否看過教學（Preferences）。
+- `src/tutorial.js`：新手教學三步驟（拖曳旋轉 → 打開線索手冊 → 點地標旁的藏匿點），期間暫停計時、翻錯不加秒；設定裡可「再看一次」。
 - `src/audio.js`：Web Audio 即時合成音效與配樂，不使用音檔。配樂依星球 id 產生固定的 8 小節循環，`MINOR` 清單裡的星球用小調；第一次觸控才解鎖發聲（iOS 規定）。
 - `src/haptics.js`：觸覺回饋（只在原生 App）。按鈕的點擊音效與震動由 `main.js` 的 document click 統一處理，不用每顆按鈕各自加。
 - `src/gamecenter.js`：Game Center 登入、上傳分數、開啟排行榜。時間以 1/100 秒上傳。
