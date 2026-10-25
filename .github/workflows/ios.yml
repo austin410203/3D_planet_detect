@@ -99,6 +99,45 @@ jobs:
           if [ -n "$MISSING" ]; then echo "缺少原生呼叫：$MISSING" | tee ci-out/plugin-check.txt; echo "::error::原生外掛沒有被呼叫：$MISSING"; exit 1; fi
           echo "OK：GameCenter、Store 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
 
+      - name: 商店截圖（commit 訊息含 [shots] 或手動觸發時）
+        if: steps.build.outputs.status == '0' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
+        run: |
+          # 截圖版網頁：含 src/demo.js 自動展示，依序輸出 SHOT:名稱，看到就截圖
+          VITE_SCREENSHOT=1 npx vite build --outDir dist-shots
+          cp -R build/Build/Products/Debug-iphonesimulator/App.app App-shots.app
+          rm -rf App-shots.app/public && cp -R dist-shots App-shots.app/public
+          mkdir -p ci-out/shots
+          find_dev() {
+            xcrun simctl list devices available -j | python3 -c "
+          import json, re, sys
+          devs = json.load(sys.stdin)['devices']
+          for rt in sorted(devs, reverse=True):
+              if 'iOS' in rt:
+                  for d in devs[rt]:
+                      if re.match(sys.argv[1], d['name']):
+                          print(d['udid']); sys.exit()
+          " "$1"
+          }
+          shoot() {
+            UDID=$(find_dev "$1")
+            xcrun simctl list devices | grep "$UDID" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
+            xcrun simctl boot "$UDID" || true
+            xcrun simctl bootstatus "$UDID" -b
+            xcrun simctl install "$UDID" App-shots.app
+            LOG="ci-out/shots/$2-log.txt"
+            script -q -F "$LOG" xcrun simctl launch --console-pty "$UDID" com.austin410203.planetlostfound > /dev/null 2>&1 &
+            for name in select intro play result daily; do
+              for t in $(seq 1 240); do grep -q "SHOT:$name" "$LOG" && break; sleep 0.5; done
+              sleep 1.2
+              xcrun simctl io "$UDID" screenshot "ci-out/shots/$2-$name.png"
+            done
+            xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
+            xcrun simctl shutdown "$UDID" || true
+            grep -E "SHOT:|rror" "$LOG" | tr -d '\r' | head -40 > "$LOG.tmp"; mv "$LOG.tmp" "$LOG"
+          }
+          shoot '^iPhone 1[6-9] Pro Max' iphone69
+          shoot '^iPad Pro 13' ipad13
+
       - name: 推送結果到 ci-results 分支
         if: always()
         run: |

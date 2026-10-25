@@ -1,7 +1,7 @@
 /**
  * subset-fonts.mjs — 產生打包在 App 內的字型（不依賴 Google Fonts，離線也能顯示）
  * --------------------------------------------------
- * - 掃描 index.html、main.js、style.css、src/*.js，收集遊戲中實際用到的字
+ * - 掃描 index.html、main.js、style.css、src/*.js、public/*.html，收集實際用到的字
  * - 把 Noto Sans TC（500/700/900）與 Baloo 2（600/800）縮減成只含這些字的 woff2
  * - 輸出到 public/fonts/，並產生 public/fonts/fonts.css
  * 每次 npm run build 前會自動執行（prebuild），新增關卡文字後字型會跟著更新。
@@ -24,7 +24,11 @@ const FONTS = [
 ];
 
 /* ---------- 收集用到的字 ---------- */
-const sources = ['index.html', 'main.js', 'style.css', ...readdirSync(join(root, 'src')).filter((f) => f.endsWith('.js')).map((f) => join('src', f))];
+const sources = [
+  'index.html', 'main.js', 'style.css',
+  ...readdirSync(join(root, 'src')).filter((f) => f.endsWith('.js')).map((f) => join('src', f)),
+  ...readdirSync(join(root, 'public')).filter((f) => f.endsWith('.html')).map((f) => join('public', f)), // 隱私權政策、支援頁
+];
 const chars = new Set();
 for (let c = 0x20; c <= 0x7e; c++) chars.add(String.fromCharCode(c));       // 英數與半形符號
 for (const c of '，。、！？：；「」『』（）《》〈〉…—～・＋－×％') chars.add(c);  // 常用全形標點

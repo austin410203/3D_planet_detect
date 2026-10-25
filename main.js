@@ -501,3 +501,8 @@ await Promise.all([loadProgress(), loadSettings(), loadDaily(), loadStore()]);
 signInGameCenter();
 showSelect();
 applyTheme(LEVELS[0].theme, true);
+
+// 商店截圖用的自動展示模式：只在 VITE_SCREENSHOT=1 建置時打包，正式版會被整段移除
+if (import.meta.env.VITE_SCREENSHOT === '1') {
+  import('./src/demo.js').then((m) => m.runDemo({ LEVELS, choose, startLevel, progress }));
+}
