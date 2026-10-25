@@ -7,7 +7,7 @@
  */
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const HOLD = 7000; // 每個畫面停留時間：iPad 模擬器的紀錄輸出較慢，CI 看到標記可能晚好幾秒
+const HOLD = 20000; // 每個畫面停留時間：模擬器的紀錄轉到檔案會延遲（實測 5～10 秒），CI 看到標記時畫面必須還沒切走
 
 async function shot(name) {
   console.log(`SHOT:${name}`);
