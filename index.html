@@ -42,6 +42,10 @@
       </dl>
       <button class="btn btn-go" id="startBtn">出發！</button>
       <p class="pc-lock" id="pcLock" hidden>🔒 先在上一顆星球拿到 1 顆星才能解鎖</p>
+      <div class="pc-paid" id="pcPaid" hidden>
+        <p class="pc-lock">💎 第 9～28 顆星球屬於完整版</p>
+        <button class="btn btn-go btn-small" id="unlockBtn">🔓 解鎖完整版</button>
+      </div>
     </article>
 
     <div class="dots" id="planetDots"></div>
@@ -96,8 +100,27 @@
         <li>🎵 配樂 <button class="toggle" id="set-music"></button></li>
         <li>🔊 音效 <button class="toggle" id="set-sfx"></button></li>
         <li id="hapticsRow">📳 震動 <button class="toggle" id="set-haptics"></button></li>
+        <li id="restoreRow">💎 完整版 <button class="toggle" id="restoreBtn2">恢復購買</button></li>
       </ul>
       <button class="btn btn-go btn-small" id="settingsClose">完成</button>
+    </div>
+  </div>
+
+  <!-- ==================== 完整版（App 內購買） ==================== -->
+  <div class="modal" id="store" hidden>
+    <div class="dialog">
+      <h2 class="result-title">💎 完整版</h2>
+      <ul class="store-perks">
+        <li>🪐 再解鎖 <b>20 顆</b>傳說與科幻主題星球（第 9～28 關）</li>
+        <li>🏴‍☠️ 海盜灣、亞特蘭提斯、巨龍之巢、聖誕北極星……</li>
+        <li>✨ 一次購買、永久擁有，沒有廣告</li>
+      </ul>
+      <p class="store-msg" id="storeMsg"></p>
+      <div class="result-btns">
+        <button class="btn btn-small" id="storeClose">之後再說</button>
+        <button class="btn btn-go btn-small" id="buyBtn">購買</button>
+      </div>
+      <button class="link-btn" id="restoreBtn">已經買過了？恢復購買</button>
     </div>
   </div>
 

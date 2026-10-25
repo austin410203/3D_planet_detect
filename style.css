@@ -306,6 +306,17 @@ html, body {
 }
 .toggle.on { background: var(--mint); }
 
+/* ---------- 完整版（App 內購買） ---------- */
+.pc-paid .pc-lock { margin: 0 0 8px; }
+.store-perks { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 14px 0; text-align: left; }
+.store-perks li { background: #fff; border: 3px solid var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 15px; font-weight: 700; }
+.store-msg { min-height: 1.5em; margin-bottom: 8px; font-size: 15px; font-weight: 900; }
+.link-btn {
+  margin-top: 12px; background: none; border: none; color: var(--ink); opacity: .7; cursor: pointer;
+  font: 700 13px var(--font); text-decoration: underline;
+}
+.btn:disabled.btn-go { cursor: progress; }
+
 @media (max-width: 700px) {
   .side-btns { top: calc(10px + var(--sa-t)); left: calc(8px + var(--sa-l)); gap: 8px; }
   .icon-btn { width: 48px; height: 48px; font-size: 20px; border-radius: 14px; }

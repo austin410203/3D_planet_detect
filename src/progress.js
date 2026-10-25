@@ -1,6 +1,6 @@
 /**
  * progress.js — 關卡進度存檔
- * 記錄每顆星球的最佳星數與最佳時間；上一關拿到至少 1 星才解鎖下一關。
+ * 記錄每顆星球的最佳星數與最佳時間；上一關拿到至少 1 星才解鎖下一關，第 9 關以後另需完整版（store.js）。
  * - 存在 Capacitor Preferences：iOS App 內存在原生 UserDefaults（不會被系統清掉），
  *   網頁版則由 Preferences 自動改用 localStorage。
  * - 舊版直接存在 localStorage 的進度，第一次啟動時會自動搬過來。
@@ -8,6 +8,7 @@
  */
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
+import { store } from './store.js';
 
 const KEY = 'planetLostFound.v1';
 let data = {};
@@ -40,10 +41,13 @@ export const progress = {
     persist();
     return isBest;
   },
-  isUnlocked(levels, index) {
-    if (index === 0 || unlockAll) return true;
-    return this.get(levels[index - 1].id).stars > 0;
+  /** 鎖住的原因：null（可以玩）、'paid'（需要完整版）、'stars'（上一關還沒拿到星） */
+  lockReason(levels, index) {
+    if (index === 0 || unlockAll) return null;
+    if (store.needsPurchase(index)) return 'paid';
+    return this.get(levels[index - 1].id).stars > 0 ? null : 'stars';
   },
+  isUnlocked(levels, index) { return !this.lockReason(levels, index); },
   totalStars(levels) { return levels.reduce((s, l) => s + this.get(l.id).stars, 0); },
 };
 

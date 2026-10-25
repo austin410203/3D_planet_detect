@@ -1,0 +1,38 @@
+{
+  "identifier" : "5C2F7A10",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "90.0",
+      "familyShareable" : true,
+      "internalID" : "6740000001",
+      "localizations" : [
+        {
+          "description" : "解鎖第 9～28 關，再多 20 顆傳說與科幻主題星球。",
+          "displayName" : "完整版",
+          "locale" : "zh_TW"
+        }
+      ],
+      "productID" : "com.austin410203.planetlostfound.fullunlock",
+      "referenceName" : "Full Unlock",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "zh_TW",
+    "_storefront" : "TWN",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

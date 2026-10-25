@@ -64,7 +64,8 @@
     ├── audio.js        # Web Audio 合成音效與配樂
     ├── haptics.js      # 觸覺回饋（iOS）
     ├── gamecenter.js   # Game Center 排行榜（iOS）
-    └── daily.js        # 每日挑戰
+    ├── daily.js        # 每日挑戰
+    └── store.js        # 完整版內購（iOS）
 ├── scripts/subset-fonts.mjs  # 縮減字型（只保留遊戲用到的字）
 ├── public/fonts/       # 打包在本地的字型（自動產生）
 ├── capacitor.config.json
@@ -98,3 +99,5 @@ npm run ios:open   # 用 Xcode 開啟，選裝置後執行或 Archive 上傳
 ```
 
 Game Center 排行榜要先在 App Store Connect 建立，ID 與設定見 [docs/game-center.md](docs/game-center.md)。
+
+iOS 版前 8 顆星球免費，「完整版」內購解鎖第 9～28 關，商品設定與測試方式見 [docs/in-app-purchase.md](docs/in-app-purchase.md)。

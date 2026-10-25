@@ -14,7 +14,8 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `npm run ios`：build 後同步到 `ios/`；`npm run ios:open` 用 Xcode 開啟（需要 Mac）。
 
 ## iOS App（Capacitor 8）
-- 目標：上架 App Store，免費加內購——前 8 關免費，買斷解鎖第 9～28 關（第 3 階段實作）。
+- 目標：上架 App Store，免費加內購——前 8 關免費，買斷「完整版」解鎖第 9～28 關。內購用自寫 StoreKit 2 外掛 `StorePlugin.swift`，設定與測試方式見 `docs/in-app-purchase.md`。
+- 網頁版是否全部免費由 `src/store.js` 的 `WEB_FULL_ACCESS` 控制（App 上架前為 `true`）。
 - `capacitor.config.json`：Bundle ID `com.austin410203.planetlostfound`，`webDir: dist`。
 - `ios/`：Xcode 專案（SPM，不用 CocoaPods）。iPhone 鎖直式、iPad 四個方向；隱藏狀態列。`ios/App/App/public` 是同步產物，不進 git。
 - 介面貼邊元素一律加上 `--sa-t/--sa-r/--sa-b/--sa-l`（safe-area-inset）避開瀏海與 Home 指示條。
@@ -36,6 +37,7 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `src/audio.js`：Web Audio 即時合成音效與配樂，不使用音檔。配樂依星球 id 產生固定的 8 小節循環，`MINOR` 清單裡的星球用小調；第一次觸控才解鎖發聲（iOS 規定）。
 - `src/haptics.js`：觸覺回饋（只在原生 App）。按鈕的點擊音效與震動由 `main.js` 的 document click 統一處理，不用每顆按鈕各自加。
 - `src/gamecenter.js`：Game Center 登入、上傳分數、開啟排行榜。時間以 1/100 秒上傳。
+- `src/store.js`：完整版購買狀態（本地快取＋StoreKit 確認）、購買、恢復購買。`progress.lockReason()` 回傳 `'paid'`／`'stars'`／`null`，畫面依原因顯示不同鎖定提示。
 - `src/daily.js`：每日挑戰。以 UTC+8 日期算出星球與 seed（全世界同一張地圖），只記錄當天第一次的成績、計算連續天數；不影響一般關卡進度與解鎖，也不受解鎖限制。
 
 ## 關卡設計規則

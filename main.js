@@ -26,6 +26,7 @@ import { sfx, playMusic, setAudioPaused } from './src/audio.js';
 import { haptic, hasHaptics } from './src/haptics.js';
 import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitScore, LEADERBOARD } from './src/gamecenter.js';
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
+import { store, hasStore, loadStore, purchaseFull, restorePurchases, onStoreChange } from './src/store.js';
 
 const $ = (id) => document.getElementById(id);
 const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
@@ -149,7 +150,7 @@ function renderSelectCard() {
   ensurePreviews(selected);
   const lv = LEVELS[selected];
   const p = progress.get(lv.id);
-  const unlocked = progress.isUnlocked(LEVELS, selected);
+  const lock = progress.lockReason(LEVELS, selected);
   $('pcNum').textContent = selected + 1;
   $('pcEmoji').textContent = lv.emoji;
   $('pcName').textContent = lv.name;
@@ -158,8 +159,10 @@ function renderSelectCard() {
   $('pcItems').textContent = `${lv.targets.length} 件`;
   $('pcBest').textContent = p.best !== null ? fmtTime(p.best) : '--';
   $('pcGoal').textContent = `${lv.stars[0]} 秒`;
-  $('planetCard').classList.toggle('locked', !unlocked);
-  $('pcLock').hidden = unlocked;
+  $('planetCard').classList.toggle('locked', !!lock);
+  $('pcLock').hidden = lock !== 'stars';
+  $('pcPaid').hidden = lock !== 'paid';
+  $('unlockBtn').textContent = store.price ? `🔓 解鎖完整版 ${store.price}` : '🔓 解鎖完整版';
   $('planetDots').innerHTML = LEVELS.map((_, i) => `<span class="${i === selected ? 'on' : ''}" data-i="${i}"></span>`).join('');
   $('totalStars').textContent = progress.totalStars(LEVELS);
   $('maxStars').textContent = LEVELS.length * 3;
@@ -174,7 +177,7 @@ $('nextPlanet').onclick = () => choose(selected + 1);
 $('planetDots').onclick = (e) => { if (e.target.dataset.i) { sfx.swipe(); choose(Number(e.target.dataset.i)); } };
 $('startBtn').onclick = () => startLevel(selected);
 addEventListener('keydown', (e) => {
-  if (mode !== 'select' || !$('daily').hidden || !$('settings').hidden) return;
+  if (mode !== 'select' || !$('daily').hidden || !$('settings').hidden || !$('store').hidden) return;
   if (e.key === 'ArrowLeft') { sfx.swipe(); choose(selected - 1); }
   if (e.key === 'ArrowRight') { sfx.swipe(); choose(selected + 1); }
   if (e.key === 'Enter' && progress.isUnlocked(LEVELS, selected)) startLevel(selected);
@@ -319,7 +322,12 @@ function showResult({ time, stars }) {
 $('retryBtn').onclick = () => startLevel(levelIndex, dailyRun?.key);
 $('resultLbBtn').onclick = () => showLeaderboard(dailyRun ? LEADERBOARD.daily : LEADERBOARD.best(LEVELS[levelIndex].id));
 $('menuBtn').onclick = () => { selected = levelIndex; showSelect(); };
-$('nextBtn').onclick = () => { selected = levelIndex + 1; startLevel(levelIndex + 1); };
+$('nextBtn').onclick = () => {
+  selected = levelIndex + 1;
+  // 打完第 8 關還沒買完整版：回選關畫面並打開完整版介紹
+  if (progress.lockReason(LEVELS, selected) === 'paid') { showSelect(); openStore(); return; }
+  startLevel(selected);
+};
 $('backBtn').onclick = () => { selected = levelIndex; showSelect(); };
 $('journalTab').onclick = () => $('journal').classList.toggle('closed');
 
@@ -349,6 +357,54 @@ $('dailyLb').onclick = () => showLeaderboard(LEADERBOARD.daily);
 $('dailyClose').onclick = () => { $('daily').hidden = true; };
 
 /* =========================================================
+ * 完整版（App 內購買）
+ * ======================================================= */
+function openStore() {
+  $('storeMsg').textContent = hasStore ? '' : '完整版請下載 iOS App 購買';
+  $('buyBtn').hidden = !hasStore;
+  $('restoreBtn').hidden = !hasStore;
+  $('buyBtn').disabled = false;
+  $('buyBtn').textContent = store.price ? `購買 ${store.price}` : '購買';
+  $('store').hidden = false;
+}
+const STORE_MSG = {
+  purchased: '🎉 感謝購買！全部星球都解鎖了',
+  cancelled: '',
+  pending: '⏳ 等待核准（例如家長同意）後就會自動解鎖',
+  failed: '購買沒有完成，請稍後再試',
+};
+$('unlockBtn').onclick = openStore;
+$('storeClose').onclick = () => { $('store').hidden = true; };
+$('buyBtn').onclick = async () => {
+  $('buyBtn').disabled = true;
+  $('storeMsg').textContent = '連線到 App Store…';
+  const status = await purchaseFull();
+  $('buyBtn').disabled = false;
+  $('storeMsg').textContent = STORE_MSG[status] ?? STORE_MSG.failed;
+  if (status === 'purchased') {
+    sfx.fanfare();
+    haptic.found();
+    setTimeout(() => { $('store').hidden = true; }, 1500);
+  }
+};
+$('restoreBtn').onclick = async () => {
+  $('storeMsg').textContent = '正在向 App Store 確認…';
+  const ok = await restorePurchases();
+  $('storeMsg').textContent = ok ? '✅ 已恢復完整版' : '這個 Apple ID 沒有完整版的購買紀錄';
+  if (ok) { haptic.found(); setTimeout(() => { $('store').hidden = true; }, 1500); }
+};
+// 設定裡的恢復購買（按鈕空間小，只顯示簡短結果）
+$('restoreBtn2').onclick = async () => {
+  const b = $('restoreBtn2');
+  b.textContent = '確認中…';
+  const ok = await restorePurchases();
+  b.textContent = ok ? '已擁有' : '查無紀錄';
+  b.classList.toggle('on', ok);
+};
+// 購買、退款、家人共享等狀態改變時更新畫面
+onStoreChange(() => { if (mode === 'select') renderSelectCard(); });
+
+/* =========================================================
  * 排行榜與設定
  * ======================================================= */
 $('lbBtn').hidden = !hasGameCenter;
@@ -363,7 +419,13 @@ function renderSettings() {
 }
 for (const k of TOGGLES) $(`set-${k}`).onclick = () => { setSetting(k, !settings[k]); renderSettings(); };
 $('hapticsRow').hidden = !hasHaptics;
-$('settingsBtn').onclick = () => { renderSettings(); $('settings').hidden = false; };
+$('restoreRow').hidden = !hasStore;
+$('settingsBtn').onclick = () => {
+  renderSettings();
+  $('restoreBtn2').textContent = store.owned ? '已擁有' : '恢復購買';
+  $('restoreBtn2').classList.toggle('on', store.owned);
+  $('settings').hidden = false;
+};
 $('settingsClose').onclick = () => { $('settings').hidden = true; };
 
 /* =========================================================
@@ -435,7 +497,7 @@ function loop() {
 renderer.setAnimationLoop(loop);
 
 // 先讀完存檔與設定，選關畫面的星數、解鎖狀態、每日挑戰標記才正確
-await Promise.all([loadProgress(), loadSettings(), loadDaily()]);
+await Promise.all([loadProgress(), loadSettings(), loadDaily(), loadStore()]);
 signInGameCenter();
 showSelect();
 applyTheme(LEVELS[0].theme, true);
