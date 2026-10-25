@@ -28,7 +28,7 @@ permissions:
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -101,12 +101,15 @@ jobs:
         # 外掛檢查失敗也照樣截圖（截圖只看畫面，失敗原因看 plugin-check.txt）
         if: always() && steps.build.outputs.status == '0' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
         run: |
-          # 截圖版網頁：含 src/demo.js 自動展示，依序輸出 SHOT:名稱，看到就截圖
-          VITE_SCREENSHOT=1 npx vite build --outDir dist-shots
-          cp -R build/Build/Products/Debug-iphonesimulator/App.app App-shots.app
-          rm -rf App-shots.app/public && cp -R dist-shots App-shots.app/public
-          # 只有截圖版 App 加上 planetshots:// 網址（讓 CI 通知展示模式換畫面），正式版不受影響
-          plutil -insert CFBundleURLTypes -json '[{"CFBundleURLName":"shots","CFBundleURLSchemes":["planetshots"]}]' App-shots.app/Info.plist
+          # 截圖版網頁：含 src/demo.js 自動展示；每種語言各建一份 App（VITE_SHOT_LANG 固定語言）
+          LANGS="zh en ja ko"
+          for L in $LANGS; do
+            VITE_SCREENSHOT=1 VITE_SHOT_LANG=$L npx vite build --outDir dist-shots-$L
+            cp -R build/Build/Products/Debug-iphonesimulator/App.app App-shots-$L.app
+            rm -rf App-shots-$L.app/public && cp -R dist-shots-$L App-shots-$L.app/public
+            # 只有截圖版 App 加上 planetshots:// 網址（讓 CI 通知展示模式換畫面），正式版不受影響
+            plutil -insert CFBundleURLTypes -json '[{"CFBundleURLName":"shots","CFBundleURLSchemes":["planetshots"]}]' App-shots-$L.app/Info.plist
+          done
           mkdir -p ci-out/shots
           find_dev() {
             xcrun simctl list devices available -j | python3 -c "
@@ -119,27 +122,31 @@ jobs:
                           print(d['udid']); sys.exit()
           " "$1"
           }
+          # shoot <裝置名稱規則> <裝置代號>：開機一次，依序安裝四種語言的截圖版並拍 5 個畫面
           shoot() {
             UDID=$(find_dev "$1")
             xcrun simctl list devices | grep "$UDID" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
             xcrun simctl boot "$UDID" || true
             xcrun simctl bootstatus "$UDID" -b
-            xcrun simctl install "$UDID" App-shots.app
-            LOG="ci-out/shots/$2-log.txt"
-            bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
-            # src/demo.js 每個畫面準備好就停住，截完圖再用 openurl 通知它換下一個
-            # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜）
-            # 數字是送出通知後，等下一個畫面準備好的秒數
-            sleep 15
-            for shot in select:6 intro:12 play:9 result:6 daily:0; do
-              name=${shot%%:*}; settle=${shot##*:}
-              xcrun simctl io "$UDID" screenshot "ci-out/shots/$2-$name.png"
-              xcrun simctl openurl "$UDID" "planetshots://next" || true
-              sleep "$settle"
+            for L in $LANGS; do
+              TAG="$2-$L"
+              xcrun simctl install "$UDID" App-shots-$L.app
+              LOG="ci-out/shots/$TAG-log.txt"
+              bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$TAG: /" >> ci-out/shots/devices.txt
+              # src/demo.js 每個畫面準備好就停住，截完圖再用 openurl 通知它換下一個
+              # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜）
+              # 數字是送出通知後，等下一個畫面準備好的秒數
+              sleep 15
+              for shot in select:6 intro:12 play:9 result:6 daily:0; do
+                name=${shot%%:*}; settle=${shot##*:}
+                xcrun simctl io "$UDID" screenshot "ci-out/shots/$TAG-$name.png"
+                xcrun simctl openurl "$UDID" "planetshots://next" || true
+                sleep "$settle"
+              done
+              xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
+              grep -E "SHOT:|rror" "$LOG" | tr -d '\r' | head -40 > "$LOG.tmp"; mv "$LOG.tmp" "$LOG"
             done
-            xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
             xcrun simctl shutdown "$UDID" || true
-            grep -E "SHOT:|rror" "$LOG" | tr -d '\r' | head -40 > "$LOG.tmp"; mv "$LOG.tmp" "$LOG"
           }
           shoot '^iPhone 1[6-9] Pro Max' iphone69
           shoot '^iPad Pro 13' ipad13

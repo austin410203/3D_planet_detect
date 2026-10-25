@@ -501,7 +501,7 @@ renderer.setAnimationLoop(loop);
 // 先讀完存檔與設定，選關畫面的星數、解鎖狀態、每日挑戰標記才正確
 await Promise.all([loadProgress(), loadSettings(), loadDaily(), loadStore()]);
 // 語言：設定 → 裝置語言；關卡文字與藏匿點名稱換成目前語言，再套用 HTML 上的固定文字
-initLang(settings.lang);
+initLang(import.meta.env.VITE_SHOT_LANG || settings.lang); // VITE_SHOT_LANG：商店截圖版固定語言
 await localizeLevels(LEVELS, SPOTS);
 applyStaticText();
 // 設定裡的語言選單：切換後存檔並重新載入，整個畫面一次換好
