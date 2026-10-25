@@ -78,9 +78,8 @@ jobs:
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
           xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/App.app
-          # Capacitor 用 print() 輸出 JS console 與外掛呼叫（⚡️ 開頭）。輸出導向檔案時會被緩衝、
-          # App 結束就遺失，所以用 --console-pty，再用 script -F 提供終端機並即時寫入檔案
-          script -q -F ci-out/app-stdout.log xcrun simctl launch --console-pty "$UDID" com.austin410203.planetlostfound > /dev/null 2> ci-out/app-stderr.log &
+          # 啟動 App 並即時收集輸出（含重試，見 scripts/ci-launch-app.sh）
+          bash scripts/ci-launch-app.sh "$UDID" ci-out/app-stdout.log | tee ci-out/launch.txt
           sleep 20
           xcrun simctl io "$UDID" screenshot ci-out/launch-20s.png
           sleep 15
@@ -88,9 +87,8 @@ jobs:
           xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
           sleep 2
           # 只保留外掛呼叫、JS console 與錯誤
-          cat ci-out/app-stdout.log ci-out/app-stderr.log 2>/dev/null \
-            | grep -E "⚡️|rror|xception|GameCenter|Store|Haptics|Preferences|App " | cut -c1-400 | head -300 > ci-out/app.log || true
-          rm -f ci-out/app-stdout.log ci-out/app-stderr.log
+          grep -E "⚡️|rror|xception|GameCenter|Store|Haptics|Preferences|App " ci-out/app-stdout.log | tr -d '\r' | cut -c1-400 | head -300 > ci-out/app.log || true
+          rm -f ci-out/app-stdout.log
           # 自寫的原生外掛一定要真的被呼叫到（沒註冊時 JS 會直接回傳「未實作」，畫面看起來仍正常）
           MISSING=""
           for call in "GameCenter signIn" "Store getEntitlements" "Store getProducts"; do
@@ -100,7 +98,8 @@ jobs:
           echo "OK：GameCenter、Store 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
 
       - name: 商店截圖（commit 訊息含 [shots] 或手動觸發時）
-        if: steps.build.outputs.status == '0' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
+        # 外掛檢查失敗也照樣截圖（截圖只看畫面，失敗原因看 plugin-check.txt）
+        if: always() && steps.build.outputs.status == '0' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
         run: |
           # 截圖版網頁：含 src/demo.js 自動展示，依序輸出 SHOT:名稱，看到就截圖
           VITE_SCREENSHOT=1 npx vite build --outDir dist-shots
@@ -125,7 +124,7 @@ jobs:
             xcrun simctl bootstatus "$UDID" -b
             xcrun simctl install "$UDID" App-shots.app
             LOG="ci-out/shots/$2-log.txt"
-            script -q -F "$LOG" xcrun simctl launch --console-pty "$UDID" com.austin410203.planetlostfound > /dev/null 2>&1 &
+            bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
             for name in select intro play result daily; do
               for t in $(seq 1 240); do grep -q "SHOT:$name" "$LOG" && break; sleep 0.5; done
               sleep 1.2
