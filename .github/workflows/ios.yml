@@ -78,9 +78,9 @@ jobs:
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
           xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/App.app
-          # Capacitor 用 print() 輸出 JS console 與外掛呼叫（⚡️ 開頭）。導向檔案時 stdout 會整段緩衝、
-          # App 被結束就遺失，所以用 --console-pty（終端機模式逐行輸出）在背景收集
-          xcrun simctl launch --console-pty "$UDID" com.austin410203.planetlostfound > ci-out/app-stdout.log 2> ci-out/app-stderr.log &
+          # Capacitor 用 print() 輸出 JS console 與外掛呼叫（⚡️ 開頭）。輸出導向檔案時會被緩衝、
+          # App 結束就遺失，所以用 --console-pty，再用 script -F 提供終端機並即時寫入檔案
+          script -q -F ci-out/app-stdout.log xcrun simctl launch --console-pty "$UDID" com.austin410203.planetlostfound > /dev/null 2> ci-out/app-stderr.log &
           sleep 20
           xcrun simctl io "$UDID" screenshot ci-out/launch-20s.png
           sleep 15
