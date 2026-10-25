@@ -1,0 +1,1467 @@
+{
+ "icons": [
+  {
+   "emoji": "🔍",
+   "file": "1f50d",
+   "label": "放大鏡（遊戲標誌）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "⭐",
+   "file": "2b50",
+   "label": "星星（評分）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🔒",
+   "file": "1f512",
+   "label": "鎖頭（未解鎖）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🔓",
+   "file": "1f513",
+   "label": "打開的鎖頭（解鎖）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "💎",
+   "file": "1f48e",
+   "label": "鑽石（完整版）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "📅",
+   "file": "1f4c5",
+   "label": "日曆（每日挑戰）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🏆",
+   "file": "1f3c6",
+   "label": "獎盃（排行榜）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "⚙",
+   "file": "2699",
+   "label": "齒輪（設定）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "💡",
+   "file": "1f4a1",
+   "label": "燈泡（提示）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "📖",
+   "file": "1f4d6",
+   "label": "打開的書（線索手冊）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🎵",
+   "file": "1f3b5",
+   "label": "音符（配樂）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🔊",
+   "file": "1f50a",
+   "label": "喇叭（音效）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "📳",
+   "file": "1f4f3",
+   "label": "震動中的手機（震動）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🪐",
+   "file": "1fa90",
+   "label": "土星（選關）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🔥",
+   "file": "1f525",
+   "label": "火焰（連續天數）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "🎉",
+   "file": "1f389",
+   "label": "拉炮（找到了）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "⏳",
+   "file": "23f3",
+   "label": "沙漏（等待）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "✅",
+   "file": "2705",
+   "label": "打勾（完成）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "📍",
+   "file": "1f4cd",
+   "label": "地圖圖釘（地標）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "✨",
+   "file": "2728",
+   "label": "閃光（亮點）",
+   "cat": "ui"
+  },
+  {
+   "emoji": "💌",
+   "file": "1f48c",
+   "label": "情書",
+   "cat": "item"
+  },
+  {
+   "emoji": "📦",
+   "file": "1f4e6",
+   "label": "國王的包裹",
+   "cat": "item"
+  },
+  {
+   "emoji": "📨",
+   "file": "1f4e8",
+   "label": "明信片",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪶",
+   "file": "1fab6",
+   "label": "鳳凰羽毛",
+   "cat": "item"
+  },
+  {
+   "emoji": "🕯",
+   "file": "1f56f",
+   "label": "永恆燭火",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔨",
+   "file": "1f528",
+   "label": "雷神鐵鎚",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎺",
+   "file": "1f3ba",
+   "label": "派對喇叭",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍰",
+   "file": "1f370",
+   "label": "生日蛋糕",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎈",
+   "file": "1f388",
+   "label": "彩色氣球",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎁",
+   "file": "1f381",
+   "label": "神秘禮物",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍯",
+   "file": "1f36f",
+   "label": "金色蜂蜜",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍬",
+   "file": "1f36c",
+   "label": "彩虹糖",
+   "cat": "item"
+  },
+  {
+   "emoji": "🥛",
+   "file": "1f95b",
+   "label": "星星牛奶",
+   "cat": "item"
+  },
+  {
+   "emoji": "🧭",
+   "file": "1f9ed",
+   "label": "指南針",
+   "cat": "item"
+  },
+  {
+   "emoji": "🧣",
+   "file": "1f9e3",
+   "label": "毛毛圍巾",
+   "cat": "item"
+  },
+  {
+   "emoji": "🗺",
+   "file": "1f5fa",
+   "label": "探險地圖",
+   "cat": "item"
+  },
+  {
+   "emoji": "🐟",
+   "file": "1f41f",
+   "label": "晚餐鮮魚",
+   "cat": "item"
+  },
+  {
+   "emoji": "🗝",
+   "file": "1f5dd",
+   "label": "古老鑰匙",
+   "cat": "item"
+  },
+  {
+   "emoji": "📜",
+   "file": "1f4dc",
+   "label": "藏寶圖",
+   "cat": "item"
+  },
+  {
+   "emoji": "🫖",
+   "file": "1fad6",
+   "label": "青瓷茶壺",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪔",
+   "file": "1fa94",
+   "label": "神燈",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔮",
+   "file": "1f52e",
+   "label": "水晶球",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎻",
+   "file": "1f3bb",
+   "label": "精靈小提琴",
+   "cat": "item"
+  },
+  {
+   "emoji": "📕",
+   "file": "1f4d5",
+   "label": "咒語書",
+   "cat": "item"
+  },
+  {
+   "emoji": "🌙",
+   "file": "1f319",
+   "label": "月光瓶",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔋",
+   "file": "1f50b",
+   "label": "能量電池",
+   "cat": "item"
+  },
+  {
+   "emoji": "💾",
+   "file": "1f4be",
+   "label": "記憶磁碟",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔩",
+   "file": "1f529",
+   "label": "萬能螺絲",
+   "cat": "item"
+  },
+  {
+   "emoji": "🏴",
+   "file": "1f3f4",
+   "label": "船長的眼罩",
+   "cat": "item"
+  },
+  {
+   "emoji": "💍",
+   "file": "1f48d",
+   "label": "巨人的戒指",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪨",
+   "file": "1faa8",
+   "label": "石板碎片",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔘",
+   "file": "1f518",
+   "label": "巨人的鈕扣",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎖",
+   "file": "1f396",
+   "label": "勇者徽章",
+   "cat": "item"
+  },
+  {
+   "emoji": "🥫",
+   "file": "1f96b",
+   "label": "太空食物",
+   "cat": "item"
+  },
+  {
+   "emoji": "🫧",
+   "file": "1fae7",
+   "label": "氧氣瓶",
+   "cat": "item"
+  },
+  {
+   "emoji": "🌑",
+   "file": "1f311",
+   "label": "外星石頭",
+   "cat": "item"
+  },
+  {
+   "emoji": "📀",
+   "file": "1f4c0",
+   "label": "記憶檔案 A",
+   "cat": "item"
+  },
+  {
+   "emoji": "💿",
+   "file": "1f4bf",
+   "label": "記憶檔案 B",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔑",
+   "file": "1f511",
+   "label": "密碼鑰匙",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪄",
+   "file": "1fa84",
+   "label": "魔杖",
+   "cat": "item"
+  },
+  {
+   "emoji": "🧪",
+   "file": "1f9ea",
+   "label": "星辰藥水",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪙",
+   "file": "1fa99",
+   "label": "幸運金幣",
+   "cat": "item"
+  },
+  {
+   "emoji": "💠",
+   "file": "1f4a0",
+   "label": "水晶髮飾",
+   "cat": "item"
+  },
+  {
+   "emoji": "🥧",
+   "file": "1f967",
+   "label": "手工蘋果派",
+   "cat": "item"
+  },
+  {
+   "emoji": "📿",
+   "file": "1f4ff",
+   "label": "鑽石項鍊",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎶",
+   "file": "1f3b6",
+   "label": "小鳥音樂盒",
+   "cat": "item"
+  },
+  {
+   "emoji": "⌚",
+   "file": "231a",
+   "label": "懷錶",
+   "cat": "item"
+  },
+  {
+   "emoji": "🧁",
+   "file": "1f9c1",
+   "label": "「吃我」蛋糕",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍶",
+   "file": "1f376",
+   "label": "「喝我」藥水",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪭",
+   "file": "1faad",
+   "label": "紅心皇后的扇子",
+   "cat": "item"
+  },
+  {
+   "emoji": "🛢",
+   "file": "1f6e2",
+   "label": "能量燃料",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎛",
+   "file": "1f39b",
+   "label": "控制面板",
+   "cat": "item"
+  },
+  {
+   "emoji": "🛞",
+   "file": "1f6de",
+   "label": "方向盤",
+   "cat": "item"
+  },
+  {
+   "emoji": "👑",
+   "file": "1f451",
+   "label": "海神之冠",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪕",
+   "file": "1fa95",
+   "label": "月光豎琴",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪁",
+   "file": "1fa81",
+   "label": "風箏",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎐",
+   "file": "1f390",
+   "label": "風鈴",
+   "cat": "item"
+  },
+  {
+   "emoji": "👒",
+   "file": "1f452",
+   "label": "羽毛帽",
+   "cat": "item"
+  },
+  {
+   "emoji": "📯",
+   "file": "1f4ef",
+   "label": "風之號角",
+   "cat": "item"
+  },
+  {
+   "emoji": "👓",
+   "file": "1f453",
+   "label": "村長的眼鏡",
+   "cat": "item"
+  },
+  {
+   "emoji": "🥖",
+   "file": "1f956",
+   "label": "麵包師的擀麵棍",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎸",
+   "file": "1f3b8",
+   "label": "吟遊詩人的魯特琴",
+   "cat": "item"
+  },
+  {
+   "emoji": "🧸",
+   "file": "1f9f8",
+   "label": "小女孩的布偶",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍭",
+   "file": "1f36d",
+   "label": "彩虹棒棒糖",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍫",
+   "file": "1f36b",
+   "label": "巧克力球",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍎",
+   "file": "1f34e",
+   "label": "焦糖蘋果",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪷",
+   "file": "1fab7",
+   "label": "如意",
+   "cat": "item"
+  },
+  {
+   "emoji": "🟢",
+   "file": "1f7e2",
+   "label": "玉珮",
+   "cat": "item"
+  },
+  {
+   "emoji": "💊",
+   "file": "1f48a",
+   "label": "仙丹",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍺",
+   "file": "1f37a",
+   "label": "黃金角杯",
+   "cat": "item"
+  },
+  {
+   "emoji": "🪓",
+   "file": "1fa93",
+   "label": "戰斧",
+   "cat": "item"
+  },
+  {
+   "emoji": "⏲",
+   "file": "23f2",
+   "label": "壓力錶",
+   "cat": "item"
+  },
+  {
+   "emoji": "🌀",
+   "file": "1f300",
+   "label": "黃銅螺旋槳",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔧",
+   "file": "1f527",
+   "label": "蒸汽閥門",
+   "cat": "item"
+  },
+  {
+   "emoji": "📓",
+   "file": "1f4d3",
+   "label": "航海日誌",
+   "cat": "item"
+  },
+  {
+   "emoji": "🟣",
+   "file": "1f7e3",
+   "label": "發光波波球",
+   "cat": "item"
+  },
+  {
+   "emoji": "🌟",
+   "file": "1f31f",
+   "label": "星星搖鈴",
+   "cat": "item"
+  },
+  {
+   "emoji": "🧊",
+   "file": "1f9ca",
+   "label": "果凍積木",
+   "cat": "item"
+  },
+  {
+   "emoji": "🍼",
+   "file": "1f37c",
+   "label": "宇宙奶嘴",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎊",
+   "file": "1f38a",
+   "label": "彩色紙花",
+   "cat": "item"
+  },
+  {
+   "emoji": "👠",
+   "file": "1f460",
+   "label": "紅寶石鞋",
+   "cat": "item"
+  },
+  {
+   "emoji": "🐕",
+   "file": "1f415",
+   "label": "小狗的項圈",
+   "cat": "item"
+  },
+  {
+   "emoji": "🔔",
+   "file": "1f514",
+   "label": "馴鹿的鈴鐺",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎅",
+   "file": "1f385",
+   "label": "聖誕老人的帽子",
+   "cat": "item"
+  },
+  {
+   "emoji": "🎭",
+   "file": "1f3ad",
+   "label": "黃金面具",
+   "cat": "item"
+  },
+  {
+   "emoji": "🟩",
+   "file": "1f7e9",
+   "label": "翡翠之眼",
+   "cat": "item"
+  },
+  {
+   "emoji": "🌞",
+   "file": "1f31e",
+   "label": "太陽石盤",
+   "cat": "item"
+  },
+  {
+   "emoji": "🐦",
+   "file": "1f426",
+   "label": "藍鵲郵差 Pip",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🐢",
+   "file": "1f422",
+   "label": "海龜奶奶",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🐧",
+   "file": "1f427",
+   "label": "企鵝隊長 Pengo",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🐪",
+   "file": "1f42a",
+   "label": "駱駝商人 Kamal",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🦉",
+   "file": "1f989",
+   "label": "貓頭鷹長老",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🤖",
+   "file": "1f916",
+   "label": "維修機器人 Bolt",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🦜",
+   "file": "1f99c",
+   "label": "鸚鵡大副 Polly",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🧝",
+   "file": "1f9dd",
+   "label": "考古學家 Indy",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👩‍🚀",
+   "file": "1f469-200d-1f680",
+   "label": "太空人 Luna",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🧙",
+   "file": "1f9d9",
+   "label": "見習魔法師 Merry",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👸",
+   "file": "1f478",
+   "label": "森林公主 Blanca",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🐇",
+   "file": "1f407",
+   "label": "遲到的白兔先生",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👨‍🔬",
+   "file": "1f468-200d-1f52c",
+   "label": "時空博士 Doc",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🧜",
+   "file": "1f9dc",
+   "label": "海之守護者 Nerea",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🕊",
+   "file": "1f54a",
+   "label": "風之使者 Zephyr",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🐲",
+   "file": "1f432",
+   "label": "老巨龍 Ignis",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👻",
+   "file": "1f47b",
+   "label": "膽小幽靈 Boo",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🐼",
+   "file": "1f43c",
+   "label": "貪吃熊貓 Bao",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🧔",
+   "file": "1f9d4",
+   "label": "維京首領 Bjorn",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👩‍🔧",
+   "file": "1f469-200d-1f527",
+   "label": "發明家 Ada",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👽",
+   "file": "1f47d",
+   "label": "外星媽媽 Zorb",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🪆",
+   "file": "1fa86",
+   "label": "木偶隊長 Pino",
+   "cat": "npc"
+  },
+  {
+   "emoji": "👧",
+   "file": "1f467",
+   "label": "迷路的女孩 Dot",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🤠",
+   "file": "1f920",
+   "label": "探險家 Lara",
+   "cat": "npc"
+  },
+  {
+   "emoji": "🌳",
+   "file": "1f333",
+   "label": "綠野星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🌋",
+   "file": "1f30b",
+   "label": "熔岩星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🌊",
+   "file": "1f30a",
+   "label": "汪洋星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "❄",
+   "file": "2744",
+   "label": "冰晶星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🏜",
+   "file": "1f3dc",
+   "label": "沙丘星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🍄",
+   "file": "1f344",
+   "label": "蘑菇星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🏴‍☠",
+   "file": "1f3f4-200d-2620",
+   "label": "骷髏海盜灣的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🗿",
+   "file": "1f5ff",
+   "label": "巨人遺跡星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🚀",
+   "file": "1f680",
+   "label": "月球基地的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🌃",
+   "file": "1f303",
+   "label": "霓虹機械城的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🎩",
+   "file": "1f3a9",
+   "label": "奇境仙境的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🦕",
+   "file": "1f995",
+   "label": "恐龍谷的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🔱",
+   "file": "1f531",
+   "label": "亞特蘭提斯的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "☁",
+   "file": "2601",
+   "label": "天空浮島的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🐉",
+   "file": "1f409",
+   "label": "巨龍之巢的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🎃",
+   "file": "1f383",
+   "label": "南瓜鬼鎮的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🏮",
+   "file": "1f3ee",
+   "label": "東方仙山的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🛡",
+   "file": "1f6e1",
+   "label": "維京峽灣的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "👾",
+   "file": "1f47e",
+   "label": "外星蟲巢的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "💚",
+   "file": "1f49a",
+   "label": "翡翠城的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🎄",
+   "file": "1f384",
+   "label": "聖誕北極星的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🐍",
+   "file": "1f40d",
+   "label": "叢林神殿的代表圖",
+   "cat": "planet"
+  },
+  {
+   "emoji": "🧦",
+   "file": "1f9e6",
+   "label": "一隻臭襪子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐌",
+   "file": "1f40c",
+   "label": "一隻害羞的蝸牛",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍌",
+   "file": "1f34c",
+   "label": "香蕉皮",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍠",
+   "file": "1f360",
+   "label": "一顆烤焦的地瓜",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🧯",
+   "file": "1f9ef",
+   "label": "過期的滅火器",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🥵",
+   "file": "1f975",
+   "label": "一個熱到冒汗的笑臉",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🥾",
+   "file": "1f97e",
+   "label": "一隻舊靴子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦀",
+   "file": "1f980",
+   "label": "一隻生氣的螃蟹",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦷",
+   "file": "1f9b7",
+   "label": "一顆蛀牙",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍋",
+   "file": "1f34b",
+   "label": "酸到皺眉的檸檬",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🪥",
+   "file": "1faa5",
+   "label": "一支牙刷",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🧤",
+   "file": "1f9e4",
+   "label": "一隻落單的手套",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🥶",
+   "file": "1f976",
+   "label": "一個冷到發抖的臉",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍦",
+   "file": "1f366",
+   "label": "一支冷凍過頭的冰淇淋",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦂",
+   "file": "1f982",
+   "label": "一隻蠍子（快放下！）",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🌵",
+   "file": "1f335",
+   "label": "一根仙人掌刺",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐛",
+   "file": "1f41b",
+   "label": "一隻睡著的毛毛蟲",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍂",
+   "file": "1f342",
+   "label": "一片枯葉",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🔌",
+   "file": "1f50c",
+   "label": "斷掉的插頭",
+   "cat": "junk"
+  },
+  {
+   "emoji": "📟",
+   "file": "1f4df",
+   "label": "上個世紀的呼叫器",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍾",
+   "file": "1f37e",
+   "label": "空酒瓶",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦴",
+   "file": "1f9b4",
+   "label": "一根雞骨頭",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐞",
+   "file": "1f41e",
+   "label": "一隻瓢蟲",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍪",
+   "file": "1f36a",
+   "label": "太空餅乾屑",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🕹",
+   "file": "1f579",
+   "label": "壞掉的搖桿",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐸",
+   "file": "1f438",
+   "label": "一隻被變成青蛙的王子？",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🧹",
+   "file": "1f9f9",
+   "label": "一把會自己掃地的掃把",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🍏",
+   "file": "1f34f",
+   "label": "一顆還沒熟的青蘋果",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐿",
+   "file": "1f43f",
+   "label": "一隻生氣的松鼠",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🧢",
+   "file": "1f9e2",
+   "label": "小矮人的備用帽子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦩",
+   "file": "1f9a9",
+   "label": "一隻當槌球棍的紅鶴",
+   "cat": "junk"
+  },
+  {
+   "emoji": "😸",
+   "file": "1f638",
+   "label": "只剩笑容的貓",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🃏",
+   "file": "1f0cf",
+   "label": "一張鬼牌",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🥚",
+   "file": "1f95a",
+   "label": "一顆普通的雞蛋？",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐙",
+   "file": "1f419",
+   "label": "一隻害羞的章魚",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦎",
+   "file": "1f98e",
+   "label": "一隻以為自己是龍的蜥蜴",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🕷",
+   "file": "1f577",
+   "label": "一隻毛毛蜘蛛",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦇",
+   "file": "1f987",
+   "label": "一隻倒掛的蝙蝠",
+   "cat": "junk"
+  },
+  {
+   "emoji": "💀",
+   "file": "1f480",
+   "label": "會說哈囉的骷髏頭",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🥟",
+   "file": "1f95f",
+   "label": "一顆冷掉的包子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🐒",
+   "file": "1f412",
+   "label": "一隻偷笑的猴子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🎋",
+   "file": "1f38b",
+   "label": "一根竹子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🪖",
+   "file": "1fa96",
+   "label": "一頂凹掉的頭盔",
+   "cat": "junk"
+  },
+  {
+   "emoji": "☕",
+   "file": "2615",
+   "label": "冷掉的咖啡",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦠",
+   "file": "1f9a0",
+   "label": "一團會動的黏液",
+   "cat": "junk"
+  },
+  {
+   "emoji": "👁",
+   "file": "1f441",
+   "label": "一顆會眨眼的眼珠",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🧩",
+   "file": "1f9e9",
+   "label": "少了一片的拼圖",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🎲",
+   "file": "1f3b2",
+   "label": "一顆骰子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🪀",
+   "file": "1fa80",
+   "label": "纏在一起的溜溜球",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🦁",
+   "file": "1f981",
+   "label": "一隻膽小的獅子",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🌪",
+   "file": "1f32a",
+   "label": "一陣小旋風",
+   "cat": "junk"
+  },
+  {
+   "emoji": "🥕",
+   "file": "1f955",
+   "label": "雪人的備用鼻子",
+   "cat": "junk"
+  }
+ ],
+ "sheets": [
+  [
+   "1f50d",
+   "2b50",
+   "1f512",
+   "1f513",
+   "1f48e",
+   "1f4c5",
+   "1f3c6",
+   "2699",
+   "1f4a1",
+   "1f4d6",
+   "1f3b5",
+   "1f50a",
+   "1f4f3",
+   "1fa90",
+   "1f525",
+   "1f389"
+  ],
+  [
+   "23f3",
+   "2705",
+   "1f4cd",
+   "2728",
+   "1f48c",
+   "1f4e6",
+   "1f4e8",
+   "1fab6",
+   "1f56f",
+   "1f528",
+   "1f3ba",
+   "1f370",
+   "1f388",
+   "1f381",
+   "1f36f",
+   "1f36c"
+  ],
+  [
+   "1f95b",
+   "1f9ed",
+   "1f9e3",
+   "1f5fa",
+   "1f41f",
+   "1f5dd",
+   "1f4dc",
+   "1fad6",
+   "1fa94",
+   "1f52e",
+   "1f3bb",
+   "1f4d5",
+   "1f319",
+   "1f50b",
+   "1f4be",
+   "1f529"
+  ],
+  [
+   "1f3f4",
+   "1f48d",
+   "1faa8",
+   "1f518",
+   "1f396",
+   "1f96b",
+   "1fae7",
+   "1f311",
+   "1f4c0",
+   "1f4bf",
+   "1f511",
+   "1fa84",
+   "1f9ea",
+   "1fa99",
+   "1f4a0",
+   "1f967"
+  ],
+  [
+   "1f4ff",
+   "1f3b6",
+   "231a",
+   "1f9c1",
+   "1f376",
+   "1faad",
+   "1f6e2",
+   "1f39b",
+   "1f6de",
+   "1f451",
+   "1fa95",
+   "1fa81",
+   "1f390",
+   "1f452",
+   "1f4ef",
+   "1f453"
+  ],
+  [
+   "1f956",
+   "1f3b8",
+   "1f9f8",
+   "1f36d",
+   "1f36b",
+   "1f34e",
+   "1fab7",
+   "1f7e2",
+   "1f48a",
+   "1f37a",
+   "1fa93",
+   "23f2",
+   "1f300",
+   "1f527",
+   "1f4d3",
+   "1f7e3"
+  ],
+  [
+   "1f31f",
+   "1f9ca",
+   "1f37c",
+   "1f38a",
+   "1f460",
+   "1f415",
+   "1f514",
+   "1f385",
+   "1f3ad",
+   "1f7e9",
+   "1f31e",
+   "1f426",
+   "1f422",
+   "1f427",
+   "1f42a",
+   "1f989"
+  ],
+  [
+   "1f916",
+   "1f99c",
+   "1f9dd",
+   "1f469-200d-1f680",
+   "1f9d9",
+   "1f478",
+   "1f407",
+   "1f468-200d-1f52c",
+   "1f9dc",
+   "1f54a",
+   "1f432",
+   "1f47b",
+   "1f43c",
+   "1f9d4",
+   "1f469-200d-1f527",
+   "1f47d"
+  ],
+  [
+   "1fa86",
+   "1f467",
+   "1f920",
+   "1f333",
+   "1f30b",
+   "1f30a",
+   "2744",
+   "1f3dc",
+   "1f344",
+   "1f3f4-200d-2620",
+   "1f5ff",
+   "1f680",
+   "1f303",
+   "1f3a9",
+   "1f995",
+   "1f531"
+  ],
+  [
+   "2601",
+   "1f409",
+   "1f383",
+   "1f3ee",
+   "1f6e1",
+   "1f47e",
+   "1f49a",
+   "1f384",
+   "1f40d",
+   "1f9e6",
+   "1f40c",
+   "1f34c",
+   "1f360",
+   "1f9ef",
+   "1f975",
+   "1f97e"
+  ],
+  [
+   "1f980",
+   "1f9b7",
+   "1f34b",
+   "1faa5",
+   "1f9e4",
+   "1f976",
+   "1f366",
+   "1f982",
+   "1f335",
+   "1f41b",
+   "1f342",
+   "1f50c",
+   "1f4df",
+   "1f37e",
+   "1f9b4",
+   "1f41e"
+  ],
+  [
+   "1f36a",
+   "1f579",
+   "1f438",
+   "1f9f9",
+   "1f34f",
+   "1f43f",
+   "1f9e2",
+   "1f9a9",
+   "1f638",
+   "1f0cf",
+   "1f95a",
+   "1f419",
+   "1f98e",
+   "1f577",
+   "1f987",
+   "1f480"
+  ],
+  [
+   "1f95f",
+   "1f412",
+   "1f38b",
+   "1fa96",
+   "2615",
+   "1f9a0",
+   "1f441",
+   "1f9e9",
+   "1f3b2",
+   "1fa80",
+   "1f981",
+   "1f32a",
+   "1f955"
+  ]
+ ]
+}

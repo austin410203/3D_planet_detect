@@ -58,6 +58,8 @@ html, body {
 .logo h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 900; letter-spacing: .06em; line-height: 1.1; }
 .logo p { font: 800 13px var(--num); letter-spacing: .12em; opacity: .7; }
 .nowrap { white-space: nowrap; } /* 窄螢幕換行時「招領所」不拆開 */
+/* 取代 emoji 的遊戲圖示（src/icons.js），大小跟著文字走 */
+img.gi { height: 1.2em; width: auto; vertical-align: -0.25em; pointer-events: none; user-select: none; }
 
 .nav {
   position: absolute; top: 45%; width: 58px; height: 58px; border-radius: 50%;

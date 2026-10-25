@@ -27,6 +27,7 @@ import { haptic, hasHaptics } from './src/haptics.js';
 import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitScore, LEADERBOARD } from './src/gamecenter.js';
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
 import { store, hasStore, loadStore, purchaseFull, restorePurchases, onStoreChange } from './src/store.js';
+import { startIconSwap } from './src/icons.js';
 
 const $ = (id) => document.getElementById(id);
 const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
@@ -502,6 +503,7 @@ renderer.setAnimationLoop(loop);
 // 先讀完存檔與設定，選關畫面的星數、解鎖狀態、每日挑戰標記才正確
 await Promise.all([loadProgress(), loadSettings(), loadDaily(), loadStore()]);
 signInGameCenter();
+startIconSwap(); // 畫面上的 emoji 換成遊戲自己的圖示
 showSelect();
 applyTheme(LEVELS[0].theme, true);
 

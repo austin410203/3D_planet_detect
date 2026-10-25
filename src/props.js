@@ -8,6 +8,7 @@
  *   makeEmojiSprite：把物品 emoji 畫成 Sprite（搜到時彈出）
  */
 import * as THREE from 'three';
+import { iconUrl } from './icons.js';
 
 /* =========================================================
  * 共用工具
@@ -411,7 +412,15 @@ export const DECOR = {
  * 物品 Emoji Sprite（搜到時彈出）
  * ======================================================= */
 const spriteCache = new Map();
+const textureLoader = new THREE.TextureLoader();
 export function makeEmojiSprite(emoji, size = 0.4) {
+  const url = iconUrl(emoji);
+  if (!spriteCache.has(emoji) && url) {
+    // 有遊戲自己的低多邊形圖示就用圖示（icons.js），否則退回畫 emoji
+    const tex = textureLoader.load(url);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    spriteCache.set(emoji, new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  }
   if (!spriteCache.has(emoji)) {
     const c = document.createElement('canvas');
     c.width = c.height = 128;
