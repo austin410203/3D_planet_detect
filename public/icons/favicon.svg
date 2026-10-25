@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+    <defs><radialGradient id="bg" cx="42%" cy="38%" r="80%">
+      <stop offset="0" stop-color="#ffe783"/><stop offset="1" stop-color="#ffc21a"/>
+    </radialGradient></defs>
+    <rect width="1024" height="1024" fill="url(#bg)" /><g  >
+  <defs>
+    <radialGradient id="sea" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#7fe6f0"/><stop offset="1" stop-color="#2aa9c4"/>
+    </radialGradient>
+    <clipPath id="planetClip"><circle cx="430" cy="440" r="250"/></clipPath>
+    <clipPath id="lensClip"><circle cx="655" cy="650" r="158"/></clipPath>
+  </defs>
+
+  <!-- 星球：硬陰影 → 海 → 陸地 → 冰帽 → 暗面 → 描邊 -->
+  <circle cx="452" cy="466" r="250" fill="#1d1b3a"/>
+  <circle cx="430" cy="440" r="250" fill="url(#sea)"/>
+  <g clip-path="url(#planetClip)">
+    <path d="M 170 380 Q 230 300 330 320 Q 420 250 520 300 Q 600 330 640 420 Q 560 470 470 450 Q 400 520 300 500 Q 220 480 170 380 Z" fill="#8fd14f"/>
+    <path d="M 300 330 Q 380 290 450 320 L 420 380 Q 350 400 300 330 Z" fill="#6dbb3c"/>
+    <path d="M 420 600 Q 500 560 590 590 Q 640 640 600 700 Q 500 720 430 680 Q 390 640 420 600 Z" fill="#8fd14f"/>
+    <path d="M 210 560 Q 260 540 300 580 Q 280 630 230 630 Q 190 600 210 560 Z" fill="#f2c76e"/>
+    <ellipse cx="430" cy="196" rx="190" ry="60" fill="#f4f8ff"/>
+    <path d="M 680 300 A 250 250 0 0 1 430 690 A 300 300 0 0 0 680 300 Z" fill="#1d1b3a" opacity="0.18"/>
+  </g>
+  <circle cx="430" cy="440" r="250" fill="none" stroke="#1d1b3a" stroke-width="22"/>
+  <!-- 星球上的亮點 -->
+  <ellipse cx="330" cy="300" rx="46" ry="22" fill="#fff" opacity="0.55" transform="rotate(-30 330 300)"/>
+
+  <!-- 紅頂小屋與樹（站在星球頂端附近） -->
+  <g transform="rotate(-24 430 440)">
+    <rect x="398" y="152" width="64" height="52" fill="#fff8e7" stroke="#1d1b3a" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M 384 158 L 430 112 L 476 158 Z" fill="#ff5a4e" stroke="#1d1b3a" stroke-width="12" stroke-linejoin="round"/>
+    <rect x="422" y="174" width="18" height="30" fill="#1d1b3a"/>
+  </g>
+  <g transform="rotate(26 430 440)">
+    <rect x="422" y="150" width="16" height="44" fill="#8a5a3c" stroke="#1d1b3a" stroke-width="10"/>
+    <circle cx="430" cy="138" r="34" fill="#4caf50" stroke="#1d1b3a" stroke-width="12"/>
+  </g>
+
+  <!-- 放大鏡：硬陰影 → 握把 → 鏡框 → 鏡片內容 → 反光 -->
+  <g transform="translate(16 20)" fill="#1d1b3a">
+    <rect x="752" y="770" width="190" height="78" rx="34" transform="rotate(45 752 770)"/>
+    <circle cx="655" cy="650" r="186"/>
+  </g>
+  <rect x="752" y="770" width="190" height="78" rx="34" transform="rotate(45 752 770) translate(0 -39)" fill="#ff8a3c" stroke="#1d1b3a" stroke-width="22" stroke-linejoin="round"/>
+  <circle cx="655" cy="650" r="172" fill="#1d1b3a"/>
+  <circle cx="655" cy="650" r="158" fill="#eafcff"/>
+  <g clip-path="url(#lensClip)">
+    <circle cx="430" cy="440" r="330" fill="#c9f1f6"/>
+    <g transform="rotate(-10 655 655)">
+      <rect x="560" y="590" width="190" height="130" rx="14" fill="#fff" stroke="#1d1b3a" stroke-width="13" stroke-linejoin="round"/>
+      <path d="M 562 596 L 655 662 L 748 596" fill="none" stroke="#1d1b3a" stroke-width="13" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="655" cy="664" r="20" fill="#ff6fa8" stroke="#1d1b3a" stroke-width="9"/>
+    </g>
+    <path d="M 540 560 A 150 150 0 0 1 640 506" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round" opacity="0.9"/>
+  </g>
+  <circle cx="655" cy="650" r="165" fill="none" stroke="#ffd23a" stroke-width="14"/>
+  <circle cx="655" cy="650" r="179" fill="none" stroke="#1d1b3a" stroke-width="16"/>
+
+  <path d="M 850 172 Q 850 230 908 230 Q 850 230 850 288 Q 850 230 792 230 Q 850 230 850 172 Z" fill="#fff" stroke="#1d1b3a" stroke-width="12.76" stroke-linejoin="round"/>
+  <path d="M 170 790 Q 170 830 210 830 Q 170 830 170 870 Q 170 830 130 830 Q 170 830 170 790 Z" fill="#ffd23a" stroke="#1d1b3a" stroke-width="8.8" stroke-linejoin="round"/>
+  <path d="M 905 444 Q 905 470 931 470 Q 905 470 905 496 Q 905 470 879 470 Q 905 470 905 444 Z" fill="#fff" stroke="#1d1b3a" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 130 140 Q 130 170 160 170 Q 130 170 130 200 Q 130 170 100 170 Q 130 170 130 140 Z" fill="#fff" stroke="#1d1b3a" stroke-width="6.6" stroke-linejoin="round"/>
+</g></svg>

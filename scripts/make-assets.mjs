@@ -151,6 +151,31 @@ for (const [dir, [w, h]] of Object.entries(SPLASH_SIZES)) render(splashSvg(w, h)
 writeFileSync(join(RES, 'values', 'ic_launcher_background.xml'),
   `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#FFD23A</color>\n</resources>\n`);
 
+/* ---------- 網頁（分頁圖示、加入主畫面、PWA manifest） ---------- */
+const WEB = join(root, 'public', 'icons');
+render(iconSvg(), 32, join(WEB, 'favicon-32.png'));
+render(iconSvg(), 180, join(WEB, 'apple-touch-icon.png'));   // iPhone「加入主畫面」
+render(iconSvg(), 192, join(WEB, 'icon-192.png'));
+render(iconSvg(), 512, join(WEB, 'icon-512.png'));
+render(iconSvg({ bg: 'yellow', scale: 0.8 }), 512, join(WEB, 'icon-maskable-512.png')); // Android 會裁成圓形，主體縮小
+writeFileSync(join(WEB, 'favicon.svg'), iconSvg());
+writeFileSync(join(root, 'public', 'manifest.webmanifest'), JSON.stringify({
+  name: '星球失物招領所',
+  short_name: '星球失物招領所',
+  description: '讀線索、翻星球，找回所有失物的 3D 解謎遊戲',
+  lang: 'zh-Hant',
+  start_url: '/',
+  display: 'fullscreen',
+  orientation: 'portrait',
+  background_color: NIGHT,
+  theme_color: NIGHT,
+  icons: [
+    { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+  ],
+}, null, 2) + '\n');
+
 /* ---------- 預覽 ---------- */
 const DESIGN = join(root, 'design');
 render(iconSvg(), 1024, join(DESIGN, 'app-icon-1024.png'));
