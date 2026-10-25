@@ -2,6 +2,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "3d-planet-detect",
   "compatibility_date": "2026-10-19",
+  // 部署前先建置：Cloudflare 只會 npm ci 再 wrangler deploy，沒有這步 dist/ 不存在
+  "build": {
+    "command": "npm run build"
+  },
   "assets": {
     "directory": "./dist"
   }
