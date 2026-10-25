@@ -1,0 +1,82 @@
+# Android 測試版建置：在 GitHub 的 Linux 機器上包出 debug APK（可直接側載安裝）
+# APK 推到 ci-results-android 分支，用 git 取回：
+#   git fetch origin ci-results-android && git show origin/ci-results-android:summary.txt
+# 目前只做手動觸發與 android/ 有變動時建置；正式上架 Google Play 前再加 release 簽章。
+name: Android 建置
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # 推送 ci-results-android 分支
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: 建置網頁並同步到 Android
+        run: |
+          npm ci
+          npm run build
+          npx cap sync android
+
+      - name: 包 debug APK
+        id: build
+        run: |
+          mkdir -p ci-out
+          cd android
+          chmod +x gradlew
+          set +e
+          ./gradlew assembleDebug --no-daemon > ../ci-out/gradle.log 2>&1
+          STATUS=$?
+          set -e
+          cd ..
+          echo "$STATUS" > ci-out/build-status.txt
+          grep -E -B2 -A6 "FAILURE|error:|What went wrong" ci-out/gradle.log | head -200 > ci-out/errors.txt || true
+          tail -80 ci-out/gradle.log > ci-out/gradle-tail.log
+          rm ci-out/gradle.log
+          if [ "$STATUS" = "0" ]; then cp android/app/build/outputs/apk/debug/app-debug.apk ci-out/planet-lost-found-debug.apk; fi
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+
+      - name: 推送結果到 ci-results-android 分支
+        if: always()
+        run: |
+          mkdir -p ci-out && cd ci-out
+          {
+            echo "sha: $GITHUB_SHA"
+            echo "run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "build-status: $(cat build-status.txt 2>/dev/null || echo 未執行)"
+            ls -la *.apk 2>/dev/null || true
+          } > summary.txt
+          git init -q
+          git checkout -q -b ci-results-android
+          git add -A
+          git -c user.name=android-ci -c user.email=android-ci@users.noreply.github.com commit -qm "Android CI ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-results-android
+
+      - name: 建置失敗時讓工作失敗
+        if: steps.build.outputs.status != '0'
+        run: exit 1
