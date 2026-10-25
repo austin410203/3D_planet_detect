@@ -105,6 +105,8 @@ jobs:
           VITE_SCREENSHOT=1 npx vite build --outDir dist-shots
           cp -R build/Build/Products/Debug-iphonesimulator/App.app App-shots.app
           rm -rf App-shots.app/public && cp -R dist-shots App-shots.app/public
+          # 只有截圖版 App 加上 planetshots:// 網址（讓 CI 通知展示模式換畫面），正式版不受影響
+          plutil -insert CFBundleURLTypes -json '[{"CFBundleURLName":"shots","CFBundleURLSchemes":["planetshots"]}]' App-shots.app/Info.plist
           mkdir -p ci-out/shots
           find_dev() {
             xcrun simctl list devices available -j | python3 -c "
@@ -125,14 +127,15 @@ jobs:
             xcrun simctl install "$UDID" App-shots.app
             LOG="ci-out/shots/$2-log.txt"
             bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
-            # 模擬器的紀錄轉到檔案會延遲（iPad 可達數十秒），所以不看 SHOT 標記，
-            # 而是依 src/demo.js 的固定時間軸（每個畫面停 20 秒）在各畫面中間截圖
-            START=$(cat "$LOG.start")
-            for shot in select:18 intro:40 play:66 result:91 daily:113; do
-              name=${shot%%:*}; at=${shot##*:}
-              wait=$(( START + at - $(date +%s) ))
-              [ "$wait" -gt 0 ] && sleep "$wait"
+            # src/demo.js 每個畫面準備好就停住，截完圖再用 openurl 通知它換下一個
+            # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜）
+            # 數字是送出通知後，等下一個畫面準備好的秒數
+            sleep 15
+            for shot in select:6 intro:12 play:9 result:6 daily:0; do
+              name=${shot%%:*}; settle=${shot##*:}
               xcrun simctl io "$UDID" screenshot "ci-out/shots/$2-$name.png"
+              xcrun simctl openurl "$UDID" "planetshots://next" || true
+              sleep "$settle"
             done
             xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
             xcrun simctl shutdown "$UDID" || true

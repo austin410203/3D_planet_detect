@@ -2,18 +2,23 @@
  * demo.js — 商店截圖用的自動展示模式
  * --------------------------------------------------
  * 只有 VITE_SCREENSHOT=1 建置時才會打包（main.js 動態載入），正式版不包含。
- * 依序展示：選關 → 委託 → 遊戲中 → 結算 → 每日挑戰，每個畫面輸出 `SHOT:名稱` 到 console（方便除錯），
- * CI（.github/workflows/ios.yml）依固定時間軸用模擬器截圖。
+ * 依序展示：選關 → 委託 → 遊戲中 → 結算 → 每日挑戰（第一關綠野星）。
+ * 每個畫面準備好後就停住，等 CI 截完圖用 `simctl openurl planetshots://next` 通知才換下一個，
+ * 所以模擬器截圖再慢也不會錯位（URL scheme 只加在 CI 的截圖版 App，見 .github/workflows/ios.yml）。
+ * 每個畫面也會輸出 `SHOT:名稱` 到 console，方便除錯。
  */
+import { App } from '@capacitor/app';
+
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-// 每個畫面停留 20 秒。CI 依這條固定時間軸截圖（啟動後約 18／40／66／91／113 秒），
-// 修改這裡的等待時間時，要一起調整 .github/workflows/ios.yml 的截圖時間
-const HOLD = 20000;
 
+// 收到 planetshots://next 就放行下一個畫面；保險起見最多等 3 分鐘
+let release = null;
+App.addListener('appUrlOpen', ({ url }) => { if (url.includes('next') && release) release(); });
 async function shot(name) {
   console.log(`SHOT:${name}`);
-  await sleep(HOLD);
+  await Promise.race([new Promise((r) => { release = r; }), sleep(180000)]);
+  release = null;
 }
 
 /** 模擬點擊某個藏匿點：相機轉過去、投影到螢幕座標、送出觸控事件 */
