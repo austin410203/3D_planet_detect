@@ -10,6 +10,7 @@ BUNDLE=com.austin410203.planetlostfound
 
 for attempt in 1 2 3; do
   : > "$LOG"
+  date +%s > "$LOG.start" # 這次啟動的時間，商店截圖依此計算各畫面的截圖時機
   script -q -F "$LOG" xcrun simctl launch --console-pty "$UDID" "$BUNDLE" > /dev/null 2>&1 &
   for t in $(seq 1 30); do
     if grep -q "WebView loaded" "$LOG"; then

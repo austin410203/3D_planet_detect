@@ -125,9 +125,13 @@ jobs:
             xcrun simctl install "$UDID" App-shots.app
             LOG="ci-out/shots/$2-log.txt"
             bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
-            for name in select intro play result daily; do
-              for t in $(seq 1 240); do grep -q "SHOT:$name" "$LOG" && break; sleep 0.5; done
-              sleep 1.2
+            # 模擬器的紀錄轉到檔案會延遲（iPad 可達數十秒），所以不看 SHOT 標記，
+            # 而是依 src/demo.js 的固定時間軸（每個畫面停 20 秒）在各畫面中間截圖
+            START=$(cat "$LOG.start")
+            for shot in select:18 intro:40 play:66 result:91 daily:113; do
+              name=${shot%%:*}; at=${shot##*:}
+              wait=$(( START + at - $(date +%s) ))
+              [ "$wait" -gt 0 ] && sleep "$wait"
               xcrun simctl io "$UDID" screenshot "ci-out/shots/$2-$name.png"
             done
             xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true

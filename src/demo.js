@@ -2,12 +2,14 @@
  * demo.js — 商店截圖用的自動展示模式
  * --------------------------------------------------
  * 只有 VITE_SCREENSHOT=1 建置時才會打包（main.js 動態載入），正式版不包含。
- * 依序展示：選關 → 委託 → 遊戲中 → 結算 → 每日挑戰，每個畫面輸出 `SHOT:名稱` 到 console，
- * CI（.github/workflows/ios.yml）看到標記就用模擬器截圖。
+ * 依序展示：選關 → 委託 → 遊戲中 → 結算 → 每日挑戰，每個畫面輸出 `SHOT:名稱` 到 console（方便除錯），
+ * CI（.github/workflows/ios.yml）依固定時間軸用模擬器截圖。
  */
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const HOLD = 20000; // 每個畫面停留時間：模擬器的紀錄轉到檔案會延遲（實測 5～10 秒），CI 看到標記時畫面必須還沒切走
+// 每個畫面停留 20 秒。CI 依這條固定時間軸截圖（啟動後約 18／40／66／91／113 秒），
+// 修改這裡的等待時間時，要一起調整 .github/workflows/ios.yml 的截圖時間
+const HOLD = 20000;
 
 async function shot(name) {
   console.log(`SHOT:${name}`);
