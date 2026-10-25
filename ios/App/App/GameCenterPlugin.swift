@@ -2,7 +2,7 @@ import UIKit
 import Capacitor
 import GameKit
 
-/// 自訂 Bridge 畫面：在這裡註冊 App 內建的本地外掛（Main.storyboard 指向這個類別）
+/// 自訂 Bridge 畫面：在這裡註冊 App 內建的本地外掛（SceneDelegate 建立的根畫面就是這個類別）
 class MainViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(GameCenterPlugin())

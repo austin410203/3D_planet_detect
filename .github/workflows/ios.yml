@@ -91,6 +91,13 @@ jobs:
           cat ci-out/app-stdout.log ci-out/app-stderr.log 2>/dev/null \
             | grep -E "⚡️|rror|xception|GameCenter|Store|Haptics|Preferences|App " | cut -c1-400 | head -300 > ci-out/app.log || true
           rm -f ci-out/app-stdout.log ci-out/app-stderr.log
+          # 自寫的原生外掛一定要真的被呼叫到（沒註冊時 JS 會直接回傳「未實作」，畫面看起來仍正常）
+          MISSING=""
+          for call in "GameCenter signIn" "Store getEntitlements" "Store getProducts"; do
+            grep -q "To Native ->  $call" ci-out/app.log || MISSING="$MISSING [$call]"
+          done
+          if [ -n "$MISSING" ]; then echo "缺少原生呼叫：$MISSING" | tee ci-out/plugin-check.txt; echo "::error::原生外掛沒有被呼叫：$MISSING"; exit 1; fi
+          echo "OK：GameCenter、Store 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
 
       - name: 推送結果到 ci-results 分支
         if: always()
