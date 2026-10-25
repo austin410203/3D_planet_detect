@@ -7,7 +7,7 @@
  */
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const HOLD = 4000; // 每個畫面停留時間，讓 CI 有空截圖
+const HOLD = 7000; // 每個畫面停留時間：iPad 模擬器的紀錄輸出較慢，CI 看到標記可能晚好幾秒
 
 async function shot(name) {
   console.log(`SHOT:${name}`);
@@ -55,6 +55,10 @@ export async function runDemo({ LEVELS, choose, startLevel, progress }) {
   if ($('journal').classList.contains('closed')) $('journalTab').click();
   const targets = window.__dbg.world.spots.filter((s) => s.content?.target);
   await tapSpot(targets[0]);
+  // 相機拉遠，畫面看得到整顆星球與地標名稱
+  const { camera, controls } = window.__dbg;
+  camera.position.setLength(17);
+  controls.update();
   await sleep(1500);
   $('hintBtn').click();
   await sleep(500);

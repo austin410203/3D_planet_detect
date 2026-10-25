@@ -469,9 +469,12 @@ function loop() {
   if (mode === 'select') {
     // 輪播：相機滑到選中的星球，星球緩慢自轉
     const portrait = innerWidth < innerHeight;
-    camGoal.set(selected * SPACING, 1.2, portrait ? 26 : 19);
+    // 直式時依螢幕寬度拉遠相機，讓整顆星球（含大氣層，半寬約 6.3）都放得進畫面
+    const fit = 6.3 / (camera.aspect * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    const dist = portrait ? Math.max(26, fit) : 19;
+    camGoal.set(selected * SPACING, 1.2, dist);
     camera.position.lerp(camGoal, Math.min(1, dt * 4));
-    camera.lookAt(camera.position.x, portrait ? -1.5 : -0.8, 0);
+    camera.lookAt(camera.position.x, portrait ? -1.5 * (dist / 26) : -0.8, 0);
     previews.children.forEach((p) => {
       const i = p.userData.index;
       p.rotation.y += dt * (i === selected ? 0.25 : 0.08);

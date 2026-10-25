@@ -6,6 +6,7 @@
     "dev": "vite",
     "fonts": "node scripts/subset-fonts.mjs",
     "assets": "node scripts/make-assets.mjs",
+    "store-shots": "node scripts/make-store-shots.mjs",
     "prebuild": "node scripts/subset-fonts.mjs",
     "build": "vite build",
     "preview": "vite preview",
