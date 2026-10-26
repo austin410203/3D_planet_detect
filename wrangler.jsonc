@@ -6,6 +6,9 @@
   "build": {
     "command": "npm run build"
   },
+  // 品牌網域；加了 routes 後 workers.dev 預設會關閉，要明確保留舊網址
+  "routes": [{ "pattern": "planet.emptyoffice.app", "custom_domain": true }],
+  "workers_dev": true,
   "assets": {
     "directory": "./dist"
   }
