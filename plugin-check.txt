@@ -1,0 +1,1 @@
+OK：GameCenter、Store、AdMob 外掛都有原生呼叫

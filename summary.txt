@@ -1,0 +1,8 @@
+sha: 4fbcdd941cd2adee5f5199e2be082713fd8664af
+run: https://github.com/austin410203/3D_planet_detect/actions/runs/40370961154
+build-status: 0
+plugin-check: success
+shots: cancelled
+Xcode 26.6
+Build version 17F113
+    iPhone 17 Pro (E839A11B-51B4-4AD3-ACF4-A53B95B7C957) (Shutdown) 

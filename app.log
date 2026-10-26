@@ -1,0 +1,24 @@
+⚡️  Loading app at capacitor://localhost...
+⚡️  WebView loaded
+⚡️  To Native ->  App addListener 114020783
+⚡️  To Native ->  Preferences get 114020784
+⚡️  To Native ->  Preferences get 114020785
+⚡️  To Native ->  Preferences get 114020786
+⚡️  To Native ->  Preferences get 114020787
+⚡️  TO JS {"value":null}
+⚡️  TO JS {"value":null}
+⚡️  TO JS {"value":null}
+⚡️  TO JS {"value":null}
+⚡️  To Native ->  Store addListener 114020788
+⚡️  To Native ->  Store getEntitlements 114020789
+⚡️  To Native ->  Store getProducts 114020790
+⚡️  TO JS {"productIds":[]}
+⚡️  To Native ->  Preferences get 114020791
+⚡️  TO JS {"value":null}
+⚡️  To Native ->  GameCenter signIn 114020792
+⚡️  To Native ->  AdMob requestConsentInfo 114020793
+⚡️  TO JS {"authenticated":false}
+⚡️  TO JS {"canRequestAds":true,"isConsentFormAvailable":true,"privacyOptionsRequirementStatus":"REQUIRED","status":"NOT_REQUIRED"}
+⚡️  TO JS {"products":[{"id":"com.austin410203.planetlostfound.fullunlock","description":"Unlock planets 5-28, ad-free forever","displayName":"Full Version","displayPrice":"$2.99"}]}
+⚡️  To Native ->  AdMob initialize 114020794
+⚡️  TO JS {}

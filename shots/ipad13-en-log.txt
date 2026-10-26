@@ -1,0 +1,5 @@
+⚡️  [log] - SHOT:select
+⚡️  [log] - SHOT:intro
+⚡️  [log] - SHOT:play
+⚡️  [log] - SHOT:result
+⚡️  [log] - SHOT:daily

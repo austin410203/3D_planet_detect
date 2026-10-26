@@ -1,0 +1,4 @@
+iphone69-ja:     iPhone 17 Pro Max (36E2B8D9-F7DC-43ED-8383-C3824D1485A8) (Shutdown) 
+iphone69-ja: 第 1 次啟動沒有成功，紀錄最後幾行：
+iphone69-ja: ^D第 2 次啟動沒有成功，紀錄最後幾行：
+iphone69-ja: ^DApp 已啟動（第 3 次）
