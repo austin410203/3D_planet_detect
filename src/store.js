@@ -20,7 +20,7 @@ export const isWeb = !Capacitor.isNativePlatform();
 
 /** 網頁版：Lemon Squeezy 結帳連結（商品建好後填入）。商店還在測試模式時只有網址加 ?lstest 才看得到購買按鈕 */
 const LIVE = false;
-const CHECKOUT = '';
+const CHECKOUT = 'https://emptyofficex.lemonsqueezy.com/checkout/buy/4abd2750-5d0b-4452-942b-d42af98b355c';
 const testing = (() => { try { return new URLSearchParams(location.search).has('lstest'); } catch { return false; } })();
 export const WEB_PASS = {
   checkoutUrl: LIVE || testing ? CHECKOUT : '', // 空字串：購買按鈕顯示「付款頁面即將開放」

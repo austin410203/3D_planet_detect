@@ -84,6 +84,6 @@ To activate: open Lost & Found in Space → tap a locked planet or ⚙️ Settin
 - 網頁版已上鎖：第 5～28 顆需要完整版，不用依序過關（`src/store.js` 的 `FREE_LEVELS = 4`）。
 - Worker `worker/index.js`：`/api/license/activate|validate` 代呼叫 Lemon Squeezy 授權 API，並確認序號屬於這個商品。
 - 完整版視窗（網頁版）：購買 NT$90（開結帳頁）、序號輸入與啟用、完整版說明連結；App 內不顯示。
-- **還缺結帳連結**：填進 `src/store.js` 的 `CHECKOUT`。商店測試模式期間只有網址加 `?lstest` 才會開結帳頁，一般訪客看到「付款頁面即將開放」。
+- 結帳連結：`src/store.js` 的 `CHECKOUT`（emptyofficex.lemonsqueezy.com）。商店測試模式期間只有網址加 `?lstest` 才會開結帳頁，一般訪客看到「付款頁面即將開放」。
 - 測試：測試模式用測試卡 `4242 4242 4242 4242` 走一次：付款 → 拿到序號 → 輸入 → 解鎖 → 退款 → 重新上鎖（重新驗證每 7 天一次，測退款時可清掉 localStorage 的 `planetLostFound.pass` 的 `checked`）。
 - 正式收款：Lemon Squeezy 商店啟用後，把 `src/store.js` 的 `LIVE` 改成 `true`、`wrangler.jsonc` 的 `LS_LIVE` 改成 `"1"`。
