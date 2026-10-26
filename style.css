@@ -257,7 +257,7 @@ img.gi { height: 1.2em; width: auto; vertical-align: -0.25em; pointer-events: no
 .clue p { font-size: 13.5px; line-height: 1.6; font-weight: 500; }
 .clue.found { opacity: .55; }
 .clue.found::after {
-  content: '找到了！'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%) rotate(-14deg);
+  content: attr(data-stamp); /* 蓋章文字依語言（game.js 的 data-stamp） */ position: absolute; right: 8px; top: 50%; transform: translateY(-50%) rotate(-14deg);
   font-weight: 900; font-size: 20px; color: #e2434b; border: 3px solid #e2434b; border-radius: 8px; padding: 0 8px; background: #ffffffd0;
 }
 

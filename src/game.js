@@ -50,7 +50,7 @@ export function createGame({ level, world, camera, domElement, particles, onFini
   /* ---------- HUD：物品欄與線索手冊 ---------- */
   $('itemSlots').innerHTML = targets.map((t, i) => `<li data-i="${i}" title="${t.name}"><span>${t.emoji}</span></li>`).join('');
   $('journalBody').innerHTML = targets.map((t, i) => `
-    <div class="clue" data-i="${i}">
+    <div class="clue" data-i="${i}" data-stamp="${tr('foundStamp')}">
       <div class="clue-head"><b>${t.emoji}</b><strong>${t.name}</strong><span class="tag tag-${t.type}">${tr(`clue.${t.type}`)}</span></div>
       <p>${t.clue}</p>
     </div>`).join('');
