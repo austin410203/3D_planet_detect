@@ -13,9 +13,9 @@
 | 主要類別 | 遊戲 → 解謎 |
 | 次要類別 | 遊戲 → 休閒 |
 | 價格 | 免費（含 App 內購買「完整版」，見 `docs/in-app-purchase.md`） |
-| 隱私權政策網址 | `https://3dplanetdetect.vercel.app/privacy.html` |
-| 支援網址 | `https://3dplanetdetect.vercel.app/support.html` |
-| 行銷網址（選填） | `https://3dplanetdetect.vercel.app/` |
+| 隱私權政策網址 | `https://planet.emptyoffice.app/privacy` |
+| 支援網址 | `https://planet.emptyoffice.app/support` |
+| 行銷網址（選填） | `https://planet.emptyoffice.app/` |
 | 版權 | `2026 austin410203` |
 
 ## 繁體中文（主要語言）

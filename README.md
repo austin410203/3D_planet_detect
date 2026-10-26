@@ -86,7 +86,7 @@ npm run dev      # 本地開發
 npm run build    # 輸出至 dist/
 ```
 
-部署到 Vercel：匯入此 repo 即可，`vercel.json` 已設定好建置指令與輸出資料夾。
+部署到 Cloudflare Workers（`wrangler.jsonc`，推送 main 自動建置）：https://planet.emptyoffice.app/ 。條款頁（完整版介紹、服務條款、退款、隱私權、聯絡）由 `python scripts/legal_gen.py` 產生到 `public/`。
 
 ## iOS App
 

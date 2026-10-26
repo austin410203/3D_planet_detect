@@ -78,6 +78,12 @@ html, body {
   text-shadow: 0 3px 0 var(--ink), 0 0 14px rgba(255, 210, 58, .8);
   animation: blink 1.4s ease-in-out infinite;
 }
+.title-bottom { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+/* 條款頁連結（標題畫面底部、設定視窗）；頁面由 scripts/legal_gen.py 產生 */
+.legal-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; font-size: 12.5px; font-weight: 700; }
+.legal-links a { color: inherit; opacity: .8; text-decoration: underline; text-underline-offset: 3px; }
+.title-bottom .legal-links { color: #fff; text-shadow: 0 2px 0 var(--ink); }
+#settingsLegal { color: var(--ink); margin: -6px 0 14px; }
 @keyframes titleIn { from { transform: rotate(-3deg) scale(.4); opacity: 0; } to { transform: rotate(-3deg) scale(1); opacity: 1; } }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 

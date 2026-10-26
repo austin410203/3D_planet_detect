@@ -1,6 +1,8 @@
 # 星球失物招領所（3D_planet_detect）
 
-Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起來的物品，依時間給 1～3 星。部署在 Vercel。
+Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起來的物品，依時間給 1～3 星。部署在 Cloudflare Workers：https://planet.emptyoffice.app/（品牌網域，`wrangler.jsonc` 的 routes；舊的 workers.dev 網址保留）。
+
+- 條款頁：`python scripts/legal_gen.py` 產生 `public/` 的 pass／terms／refund／privacy／contact.html（四語系），`support.html` 轉址到 contact。App 內自動隱藏 `.web-only`（網頁付款、Lemon Squeezy），遊戲內不可出現外部付款連結（審查指南 3.1.1）。公開聯絡 email 一律 hello@emptyoffice.app。
 
 ## 慣例
 - 所有說明、程式註解、文件一律使用**繁體中文**。

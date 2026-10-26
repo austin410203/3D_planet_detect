@@ -548,6 +548,14 @@ initLang(import.meta.env.VITE_SHOT_LANG || settings.lang); // VITE_SHOT_LANG：�
 await localizeLevels(LEVELS, SPOTS);
 applyStaticText();
 // 設定裡的語言選單：切換後存檔並重新載入，整個畫面一次換好
+// 條款頁連結：App 內不放完整版介紹（避免連到網頁付款說明，審查指南 3.1.1），並帶 ?app=1 讓條款頁隱藏網頁付款段落
+{
+  const native = Capacitor.isNativePlatform();
+  const pages = native ? ['terms', 'privacy', 'contact'] : ['pass', 'terms', 'privacy', 'contact'];
+  const html = pages.map((k) => `<a href="${k}.html?lang=${lang}${native ? '&app=1' : ''}">${t(`legal${k[0].toUpperCase()}${k.slice(1)}`)}</a>`).join('');
+  for (const id of ['titleLegal', 'settingsLegal']) $(id).innerHTML = html;
+  $('titleLegal').addEventListener('click', (e) => e.stopPropagation()); // 不要觸發「點一下開始」
+}
 $('langSelect').innerHTML = LANGS.map((l) => `<option value="${l}">${UI[l]['lang.name']}</option>`).join('');
 $('langSelect').value = lang;
 $('langSelect').onchange = async (e) => { await setSetting('lang', e.target.value); location.reload(); };
