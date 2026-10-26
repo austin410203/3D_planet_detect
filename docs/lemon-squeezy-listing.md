@@ -28,7 +28,7 @@
 The first 8 planets and the Daily Challenge are free. Buy the Full Version once to unlock planets 9–28 — 28 planets in all. One-time purchase: no subscription, no ads.
 
 ・Read the clue notebook and find lost items on low-poly 3D planets
-・20 more planets — Skull Pirate Cove, Moon Base, Dinosaur Valley, Atlantis, Dragon's Nest, Pumpkin Ghost Town, Toy Kingdom and more — each with its own client, landmarks and music
+・20 more planets — Skull Pirate Cove, Moon Base, Dinosaur Valley, Atlantis, Dragon's Lair, Pumpkin Ghost Town, Toy Kingdom and more — each with its own client, landmarks and music
 ・Available in English, 繁體中文, 日本語 and 한국어
 ・You'll receive a licence key after payment; enter it in the game to unlock. One key works on up to 5 devices or browsers.
 
