@@ -1,4 +1,5 @@
 # iOS 建置：在 GitHub 的 macOS 機器上編譯 iOS App，並在 iPhone 模擬器啟動、截圖
+# commit 訊息含 [shots] 時另外拍商店截圖：繁中／英／日／韓 × 6.9 吋 iPhone、13 吋 iPad，各 5 個畫面
 # 結果（編譯錯誤、截圖、App 紀錄）推到 ci-results 分支，沒有 Mac 也能用 git 取回查看：
 #   git fetch origin ci-results && git show origin/ci-results:summary.txt
 name: iOS 建置
