@@ -50,6 +50,7 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `src/haptics.js`：觸覺回饋（只在原生 App）。按鈕的點擊音效與震動由 `main.js` 的 document click 統一處理，不用每顆按鈕各自加。
 - `src/gamecenter.js`：Game Center 登入、上傳分數、開啟排行榜。時間以 1/100 秒上傳。
 - `src/store.js`：完整版購買狀態（本地快取＋StoreKit 確認）、購買、恢復購買。`progress.lockReason()` 回傳 `'paid'`／`null`（關卡不用依序過關，只看有沒有完整版）。
+- `src/ads.js`：免費版廣告（公司規定：免費版網頁與 App 都有廣告，買完整版永久無廣告；規則見 `Company/playbooks/ads-monetization.md`）。iOS 用 AdMob（`@capacitor-community/admob`，非個人化、分級 G、不跳 ATT、歐盟先 UMP 同意），網頁用 AdSense H5 遊戲廣告，還沒有發布商 ID 時播自家推廣卡片。獎勵廣告＝看完試玩一次付費星球（每天 5 次，`progress.lockReason` 以 `hasTrial` 放行一次）；插頁廣告在離開結算畫面時，每 2 關、至少隔 3 分鐘、每次開啟最多 4 支。正式廣告 ID 未申請前用 Google 測試 ID（`ADMOB_LIVE=false`，Info.plist 的 `GADApplicationIdentifier` 也是測試 ID）。商店截圖模式不載入廣告。
 - `src/daily.js`：每日挑戰。以 UTC+8 日期算出星球與 seed（全世界同一張地圖），只記錄當天第一次的成績、計算連續天數；不影響一般關卡進度與解鎖，也不受解鎖限制。
 
 ## 關卡設計規則

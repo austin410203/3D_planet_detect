@@ -3,6 +3,14 @@
 > 沒有 Mac：編譯、簽章、上傳都在 GitHub Actions 的 macOS 機器上做（`.github/workflows/testflight.yml`）。
 > 公司通用流程見 `Company/playbooks/ios-app-store-release.md` 第 1、7、8 節。
 
+## 目前狀態（2026-10-27）
+- ✅ Bundle ID `com.austin410203.planetlostfound` 已註冊（Game Center、In-App Purchase），Team ID `M3FNV67WZ3`
+- ✅ App 記錄：星球失物招領所，Apple ID **6827234202**，SKU `planet-lost-found-001`，主要語言繁中
+- ✅ 價格免費（基準國家台灣）；供應 148 國，**排除歐盟 27 國**（DSA 申報為非交易者）
+- ✅ 內購「完整版」Apple ID **6827238278**：NT$90、148 國、家人共享、中英日韓名稱與描述、審查備註；還缺審查截圖
+- ❌ 付費 App 協議已過期，要重新簽；銀行帳戶要補持有人地址與類型（老闆）
+- ❌ GitHub secrets 還沒設定；Game Center 排行榜等 API 金鑰後用 API 批次建立
+
 ## A. 一次性準備（老闆）
 
 1. **加入 Apple Developer Program**：developer.apple.com/programs/enroll，用**個人**身分、本名，年費 US$99。付款後審核約 1～2 天。
@@ -18,6 +26,13 @@
    | `ASC_KEY_ID` | Key ID |
    | `ASC_KEY_P8` | `.p8` 檔用記事本打開後的**完整內容**（含 BEGIN／END 兩行） |
    | `APPLE_TEAM_ID` | developer.apple.com → Account → Membership details 的 Team ID（10 碼） |
+
+## A2. 廣告帳號（老闆，詳見 Company/playbooks/ads-monetization.md 第 2 節）
+1. **Google AdMob**：建立帳號（台灣、W-8BEN、銀行 SWIFT）→ 新增應用程式「星球失物招領所」（iOS）→ 建立兩個廣告單元：**獎勵廣告**、**插頁廣告**。把 App ID（`ca-app-pub-…~…`）和兩個廣告單元 ID（`ca-app-pub-…/…`）交給 Claude。
+2. AdMob「隱私權與訊息」：建立歐盟／英國的 GDPR 同意訊息（App 用 Google UMP 顯示）。
+3. **app-ads.txt**：`https://emptyoffice.app/app-ads.txt` 已上線（目前是 AdSense 那一行，AdMob 開好後確認同一個發布商 ID 即可）；App Store Connect 的「行銷網址／開發者網站」填 `https://emptyoffice.app`。
+4. **Google AdSense**（網頁版）：✅ 2026-10-27 已用 `emptyoffice.app` 送審（發布商 ID `ca-pub-4390142574700801`，`ads.txt`／`app-ads.txt` 已上線，進度見 `Company/outbox/2026-10-27_C_adsense-signup.md`）。還要另外通過「H5 遊戲廣告」才填進 `src/ads.js` 的 `WEB_AD_CLIENT`；在那之前網頁版播自家推廣廣告。
+5. Claude 收到 ID 後：`src/ads.js` 填入並把 `ADMOB_LIVE` 改成 `true`、Info.plist 的 `GADApplicationIdentifier` 換成正式 App ID、`WEB_AD_CLIENT` 填入發布商 ID。**正式 ID 不要自己點廣告測試**，測試一律用測試 ID。
 
 ## B. 內購與 Game Center（老闆在 App Store Connect 操作，Claude 提供內容）
 - 內購「完整版」：照 `docs/in-app-purchase.md` 建立（非消耗型，Product ID `com.austin410203.planetlostfound.fullunlock`，四語系名稱與描述、審查截圖）。
@@ -35,6 +50,7 @@
 - [ ] Game Center 登入、過關送分、每日挑戰排行
 - [ ] 切到背景再回來、飛航模式（離線）、靜音開關
 - [ ] 設定裡的條款連結：只有服務條款、隱私權、聯絡（App 內不可出現網頁付款或序號）
+- [ ] 廣告（免費版）：鎖住的星球按「看廣告試玩一次」→ 看完進入該星球、中途關閉不給試玩、每天 5 次；過 2 關且開始玩 3 分鐘後，離開結算畫面會跳插頁廣告；買完整版／恢復購買後完全沒有廣告；飛航模式下不卡住
 - [ ] iPad 直向／橫向
 
 ## E. 送審（老闆按送出，Claude 準備內容）

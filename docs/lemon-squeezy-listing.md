@@ -16,7 +16,7 @@
 
 ### Description（直接複製）
 ```
-免費就能玩前 4 顆星球和每日挑戰；買一次「完整版」，解鎖第 5～28 顆星球，共 28 顆，不用依序過關，一次付費、永久使用，沒有訂閱、沒有廣告。
+免費就能玩前 4 顆星球和每日挑戰；買一次「完整版」，解鎖第 5～28 顆星球，共 28 顆，不用依序過關，一次付費、永久使用，沒有訂閱，而且永久無廣告（免費版有廣告）。
 
 ・閱讀線索手冊，在低多邊形的 3D 星球上找出居民遺失的物品
 ・24 顆新星球：骷髏海盜灣、月球基地、恐龍谷、亞特蘭提斯、巨龍之巢、南瓜鬼鎮、玩具王國……每顆都有自己的委託人、地標與配樂
@@ -25,7 +25,7 @@
 
 ---
 
-The first 4 planets and the Daily Challenge are free. Buy the Full Version once to unlock planets 5–28 — 28 planets in all, playable in any order. One-time purchase: no subscription, no ads.
+The first 4 planets and the Daily Challenge are free. Buy the Full Version once to unlock planets 5–28 — 28 planets in all, playable in any order. One-time purchase: no subscription, and ad-free forever (the free version shows ads).
 
 ・Read the clue notebook and find lost items on low-poly 3D planets
 ・24 more planets — Skull Pirate Cove, Moon Base, Dinosaur Valley, Atlantis, Dragon's Lair, Pumpkin Ghost Town, Toy Kingdom and more — each with its own client, landmarks and music

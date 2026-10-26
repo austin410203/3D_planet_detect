@@ -27,6 +27,7 @@ import { haptic, hasHaptics } from './src/haptics.js';
 import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitScore, LEADERBOARD } from './src/gamecenter.js';
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
 import { store, hasStore, isWeb, WEB_PASS, loadStore, purchaseFull, restorePurchases, activateKey, passInfo, onStoreChange } from './src/store.js';
+import { loadAds, adsAvailable, watchForTrial, consumeTrial, trialsLeft, levelFinished, maybeInterstitial } from './src/ads.js';
 import { startIconSwap } from './src/icons.js';
 import { runTutorial } from './src/tutorial.js';
 import { t, lang, LANGS, initLang, applyStaticText, localizeLevels } from './src/i18n.js';
@@ -166,6 +167,8 @@ function renderSelectCard() {
   $('pcGoal').textContent = t('seconds', { n: lv.stars[0] });
   $('planetCard').classList.toggle('locked', !!lock);
   $('pcPaid').hidden = lock !== 'paid';
+  $('trialBtn').hidden = lock !== 'paid' || !adsAvailable;
+  $('trialBtn').innerHTML = `${t('trialBtn')}<small>${t('trialLeft', { n: trialsLeft() })}</small>`;
   $('unlockBtn').textContent = store.price ? t('unlockPrice', { price: store.price }) : t('unlock');
   $('planetDots').innerHTML = LEVELS.map((_, i) => `<span class="${i === selected ? 'on' : ''}" data-i="${i}"></span>`).join('');
   $('totalStars').textContent = progress.totalStars(LEVELS);
@@ -193,6 +196,7 @@ addEventListener('keydown', (e) => {
  * ======================================================= */
 let mode = 'title';    // title | select | intro | play | result
 let tutorialRun = false; // 這一局是否要跑新手教學
+let trialRun = false;    // 這一局是看廣告換來的付費星球試玩
 let searchHook = null;   // 教學用：翻找時通知
 let world = null;
 let game = null;
@@ -263,6 +267,7 @@ function startLevel(i, dailyKey = null, { tutorial = false } = {}) {
   if (!dailyKey && !progress.isUnlocked(LEVELS, i)) return;
   teardown();
   levelIndex = i;
+  trialRun = !dailyKey && consumeTrial(i); // 看廣告換來的試玩：只能進這一次
   const lv = LEVELS[i];
   mode = 'intro';
   $('select').hidden = true;
@@ -358,13 +363,23 @@ function showResult({ time, stars }) {
   starEls.slice(0, stars).forEach((s, k) => setTimeout(() => { s.classList.add('on'); sfx.star(k); haptic.star(); }, 700 + k * 350));
   const hasNext = levelIndex + 1 < LEVELS.length;
   $('nextBtn').hidden = !hasNext || !!dailyRun;
+  $('resultTrial').hidden = !trialRun;
+  if (!tutorialRun) levelFinished();
   $('resultLbBtn').hidden = !hasGameCenter;
   $('result').hidden = false;
 }
-$('retryBtn').onclick = () => startLevel(levelIndex, dailyRun?.key);
+// 離開結算畫面前先看要不要播插頁廣告（免費版，src/ads.js 控制頻率）
+$('retryBtn').onclick = async () => {
+  // 試玩結束後再玩一次：已經鎖回去，改開完整版介紹
+  if (!dailyRun && progress.lockReason(LEVELS, levelIndex) === 'paid') { openStore(); return; }
+  await maybeInterstitial();
+  startLevel(levelIndex, dailyRun?.key);
+};
+$('trialUnlockBtn').onclick = () => openStore();
 $('resultLbBtn').onclick = () => showLeaderboard(dailyRun ? LEADERBOARD.daily : LEADERBOARD.best(LEVELS[levelIndex].id));
-$('menuBtn').onclick = () => { selected = levelIndex; showSelect(); };
-$('nextBtn').onclick = () => {
+$('menuBtn').onclick = async () => { await maybeInterstitial(); selected = levelIndex; showSelect(); };
+$('nextBtn').onclick = async () => {
+  await maybeInterstitial();
   selected = levelIndex + 1;
   // 下一關需要完整版而還沒買：回選關畫面並打開完整版介紹
   if (progress.lockReason(LEVELS, selected) === 'paid') { showSelect(); openStore(); return; }
@@ -414,6 +429,16 @@ function openStore() {
 }
 const storeMsg = (status) => (status === 'cancelled' ? '' : t(`store.${status}`) ?? t('store.failed'));
 $('unlockBtn').onclick = openStore;
+// 免費版：看一支獎勵廣告，試玩這顆付費星球一次
+$('trialBtn').onclick = async () => {
+  const b = $('trialBtn');
+  b.disabled = true;
+  const r = await watchForTrial(selected);
+  b.disabled = false;
+  if (r === 'ok') { startLevel(selected); return; }
+  const msg = { limit: 'trialLimit', unavailable: 'adNone' }[r];
+  b.innerHTML = `${t('trialBtn')}<small>${msg ? t(msg) : t('trialLeft', { n: trialsLeft() })}</small>`;
+};
 $('storeClose').onclick = () => { $('store').hidden = true; };
 $('buyBtn').onclick = async () => {
   if (isWeb) { // 網頁版：開 Lemon Squeezy 結帳頁，付款後回來輸入序號
@@ -570,6 +595,7 @@ await Promise.all([loadProgress(), loadSettings(), loadDaily(), loadStore()]);
 initLang(import.meta.env.VITE_SHOT_LANG || settings.lang); // VITE_SHOT_LANG：商店截圖版固定語言
 await localizeLevels(LEVELS, SPOTS);
 applyStaticText();
+if (!import.meta.env.VITE_SCREENSHOT) loadAds(); // 免費版廣告（iOS：AdMob；網頁：AdSense 或自家推廣）；商店截圖模式不載入
 // 設定裡的語言選單：切換後存檔並重新載入，整個畫面一次換好
 // 條款頁連結：App 內不放完整版介紹（避免連到網頁付款說明，審查指南 3.1.1），並帶 ?app=1 讓條款頁隱藏網頁付款段落
 {

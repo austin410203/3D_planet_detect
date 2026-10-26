@@ -8,6 +8,7 @@
  */
 import { Preferences } from '@capacitor/preferences';
 import { store } from './store.js';
+import { hasTrial } from './ads.js';
 
 const KEY = 'planetLostFound.v1';
 let data = {};
@@ -43,7 +44,7 @@ export const progress = {
   /** 鎖住的原因：null（可以玩）、'paid'（需要完整版） */
   lockReason(levels, index) {
     if (unlockAll) return null;
-    return store.needsPurchase(index) ? 'paid' : null;
+    return store.needsPurchase(index) && !hasTrial(index) ? 'paid' : null; // 看完廣告的試玩可以進入一次
   },
   isUnlocked(levels, index) { return !this.lockReason(levels, index); },
   totalStars(levels) { return levels.reduce((s, l) => s + this.get(l.id).stars, 0); },

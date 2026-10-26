@@ -53,6 +53,8 @@
       <div class="pc-paid" id="pcPaid" hidden>
         <p class="pc-lock" data-i18n="lockPaid">💎 第 5～28 顆星球屬於完整版</p>
         <button class="btn btn-go btn-small" id="unlockBtn">🔓 解鎖完整版</button>
+        <!-- 免費版：看一支獎勵廣告試玩一次（src/ads.js） -->
+        <button class="btn btn-small trial-btn" id="trialBtn" hidden></button>
       </div>
     </article>
 
@@ -149,7 +151,7 @@
       <ul class="store-perks">
         <li data-i18n="perk1">🪐 再解鎖 <b>24 顆</b>主題星球（第 5～28 關），包含傳說與科幻主題</li>
         <li data-i18n="perk2">🏴‍☠️ 海盜灣、亞特蘭提斯、巨龍之巢、聖誕北極星……</li>
-        <li data-i18n="perk3">✨ 一次購買、永久擁有，沒有廣告</li>
+        <li data-i18n="perk3">✨ 一次購買、永久擁有，永久無廣告</li>
       </ul>
       <!-- 網頁版才顯示：序號輸入與說明頁（App 內不可出現，審查指南 3.1.1） -->
       <div class="store-web" id="storeWeb" hidden>
@@ -211,6 +213,11 @@
       </div>
       <div class="result-time"><span id="resultTime">0:00</span><small id="resultBest"></small></div>
       <div class="speech small" id="resultOutro"></div>
+      <!-- 試玩結束：引導解鎖完整版 -->
+      <div class="result-trial" id="resultTrial" hidden>
+        <p data-i18n="trialEnd">喜歡這顆星球嗎？解鎖完整版就能隨時再玩，而且永久無廣告。</p>
+        <button class="btn btn-go btn-small" id="trialUnlockBtn" data-i18n="unlock">🔓 解鎖完整版</button>
+      </div>
       <div class="result-btns">
         <button class="btn btn-small" id="retryBtn" data-i18n="retry">↻ 再玩一次</button>
         <button class="btn btn-small" id="menuBtn" data-i18n="menu">🪐 選關</button>

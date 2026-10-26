@@ -56,7 +56,7 @@
 ・可愛的手繪風 3D 星球，粗線條、亮色系
 ・每顆星球專屬的配樂與音效，搭配震動回饋
 ・不需要網路，隨時隨地都能玩
-・沒有廣告、不收集任何個人資料
+・免費版有廣告（可看廣告試玩付費星球），買完整版後永久無廣告
 
 前 4 顆星球免費遊玩；購買一次「完整版」即可永久解鎖第 5～28 顆星球，想玩哪顆就玩哪顆。
 ```
@@ -99,7 +99,7 @@ Everyone in the world plays the same planet and map each day. Only your first ru
 
 • Chunky hand-drawn 3D style with bold outlines
 • Music and sound for every planet, plus haptics
-• Plays fully offline — no ads, no data collection
+• Free version has ads (watch one to try a paid planet); the Full Version is ad-free forever
 
 The first 4 planets are free. A one-time "Full Version" purchase unlocks planets 5–28 forever — play them in any order.
 ```
@@ -142,7 +142,7 @@ The first 4 planets are free. A one-time "Full Version" purchase unlocks planets
 
 ・太い線と明るい色の、かわいいローポリ3Dの星
 ・星ごとのBGMと効果音、振動フィードバック
-・オフラインで遊べる、広告なし、個人情報を集めません
+・無料版には広告あり（広告を見て有料の星をお試し可）、完全版ならずっと広告なし
 
 最初の4つの星は無料。「完全版」を一度購入すると、5〜28番目の星がずっと遊べます。好きな順番で遊べます。
 ```
@@ -185,7 +185,7 @@ The first 4 planets are free. A one-time "Full Version" purchase unlocks planets
 
 ・굵은 선과 밝은 색의 귀여운 로우폴리 3D 행성
 ・행성마다 다른 배경음악과 효과음, 진동 피드백
-・오프라인 플레이, 광고 없음, 개인정보 수집 없음
+・무료 버전에는 광고가 있어요(광고를 보고 유료 행성 체험 가능). 정식판은 영원히 광고 없음
 
 처음 4개 행성은 무료예요. "정식판"을 한 번 구매하면 5~28번째 행성을 순서와 관계없이 계속 플레이할 수 있어요.
 ```
@@ -206,11 +206,22 @@ The first 4 planets are free. A one-time "Full Version" purchase unlocks planets
 
 所有「卡通或奇幻暴力、寫實暴力、性與裸露、褻瀆或粗俗幽默、恐怖主題、成熟主題、醫療、酒精菸草藥物、模擬賭博、比賽、競賽」都選 **無**。
 「無限制的網頁存取」：否。「使用者產生內容」：否。「家長控制」：否。「抽獎或付費隨機物品（Loot box）」：否。
+「廣告」（若問卷有這題）：**是**，免費版有 AdMob 廣告，內容分級設為普遍級（G）。
 
 ## App 隱私權（營養標籤）
 
-「你或第三方合作夥伴是否從此 App 收集資料？」→ **否，我們不會從此 App 收集資料**。
-（Game Center 與 App 內購買由 Apple 處理，不算開發者收集。）
+免費版有 Google AdMob 廣告，所以要回答「**是**，從此 App 收集資料」（第三方合作夥伴 Google 收集）。
+以下依 Google 的「AdMob 資料揭露」說明填寫，送審前請再到 Google 官方說明頁確認一次：
+
+| 資料類型 | 用途 | 與使用者身分連結 | 用於追蹤 |
+|---|---|---|---|
+| 識別碼 → 裝置 ID | 第三方廣告、分析 | 否 | 否 |
+| 使用資料 → 產品互動、廣告資料 | 第三方廣告、分析 | 否 | 否 |
+| 診斷 → 當機資料、效能資料 | 第三方廣告、分析 | 否 | 否 |
+| 位置 → 大略位置 | 第三方廣告 | 否 | 否 |
+
+- 「用於追蹤」全部選**否**：我們只要求非個人化廣告（`npa`），也不請求 ATT，所以不使用 IDFA 追蹤。
+- Game Center 與 App 內購買由 Apple 處理，不算開發者收集。
 
 ## 審查備註（App Review Information → Notes）
 
@@ -221,5 +232,9 @@ No account or login is required.
 - Restore Purchases: Settings (⚙️ 設定) → 完整版 → 恢復購買, or the link at the bottom of the purchase sheet.
 - The Daily Challenge (📅 每日) is free and may feature any planet.
 - Game Center leaderboards: 🏆 排行 on the level-select screen.
-The game works fully offline and collects no user data.
+- Ads (free version only, Google AdMob, non-personalised, rated G, no ATT prompt):
+  a rewarded ad the player chooses to watch ("📺 看廣告試玩一次" on a locked planet) grants one play of that planet
+  (max 5 per day), and an interstitial may appear when leaving the results screen (at most every 2 levels and
+  3 minutes, never during play or the tutorial). Buying the Full Version removes all ads.
+The game itself works offline; ads need a connection and are skipped when offline.
 ```

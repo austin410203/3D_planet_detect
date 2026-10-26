@@ -131,15 +131,15 @@ jobs:
           xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
           sleep 2
           # 只保留外掛呼叫、JS console 與錯誤
-          grep -E "⚡️|rror|xception|GameCenter|Store|Haptics|Preferences|App " ci-out/app-stdout.log | tr -d '\r' | cut -c1-400 | head -300 > ci-out/app.log || true
+          grep -E "⚡️|rror|xception|GameCenter|Store|Haptics|Preferences|AdMob|GAD|App " ci-out/app-stdout.log | tr -d '\r' | cut -c1-400 | head -300 > ci-out/app.log || true
           rm -f ci-out/app-stdout.log
           # 自寫的原生外掛一定要真的被呼叫到（沒註冊時 JS 會直接回傳「未實作」，畫面看起來仍正常）
           MISSING=""
-          for call in "GameCenter signIn" "Store getEntitlements" "Store getProducts"; do
+          for call in "GameCenter signIn" "Store getEntitlements" "Store getProducts" "AdMob initialize"; do
             grep -q "To Native ->  $call" ci-out/app.log || MISSING="$MISSING [$call]"
           done
           if [ -n "$MISSING" ]; then echo "缺少原生呼叫：$MISSING" | tee ci-out/plugin-check.txt; echo "::error::原生外掛沒有被呼叫：$MISSING"; exit 1; fi
-          echo "OK：GameCenter、Store 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
+          echo "OK：GameCenter、Store、AdMob 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
 
       - uses: actions/upload-artifact@v4
         if: always()
