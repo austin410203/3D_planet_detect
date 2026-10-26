@@ -3,18 +3,16 @@
  * --------------------------------------------------
  * 只有 VITE_SCREENSHOT=1 建置時才會打包（main.js 動態載入），正式版不包含。
  * 依序展示：選關 → 委託 → 遊戲中 → 結算 → 每日挑戰（第一關綠野星）。
- * 每個畫面準備好後就停住，等 CI 截完圖用 `simctl openurl planetshots://next` 通知才換下一個，
- * 所以模擬器截圖再慢也不會錯位（URL scheme 只加在 CI 的截圖版 App，見 .github/workflows/ios.yml）。
- * 每個畫面也會輸出 `SHOT:名稱` 到 console，方便除錯。
+ * 每個畫面準備好後就停住，等 CI 截完圖切換模擬器的淺色／深色模式（`simctl ui appearance`）通知才換下一個，
+ * 所以模擬器截圖再慢也不會錯位。不用自訂網址：新版 iOS 會跳出「要在 App 中開啟嗎？」確認框擋住畫面。
+ * 遊戲的配色不跟系統深淺色走，切換不影響截圖。每個畫面也會輸出 `SHOT:名稱` 到 console，方便除錯。
  */
-import { App } from '@capacitor/app';
-
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// 收到 planetshots://next 就放行下一個畫面；保險起見最多等 3 分鐘
+// 系統深淺色一改變就放行下一個畫面；保險起見最多等 3 分鐘
 let release = null;
-App.addListener('appUrlOpen', ({ url }) => { if (url.includes('next') && release) release(); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (release) release(); });
 async function shot(name) {
   console.log(`SHOT:${name}`);
   await Promise.race([new Promise((r) => { release = r; }), sleep(180000)]);

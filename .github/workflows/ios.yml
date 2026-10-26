@@ -108,8 +108,6 @@ jobs:
             VITE_SCREENSHOT=1 VITE_SHOT_LANG=$L npx vite build --outDir dist-shots-$L
             cp -R build/Build/Products/Debug-iphonesimulator/App.app App-shots-$L.app
             rm -rf App-shots-$L.app/public && cp -R dist-shots-$L App-shots-$L.app/public
-            # 只有截圖版 App 加上 planetshots:// 網址（讓 CI 通知展示模式換畫面），正式版不受影響
-            plutil -insert CFBundleURLTypes -json '[{"CFBundleURLName":"shots","CFBundleURLSchemes":["planetshots"]}]' App-shots-$L.app/Info.plist
           done
           mkdir -p ci-out/shots
           find_dev() {
@@ -132,16 +130,19 @@ jobs:
             for L in $LANGS; do
               TAG="$2-$L"
               xcrun simctl install "$UDID" App-shots-$L.app
+              xcrun simctl ui "$UDID" appearance light
+              MODE=light
               LOG="ci-out/shots/$TAG-log.txt"
               bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$TAG: /" >> ci-out/shots/devices.txt
-              # src/demo.js 每個畫面準備好就停住，截完圖再用 openurl 通知它換下一個
-              # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜）
+              # src/demo.js 每個畫面準備好就停住，截完圖再切換淺色／深色模式通知它換下一個
+              # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜；自訂網址會被 iOS 確認框擋住）
               # 數字是送出通知後，等下一個畫面準備好的秒數
               sleep 15
               for shot in select:6 intro:12 play:9 result:6 daily:0; do
                 name=${shot%%:*}; settle=${shot##*:}
                 xcrun simctl io "$UDID" screenshot "ci-out/shots/$TAG-$name.png"
-                xcrun simctl openurl "$UDID" "planetshots://next" || true
+                if [ "$MODE" = light ]; then MODE=dark; else MODE=light; fi
+                xcrun simctl ui "$UDID" appearance "$MODE"
                 sleep "$settle"
               done
               xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
