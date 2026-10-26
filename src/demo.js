@@ -11,8 +11,16 @@ const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // 系統深淺色一改變就放行下一個畫面；保險起見最多等 3 分鐘
+// iPad 的 WebView 切一次深淺色可能觸發兩次 change，放行後 4 秒內的訊號一律忽略（CI 每張至少隔 6 秒）
 let release = null;
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (release) release(); });
+let lastRelease = 0;
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (!release || Date.now() - lastRelease < 4000) return;
+  lastRelease = Date.now();
+  release();
+});
+// 本機測試用：瀏覽器模擬深淺色不會觸發 change，改在 console 呼叫 __shotNext() 放行
+window.__shotNext = () => release?.();
 async function shot(name) {
   console.log(`SHOT:${name}`);
   await Promise.race([new Promise((r) => { release = r; }), sleep(180000)]);
@@ -69,8 +77,12 @@ export async function runDemo({ LEVELS, choose, startLevel, progress }) {
   await sleep(500);
   await shot('play');
 
-  // 4. 結算：找齊剩下的物品
-  for (const s of targets.slice(1)) await tapSpot(s);
+  // 4. 結算：找齊剩下的物品（點擊可能被地標擋住而沒點中，換不同相機距離重試，最多 3 輪）
+  const found = () => window.__dbg.game.state.found;
+  for (const dist of [11, 8.5, 14]) {
+    for (const s of targets) if (!found().has(window.__dbg.world.targets.indexOf(s.content.target))) await tapSpot(s, dist);
+    if (found().size === targets.length) break;
+  }
   await sleep(3500);
   await shot('result');
 
