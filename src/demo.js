@@ -49,7 +49,7 @@ async function tapSpot(spot, dist = 11) {
 
 export async function runDemo({ LEVELS, choose, startLevel, progress }) {
   await sleep(3000);
-  // 假的進度：前 8 關有星星，畫面比較熱鬧
+  // 假的進度：前 8 關有星星，畫面比較熱鬧（不影響鎖定：完整版只看購買狀態）
   [3, 3, 2, 3, 3, 2, 3, 1].forEach((s, i) => progress.save(LEVELS[i].id, s, 40 + i * 9));
 
   // 1. 選關（第一關：綠野星）

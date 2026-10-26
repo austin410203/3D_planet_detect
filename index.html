@@ -50,9 +50,8 @@
         <div><dt data-i18n="card.goal">三星目標</dt><dd id="pcGoal">60 秒</dd></div>
       </dl>
       <button class="btn btn-go" id="startBtn" data-i18n="start">出發！</button>
-      <p class="pc-lock" id="pcLock" data-i18n="lockStars" hidden>🔒 先在上一顆星球拿到 1 顆星才能解鎖</p>
       <div class="pc-paid" id="pcPaid" hidden>
-        <p class="pc-lock" data-i18n="lockPaid">💎 第 9～28 顆星球屬於完整版</p>
+        <p class="pc-lock" data-i18n="lockPaid">💎 第 5～28 顆星球屬於完整版</p>
         <button class="btn btn-go btn-small" id="unlockBtn">🔓 解鎖完整版</button>
       </div>
     </article>
@@ -143,15 +142,24 @@
     </div>
   </div>
 
-  <!-- ==================== 完整版（App 內購買） ==================== -->
+  <!-- ==================== 完整版（iOS：App 內購買；網頁版：Lemon Squeezy 序號） ==================== -->
   <div class="modal" id="store" hidden>
     <div class="dialog">
       <h2 class="result-title" data-i18n="storeTitle">💎 完整版</h2>
       <ul class="store-perks">
-        <li data-i18n="perk1">🪐 再解鎖 <b>20 顆</b>傳說與科幻主題星球（第 9～28 關）</li>
+        <li data-i18n="perk1">🪐 再解鎖 <b>24 顆</b>主題星球（第 5～28 關），包含傳說與科幻主題</li>
         <li data-i18n="perk2">🏴‍☠️ 海盜灣、亞特蘭提斯、巨龍之巢、聖誕北極星……</li>
         <li data-i18n="perk3">✨ 一次購買、永久擁有，沒有廣告</li>
       </ul>
+      <!-- 網頁版才顯示：序號輸入與說明頁（App 內不可出現，審查指南 3.1.1） -->
+      <div class="store-web" id="storeWeb" hidden>
+        <p class="store-note" data-i18n="storeWebNote"></p>
+        <form class="key-row" id="keyForm">
+          <input id="keyInput" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+          <button class="btn btn-small" id="keyBtn" data-i18n="activate">啟用</button>
+        </form>
+        <a class="pass-link" href="pass.html" target="_blank" rel="noopener" data-i18n="passLink">完整版說明・退款政策</a>
+      </div>
       <p class="store-msg" id="storeMsg"></p>
       <div class="result-btns">
         <button class="btn btn-small" id="storeClose" data-i18n="later">之後再說</button>

@@ -58,7 +58,7 @@
 ・不需要網路，隨時隨地都能玩
 ・沒有廣告、不收集任何個人資料
 
-前 8 顆星球免費遊玩；購買一次「完整版」即可永久解鎖第 9～28 顆星球。
+前 4 顆星球免費遊玩；購買一次「完整版」即可永久解鎖第 5～28 顆星球，想玩哪顆就玩哪顆。
 ```
 
 **此版本新增內容**（第一版可省略）：首次推出！
@@ -101,7 +101,7 @@ Everyone in the world plays the same planet and map each day. Only your first ru
 • Music and sound for every planet, plus haptics
 • Plays fully offline — no ads, no data collection
 
-The first 8 planets are free. A one-time "Full Version" purchase unlocks planets 9–28 forever.
+The first 4 planets are free. A one-time "Full Version" purchase unlocks planets 5–28 forever — play them in any order.
 ```
 
 ## 日本語
@@ -144,7 +144,7 @@ The first 8 planets are free. A one-time "Full Version" purchase unlocks planets
 ・星ごとのBGMと効果音、振動フィードバック
 ・オフラインで遊べる、広告なし、個人情報を集めません
 
-最初の8つの星は無料。「完全版」を一度購入すると、9〜28番目の星がずっと遊べます。
+最初の4つの星は無料。「完全版」を一度購入すると、5〜28番目の星がずっと遊べます。好きな順番で遊べます。
 ```
 
 ## 한국어
@@ -187,7 +187,7 @@ The first 8 planets are free. A one-time "Full Version" purchase unlocks planets
 ・행성마다 다른 배경음악과 효과음, 진동 피드백
 ・오프라인 플레이, 광고 없음, 개인정보 수집 없음
 
-처음 8개 행성은 무료예요. "정식판"을 한 번 구매하면 9~28번째 행성을 계속 플레이할 수 있어요.
+처음 4개 행성은 무료예요. "정식판"을 한 번 구매하면 5~28번째 행성을 순서와 관계없이 계속 플레이할 수 있어요.
 ```
 
 ## 截圖標題（scripts/make-store-shots.mjs 會疊在截圖上方，四種語言各一組）
@@ -216,7 +216,7 @@ The first 8 planets are free. A one-time "Full Version" purchase unlocks planets
 
 ```
 No account or login is required.
-- Planets 1–8 are free. Planets 9–28 require the non-consumable in-app purchase "Full Version"
+- Planets 1–4 are free. Planets 5–28 require the non-consumable in-app purchase "Full Version"
   (com.austin410203.planetlostfound.fullunlock). Tap a locked planet → "解鎖完整版" to see the purchase sheet.
 - Restore Purchases: Settings (⚙️ 設定) → 完整版 → 恢復購買, or the link at the bottom of the purchase sheet.
 - The Daily Challenge (📅 每日) is free and may feature any planet.

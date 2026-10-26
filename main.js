@@ -26,7 +26,7 @@ import { sfx, playMusic, setAudioPaused } from './src/audio.js';
 import { haptic, hasHaptics } from './src/haptics.js';
 import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitScore, LEADERBOARD } from './src/gamecenter.js';
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
-import { store, hasStore, loadStore, purchaseFull, restorePurchases, onStoreChange } from './src/store.js';
+import { store, hasStore, isWeb, WEB_PASS, loadStore, purchaseFull, restorePurchases, activateKey, passInfo, onStoreChange } from './src/store.js';
 import { startIconSwap } from './src/icons.js';
 import { runTutorial } from './src/tutorial.js';
 import { t, lang, LANGS, initLang, applyStaticText, localizeLevels } from './src/i18n.js';
@@ -165,7 +165,6 @@ function renderSelectCard() {
   $('pcBest').textContent = p.best !== null ? fmtTime(p.best) : '--';
   $('pcGoal').textContent = t('seconds', { n: lv.stars[0] });
   $('planetCard').classList.toggle('locked', !!lock);
-  $('pcLock').hidden = lock !== 'stars';
   $('pcPaid').hidden = lock !== 'paid';
   $('unlockBtn').textContent = store.price ? t('unlockPrice', { price: store.price }) : t('unlock');
   $('planetDots').innerHTML = LEVELS.map((_, i) => `<span class="${i === selected ? 'on' : ''}" data-i="${i}"></span>`).join('');
@@ -367,7 +366,7 @@ $('resultLbBtn').onclick = () => showLeaderboard(dailyRun ? LEADERBOARD.daily : 
 $('menuBtn').onclick = () => { selected = levelIndex; showSelect(); };
 $('nextBtn').onclick = () => {
   selected = levelIndex + 1;
-  // 打完第 8 關還沒買完整版：回選關畫面並打開完整版介紹
+  // 下一關需要完整版而還沒買：回選關畫面並打開完整版介紹
   if (progress.lockReason(LEVELS, selected) === 'paid') { showSelect(); openStore(); return; }
   startLevel(selected);
 };
@@ -400,20 +399,28 @@ $('dailyLb').onclick = () => showLeaderboard(LEADERBOARD.daily);
 $('dailyClose').onclick = () => { $('daily').hidden = true; };
 
 /* =========================================================
- * 完整版（App 內購買）
+ * 完整版（iOS：App 內購買；網頁版：Lemon Squeezy 序號）
  * ======================================================= */
 function openStore() {
-  $('storeMsg').textContent = hasStore ? '' : t('storeWeb');
-  $('buyBtn').hidden = !hasStore;
+  const info = passInfo();
+  $('storeMsg').textContent = info ? t('keyActive', { key: info.key }) : '';
+  $('storeWeb').hidden = !isWeb || store.owned;
+  $('buyBtn').hidden = !(hasStore || isWeb) || store.owned;
   $('restoreBtn').hidden = !hasStore;
   $('buyBtn').disabled = false;
   $('buyBtn').textContent = store.price ? t('buyPrice', { price: store.price }) : t('buy');
+  $('keyInput').placeholder = t('keyPlaceholder');
   $('store').hidden = false;
 }
 const storeMsg = (status) => (status === 'cancelled' ? '' : t(`store.${status}`) ?? t('store.failed'));
 $('unlockBtn').onclick = openStore;
 $('storeClose').onclick = () => { $('store').hidden = true; };
 $('buyBtn').onclick = async () => {
+  if (isWeb) { // 網頁版：開 Lemon Squeezy 結帳頁，付款後回來輸入序號
+    if (WEB_PASS.checkoutUrl) window.open(WEB_PASS.checkoutUrl, '_blank', 'noopener');
+    else $('storeMsg').textContent = t('checkoutSoon');
+    return;
+  }
   $('buyBtn').disabled = true;
   $('storeMsg').textContent = t('storeConnecting');
   const status = await purchaseFull();
@@ -431,8 +438,24 @@ $('restoreBtn').onclick = async () => {
   $('storeMsg').textContent = t(ok ? 'restoreOk' : 'restoreNone');
   if (ok) { haptic.found(); setTimeout(() => { $('store').hidden = true; }, 1500); }
 };
-// 設定裡的恢復購買（按鈕空間小，只顯示簡短結果）
+$('keyForm').onsubmit = async (e) => {
+  e.preventDefault();
+  $('keyBtn').disabled = true;
+  $('storeMsg').textContent = t('keyChecking');
+  try {
+    await activateKey($('keyInput').value);
+    $('storeMsg').textContent = t('keyOk');
+    sfx.fanfare();
+    setTimeout(() => { $('store').hidden = true; }, 1800);
+  } catch (err) {
+    const why = err.message;
+    $('storeMsg').textContent = t(why === 'limit' ? 'keyLimit' : why === 'invalid' || why === 'empty' ? 'keyInvalid' : 'keyError');
+  }
+  $('keyBtn').disabled = false;
+};
+// 設定裡的恢復購買（按鈕空間小，只顯示簡短結果）；網頁版改成打開完整版視窗輸入序號
 $('restoreBtn2').onclick = async () => {
+  if (isWeb) { $('settings').hidden = true; openStore(); return; }
   const b = $('restoreBtn2');
   b.textContent = t('checking');
   const ok = await restorePurchases();
@@ -457,10 +480,10 @@ function renderSettings() {
 }
 for (const k of TOGGLES) $(`set-${k}`).onclick = () => { setSetting(k, !settings[k]); renderSettings(); };
 $('hapticsRow').hidden = !hasHaptics;
-$('restoreRow').hidden = !hasStore;
+$('restoreRow').hidden = !(hasStore || isWeb);
 $('settingsBtn').onclick = () => {
   renderSettings();
-  $('restoreBtn2').textContent = t(store.owned ? 'owned' : 'restore');
+  $('restoreBtn2').textContent = t(store.owned ? 'owned' : isWeb ? 'enterKey' : 'restore');
   $('restoreBtn2').classList.toggle('on', store.owned);
   $('settings').hidden = false;
 };

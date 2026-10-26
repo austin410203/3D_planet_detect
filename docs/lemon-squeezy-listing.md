@@ -16,19 +16,19 @@
 
 ### Description（直接複製）
 ```
-免費就能玩前 8 顆星球和每日挑戰；買一次「完整版」，解鎖第 9～28 顆星球，共 28 顆，一次付費、永久使用，沒有訂閱、沒有廣告。
+免費就能玩前 4 顆星球和每日挑戰；買一次「完整版」，解鎖第 5～28 顆星球，共 28 顆，不用依序過關，一次付費、永久使用，沒有訂閱、沒有廣告。
 
 ・閱讀線索手冊，在低多邊形的 3D 星球上找出居民遺失的物品
-・20 顆新星球：骷髏海盜灣、月球基地、恐龍谷、亞特蘭提斯、巨龍之巢、南瓜鬼鎮、玩具王國……每顆都有自己的委託人、地標與配樂
+・24 顆新星球：骷髏海盜灣、月球基地、恐龍谷、亞特蘭提斯、巨龍之巢、南瓜鬼鎮、玩具王國……每顆都有自己的委託人、地標與配樂
 ・支援繁體中文、日本語、English、한국어
 ・付款後會收到一組序號，在遊戲裡輸入即可解鎖；同一組序號最多可在 5 個裝置或瀏覽器使用
 
 ---
 
-The first 8 planets and the Daily Challenge are free. Buy the Full Version once to unlock planets 9–28 — 28 planets in all. One-time purchase: no subscription, no ads.
+The first 4 planets and the Daily Challenge are free. Buy the Full Version once to unlock planets 5–28 — 28 planets in all, playable in any order. One-time purchase: no subscription, no ads.
 
 ・Read the clue notebook and find lost items on low-poly 3D planets
-・20 more planets — Skull Pirate Cove, Moon Base, Dinosaur Valley, Atlantis, Dragon's Lair, Pumpkin Ghost Town, Toy Kingdom and more — each with its own client, landmarks and music
+・24 more planets — Skull Pirate Cove, Moon Base, Dinosaur Valley, Atlantis, Dragon's Lair, Pumpkin Ghost Town, Toy Kingdom and more — each with its own client, landmarks and music
 ・Available in English, 繁體中文, 日本語 and 한국어
 ・You'll receive a licence key after payment; enter it in the game to unlock. One key works on up to 5 devices or browsers.
 
@@ -79,14 +79,11 @@ To activate: open Lost & Found in Space → tap a locked planet or ⚙️ Settin
 有問題請來信 / Questions: hello@emptyoffice.app ・ 14 天內不論原因全額退款 / Full refund within 14 days: https://planet.emptyoffice.app/refund
 ```
 
-## 6. 建好之後交給 Claude
-- **Product ID**（商品網址裡的數字）
-- **Checkout 連結**（商品 → Share）
-- Store ID 已知：507523
-
-Claude 接著要做的程式（沿用月台圖鑑 `TrainPlatform/src/store.js`、`worker/index.js` 的 `license()`、`#unlock` 解鎖頁）：
-1. `wrangler.jsonc` 加 `main`（Worker）與 `vars`：`LS_STORE_ID`、`LS_PRODUCT_ID`；Worker 提供 `/api/license/activate|validate`，代呼叫 Lemon Squeezy 授權 API。
-2. `src/store.js`：網頁版 `WEB_FULL_ACCESS` 改為 `false`，第 9～28 顆上鎖；序號啟用、每 7 天重新驗證，退款後重新上鎖；`?lstest` 測試開關。
-3. 網頁版完整版視窗：價格、內容、「前往購買」（開 Checkout 連結）、序號輸入；**只在網頁版顯示**，App 內維持 StoreKit。
-4. 條款頁：`scripts/legal_gen.py` 的完整版介紹、退款、隱私權頁改成「網頁版 NT$90、Lemon Squeezy 序號」的正式版本，重新產生。
-5. 先在 Lemon Squeezy 測試模式用測試卡 `4242 4242 4242 4242` 走一次：付款 → 拿到序號 → 輸入 → 解鎖 → 退款 → 重新上鎖。
+## 6. 目前狀態（2026-10-26）
+- 商品已建立：**Product ID 1474126**（`wrangler.jsonc` 的 `vars`），Store ID 507523，`LS_LIVE` 為 `"0"`（測試模式）。
+- 網頁版已上鎖：第 5～28 顆需要完整版，不用依序過關（`src/store.js` 的 `FREE_LEVELS = 4`）。
+- Worker `worker/index.js`：`/api/license/activate|validate` 代呼叫 Lemon Squeezy 授權 API，並確認序號屬於這個商品。
+- 完整版視窗（網頁版）：購買 NT$90（開結帳頁）、序號輸入與啟用、完整版說明連結；App 內不顯示。
+- **還缺結帳連結**：填進 `src/store.js` 的 `CHECKOUT`。商店測試模式期間只有網址加 `?lstest` 才會開結帳頁，一般訪客看到「付款頁面即將開放」。
+- 測試：測試模式用測試卡 `4242 4242 4242 4242` 走一次：付款 → 拿到序號 → 輸入 → 解鎖 → 退款 → 重新上鎖（重新驗證每 7 天一次，測退款時可清掉 localStorage 的 `planetLostFound.pass` 的 `checked`）。
+- 正式收款：Lemon Squeezy 商店啟用後，把 `src/store.js` 的 `LIVE` 改成 `true`、`wrangler.jsonc` 的 `LS_LIVE` 改成 `"1"`。

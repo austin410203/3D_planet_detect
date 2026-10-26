@@ -366,6 +366,14 @@ img.gi { height: 1.2em; width: auto; vertical-align: -0.25em; pointer-events: no
 .pc-paid .pc-lock { margin: 0 0 8px; }
 .store-perks { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 14px 0; text-align: left; }
 .store-perks li { background: #fff; border: 3px solid var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 15px; font-weight: 700; }
+.store-web { margin: -4px 0 10px; }
+.store-note { font-size: 13.5px; font-weight: 700; margin-bottom: 8px; }
+.key-row { display: flex; gap: 8px; }
+.key-row input {
+  flex: 1; min-width: 0; font: inherit; font-size: 15px; font-weight: 700; padding: 6px 12px;
+  border: 3px solid var(--ink); border-radius: 12px; background: #fff; color: var(--ink);
+}
+.pass-link { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--ink); opacity: .75; }
 .store-msg { min-height: 1.5em; margin-bottom: 8px; font-size: 15px; font-weight: 900; }
 .link-btn {
   margin-top: 12px; background: none; border: none; color: var(--ink); opacity: .7; cursor: pointer;

@@ -1,12 +1,11 @@
 /**
  * progress.js — 關卡進度存檔
- * 記錄每顆星球的最佳星數與最佳時間；上一關拿到至少 1 星才解鎖下一關，第 9 關以後另需完整版（store.js）。
+ * 記錄每顆星球的最佳星數與最佳時間。關卡不用依序過關：前 4 顆免費，第 5 顆以後需要完整版（store.js）。
  * - 存在 Capacitor Preferences：iOS App 內存在原生 UserDefaults（不會被系統清掉），
  *   網頁版則由 Preferences 自動改用 localStorage。
  * - 舊版直接存在 localStorage 的進度，第一次啟動時會自動搬過來。
- * - 網址加上 ?unlock=all 可解鎖全部關卡（測試用；App 正式版無效）。
+ * - 網址加上 ?unlock=all 可解鎖全部關卡（只在 npm run dev 開發模式有效；網頁正式版有付費鎖，不能開）。
  */
-import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { store } from './store.js';
 
@@ -28,7 +27,7 @@ function persist() {
   Preferences.set({ key: KEY, value: JSON.stringify(data) }).catch(() => { /* 無痕模式等情況忽略 */ });
 }
 
-const unlockAll = (!Capacitor.isNativePlatform() || import.meta.env.DEV)
+const unlockAll = import.meta.env.DEV
   && new URLSearchParams(location.search).get('unlock') === 'all';
 
 export const progress = {
@@ -41,11 +40,10 @@ export const progress = {
     persist();
     return isBest;
   },
-  /** 鎖住的原因：null（可以玩）、'paid'（需要完整版）、'stars'（上一關還沒拿到星） */
+  /** 鎖住的原因：null（可以玩）、'paid'（需要完整版） */
   lockReason(levels, index) {
-    if (index === 0 || unlockAll) return null;
-    if (store.needsPurchase(index)) return 'paid';
-    return this.get(levels[index - 1].id).stars > 0 ? null : 'stars';
+    if (unlockAll) return null;
+    return store.needsPurchase(index) ? 'paid' : null;
   },
   isUnlocked(levels, index) { return !this.lockReason(levels, index); },
   totalStars(levels) { return levels.reduce((s, l) => s + this.get(l.id).stars, 0); },
