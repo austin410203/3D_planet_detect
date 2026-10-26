@@ -33,7 +33,7 @@ jobs:
     # Mac 機器的分鐘數以 10 倍計算，只在 commit 訊息含 [ios] 或 [shots]、或手動觸發時才跑
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[ios]') || contains(github.event.head_commit.message, '[shots]')
     runs-on: macos-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -67,8 +67,47 @@ jobs:
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           if [ -s ci-out/errors.txt ]; then while read -r line; do echo "::error::$line"; done < <(grep -E "error:" ci-out/errors.txt | head -20); fi
 
-      - name: 在 iPhone 模擬器啟動並截圖
+      - name: 保留結果與 App（給截圖與彙整工作）
+        if: always()
+        run: |
+          mkdir -p ci-out
+          if [ -d build/Build/Products/Debug-iphonesimulator/App.app ]; then
+            tar -czf app.tgz -C build/Build/Products/Debug-iphonesimulator App.app
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-base
+          path: ci-out
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
         if: steps.build.outputs.status == '0'
+        with:
+          name: app
+          path: app.tgz
+          retention-days: 1
+
+      - name: 編譯失敗時讓工作失敗
+        if: steps.build.outputs.status != '0'
+        run: exit 1
+
+  plugin-check:
+    # 在 iPhone 模擬器啟動 App，確認自寫的原生外掛真的有被呼叫（與截圖同時跑）
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: app
+
+      - run: tar -xzf app.tgz && mkdir -p ci-out
+
+      - name: 在 iPhone 模擬器啟動並截圖
         run: |
           UDID=$(xcrun simctl list devices available -j | python3 -c "
           import json, sys
@@ -81,8 +120,8 @@ jobs:
           ")
           xcrun simctl list devices available | grep "$UDID" | tee ci-out/simulator.txt
           xcrun simctl boot "$UDID"
-          xcrun simctl bootstatus "$UDID" -b
-          xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/App.app
+          xcrun simctl bootstatus "$UDID" -b > /dev/null
+          xcrun simctl install "$UDID" App.app
           # 啟動 App 並即時收集輸出（含重試，見 scripts/ci-launch-app.sh）
           bash scripts/ci-launch-app.sh "$UDID" ci-out/app-stdout.log | tee ci-out/launch.txt
           sleep 20
@@ -102,36 +141,17 @@ jobs:
           if [ -n "$MISSING" ]; then echo "缺少原生呼叫：$MISSING" | tee ci-out/plugin-check.txt; echo "::error::原生外掛沒有被呼叫：$MISSING"; exit 1; fi
           echo "OK：GameCenter、Store 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
 
-      - name: 保留結果與 App（給截圖與彙整工作）
-        if: always()
-        run: |
-          mkdir -p ci-out
-          if [ -d build/Build/Products/Debug-iphonesimulator/App.app ]; then
-            tar -czf app.tgz -C build/Build/Products/Debug-iphonesimulator App.app
-          fi
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ci-base
+          name: plugin-check
           path: ci-out
           if-no-files-found: ignore
 
-      - uses: actions/upload-artifact@v4
-        if: always() && steps.build.outputs.status == '0'
-        with:
-          name: app
-          path: app.tgz
-          retention-days: 1
-
-      - name: 編譯失敗時讓工作失敗
-        if: steps.build.outputs.status != '0'
-        run: exit 1
-
   shots:
-    # 外掛檢查失敗也照樣截圖（截圖只看畫面，失敗原因看 plugin-check.txt），編譯失敗就不拍
+    # 編譯成功就開始拍，與外掛檢查同時進行
     needs: build
-    if: always() && needs.build.result != 'skipped' && needs.build.result != 'cancelled' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
+    if: needs.build.result == 'success' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
     runs-on: macos-latest
     timeout-minutes: 40
     strategy:
@@ -204,7 +224,7 @@ jobs:
 
   publish:
     # 編譯結果與 8 組截圖彙整後推到 ci-results 分支
-    needs: [build, shots]
+    needs: [build, plugin-check, shots]
     if: always() && needs.build.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
@@ -216,12 +236,14 @@ jobs:
         run: |
           mkdir -p ci-out
           [ -d parts/ci-base ] && cp -R parts/ci-base/. ci-out/
+          [ -d parts/plugin-check ] && cp -R parts/plugin-check/. ci-out/
           for d in parts/shots-*; do [ -d "$d" ] && cp -R "$d/." ci-out/; done
           cd ci-out
           {
             echo "sha: $GITHUB_SHA"
             echo "run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "build-status: $(cat build-status.txt 2>/dev/null || echo 未執行)"
+            echo "plugin-check: ${{ needs.plugin-check.result }}"
             echo "shots: ${{ needs.shots.result }}"
             cat xcode.txt 2>/dev/null
             cat simulator.txt 2>/dev/null
