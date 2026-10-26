@@ -2,6 +2,7 @@
 # APK 推到 ci-results-android 分支，用 git 取回：
 #   git fetch origin ci-results-android && git show origin/ci-results-android:summary.txt
 # 網頁程式或 android/ 有變動時建置（Linux 機器，分鐘數便宜）；正式上架 Google Play 前再加 release 簽章。
+# 測試版 APK 不鎖關卡（src/store.js：Android 沒有內購，全部開放），也不會出現網頁版的序號輸入。
 name: Android 建置
 
 on:
