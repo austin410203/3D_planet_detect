@@ -1,0 +1,85 @@
+# TestFlight 上傳：在 GitHub 的 macOS 機器上 Archive、簽章、上傳到 App Store Connect
+# 觸發：GitHub → Actions → 「TestFlight 上傳」→ Run workflow，或 commit 訊息含 [testflight]
+# 需要的 repo secrets（App Store Connect → 使用者與存取權限 → 整合 → App Store Connect API，角色「App 管理」）：
+#   ASC_ISSUER_ID、ASC_KEY_ID、ASC_KEY_P8（.p8 檔的完整內容）、APPLE_TEAM_ID（developer.apple.com → Membership）
+# 簽章用 Xcode 自動管理（-allowProvisioningUpdates + API 金鑰），不用手動處理憑證與描述檔。
+# build 號用 github.run_number，每次上傳自動遞增；行銷版本（1.0）在 project.pbxproj 的 MARKETING_VERSION。
+name: TestFlight 上傳
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: testflight-${{ github.ref }}
+  cancel-in-progress: false # 上傳到一半不要被取消
+
+jobs:
+  upload:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[testflight]')
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 檢查 secrets
+        env:
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          MISSING=""
+          for v in ASC_ISSUER_ID ASC_KEY_ID ASC_KEY_P8 APPLE_TEAM_ID; do [ -n "${!v}" ] || MISSING="$MISSING $v"; done
+          if [ -n "$MISSING" ]; then echo "::error::缺少 repo secrets：$MISSING（見 docs/RELEASE.md）"; exit 1; fi
+          xcodebuild -version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 建置網頁並同步到 iOS
+        run: |
+          npm ci
+          npm run build
+          npx cap sync ios
+
+      - name: 寫入 API 金鑰
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey.p8"
+
+      - name: Archive（Release，自動簽章）
+        env:
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/App.xcarchive archive \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -80
+
+      - name: 匯出並上傳到 App Store Connect
+        env:
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          sed "s/__TEAM_ID__/$APPLE_TEAM_ID/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -80
+          echo "✅ 已上傳 build ${{ github.run_number }}，App Store Connect 處理完（約 10～30 分鐘）後會出現在 TestFlight"
+
+      - name: 清除金鑰
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"

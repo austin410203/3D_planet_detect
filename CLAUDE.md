@@ -32,6 +32,7 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - App 切到背景時 `main.js` 會停止渲染迴圈與音訊，計時不會繼續跑。
 - Game Center 用自己寫的本地外掛 `ios/App/App/GameCenterPlugin.swift`（由 `MainViewController` 註冊；Capacitor 8 的根畫面是 `SceneDelegate.swift` 用程式建立的，不是 Main.storyboard，所以要在 SceneDelegate 改用 `MainViewController()`。CI 會檢查外掛真的有原生呼叫）。新增 Swift 檔時要手動登記到 `project.pbxproj`（PBXBuildFile、PBXFileReference、App 群組、Sources）。排行榜 ID 與 App Store Connect 設定見 `docs/game-center.md`。
 - 網頁版沒有 Game Center 與震動：相關按鈕、設定列自動隱藏。
+- 上架流程與老闆要準備的帳號、金鑰：`docs/RELEASE.md`。TestFlight 上傳用 `.github/workflows/testflight.yml`（手動或 commit 訊息含 `[testflight]`；需要 repo secrets `ASC_ISSUER_ID`／`ASC_KEY_ID`／`ASC_KEY_P8`／`APPLE_TEAM_ID`）。
 - iOS CI（`.github/workflows/ios.yml`，macOS 機器）只在 commit 訊息含 `[ios]`（編譯＋模擬器外掛檢查）或 `[shots]`（再加 40 張商店截圖）時才跑：私人 repo 的 Actions 免費分鐘數有限，Mac 以 10 倍計算，2026-10-26 曾因額度用完被停。
 
 ## 架構
