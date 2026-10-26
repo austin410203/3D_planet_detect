@@ -47,7 +47,9 @@ async function tapSpot(spot, dist = 11) {
   await sleep(300);
 }
 
-export async function runDemo({ LEVELS, choose, startLevel, progress }) {
+export async function runDemo({ LEVELS, choose, startLevel, progress, previews }) {
+  // 本機用網頁拍截圖時也顯示 iOS 才有的 Game Center 排行榜按鈕，畫面才和 App 一致
+  for (const id of ['lbBtn', 'resultLbBtn', 'dailyLb']) $(id).hidden = false;
   await sleep(3000);
   // 假的進度：前 8 關有星星，畫面比較熱鬧（不影響鎖定：完整版只看購買狀態）
   [3, 3, 2, 3, 3, 2, 3, 1].forEach((s, i) => progress.save(LEVELS[i].id, s, 40 + i * 9));
@@ -55,6 +57,11 @@ export async function runDemo({ LEVELS, choose, startLevel, progress }) {
   // 1. 選關（第一關：綠野星）
   choose(0);
   await sleep(2500);
+  // 星球停止自轉並轉到綠地、紅屋頂與燈塔那一面（每次截圖都一樣）
+  window.__previewSpin = 0;
+  const planet = previews.children.find((p) => p.userData.index === 0);
+  if (planet) planet.rotation.y = 0.5;
+  await sleep(300);
   await shot('select');
 
   // 2. 委託（同一關）
@@ -84,6 +91,7 @@ export async function runDemo({ LEVELS, choose, startLevel, progress }) {
     if (found().size === targets.length) break;
   }
   await sleep(3500);
+  $('resultLbBtn').hidden = false;
   await shot('result');
 
   // 5. 每日挑戰
@@ -91,6 +99,7 @@ export async function runDemo({ LEVELS, choose, startLevel, progress }) {
   await sleep(1500);
   $('dailyBtn').click();
   await sleep(800);
+  $('dailyLb').hidden = false;
   await shot('daily');
 
   console.log('SHOT:done');

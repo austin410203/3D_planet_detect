@@ -121,6 +121,7 @@ function lerpTheme(k) {
  * ======================================================= */
 const SPACING = 18;
 const previews = new THREE.Group();
+if (import.meta.env.DEV) window.__previews = previews; // 除錯用
 scene.add(previews);
 /** 選關預覽只建立「目前選中星球的前後兩顆」，28 顆星球也不會拖慢載入 */
 const previewCache = new Map();
@@ -288,7 +289,7 @@ function startLevel(i, dailyKey = null, { tutorial = false } = {}) {
     onFinish: (r) => showResult(r),
     onSearch: (found) => searchHook?.(found),
   });
-  window.__dbg = { world, game, camera, controls }; // 除錯用
+  window.__dbg = { world, game, camera, controls, previews }; // 除錯用
 
   // 相機從第一個地標的方向看過去
   const first = world.landmarks.values().next().value.dir;
@@ -567,7 +568,7 @@ function loop() {
     camera.lookAt(camera.position.x, lookY, 0);
     previews.children.forEach((p) => {
       const i = p.userData.index;
-      p.rotation.y += dt * (i === selected ? 0.25 : 0.08);
+      p.rotation.y += dt * (i === selected ? 0.25 : 0.08) * (window.__previewSpin ?? 1); // 商店截圖模式會設成 0，固定星球角度
       const s = i === selected ? 1 : 0.7;
       p.scale.setScalar(THREE.MathUtils.lerp(p.scale.x, s, Math.min(1, dt * 5)));
     });
@@ -616,5 +617,5 @@ applyTheme(LEVELS[0].theme, true);
 
 // 商店截圖用的自動展示模式：只在 VITE_SCREENSHOT=1 建置時打包，正式版會被整段移除
 if (import.meta.env.VITE_SCREENSHOT === '1') {
-  import('./src/demo.js').then((m) => m.runDemo({ LEVELS, choose, startLevel, progress }));
+  import('./src/demo.js').then((m) => m.runDemo({ LEVELS, choose, startLevel, progress, previews }));
 }
