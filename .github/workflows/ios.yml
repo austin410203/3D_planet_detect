@@ -1,5 +1,6 @@
 # iOS 建置：在 GitHub 的 macOS 機器上編譯 iOS App，並在 iPhone 模擬器啟動、截圖
 # commit 訊息含 [shots] 時另外拍商店截圖：繁中／英／日／韓 × 6.9 吋 iPhone、13 吋 iPad，各 5 個畫面
+#   8 組（裝置 × 語言）各用一台機器同時拍：模擬器開機有時很慢，依序拍一組卡住就會整輪超時
 # 只有 commit 訊息含 [ios]／[shots] 或手動觸發時才跑（省 Mac 分鐘數）
 # 結果（編譯錯誤、截圖、App 紀錄）推到 ci-results 分支，沒有 Mac 也能用 git 取回查看：
 #   git fetch origin ci-results && git show origin/ci-results:summary.txt
@@ -101,20 +102,68 @@ jobs:
           if [ -n "$MISSING" ]; then echo "缺少原生呼叫：$MISSING" | tee ci-out/plugin-check.txt; echo "::error::原生外掛沒有被呼叫：$MISSING"; exit 1; fi
           echo "OK：GameCenter、Store 外掛都有原生呼叫" | tee ci-out/plugin-check.txt
 
-      - name: 商店截圖（commit 訊息含 [shots] 或手動觸發時）
-        # 外掛檢查失敗也照樣截圖（截圖只看畫面，失敗原因看 plugin-check.txt）
-        if: always() && steps.build.outputs.status == '0' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
+      - name: 保留結果與 App（給截圖與彙整工作）
+        if: always()
         run: |
-          # 截圖版網頁：含 src/demo.js 自動展示；每種語言各建一份 App（VITE_SHOT_LANG 固定語言）
-          LANGS="zh en ja ko"
-          for L in $LANGS; do
-            VITE_SCREENSHOT=1 VITE_SHOT_LANG=$L npx vite build --outDir dist-shots-$L
-            cp -R build/Build/Products/Debug-iphonesimulator/App.app App-shots-$L.app
-            rm -rf App-shots-$L.app/public && cp -R dist-shots-$L App-shots-$L.app/public
-          done
-          mkdir -p ci-out/shots
-          find_dev() {
-            xcrun simctl list devices available -j | python3 -c "
+          mkdir -p ci-out
+          if [ -d build/Build/Products/Debug-iphonesimulator/App.app ]; then
+            tar -czf app.tgz -C build/Build/Products/Debug-iphonesimulator App.app
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-base
+          path: ci-out
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.build.outputs.status == '0'
+        with:
+          name: app
+          path: app.tgz
+          retention-days: 1
+
+      - name: 編譯失敗時讓工作失敗
+        if: steps.build.outputs.status != '0'
+        run: exit 1
+
+  shots:
+    # 外掛檢查失敗也照樣截圖（截圖只看畫面，失敗原因看 plugin-check.txt），編譯失敗就不拍
+    needs: build
+    if: always() && needs.build.result != 'skipped' && needs.build.result != 'cancelled' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shots]'))
+    runs-on: macos-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [iphone69, ipad13]
+        lang: [zh, en, ja, ko]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: app
+
+      - name: 截圖版 App（含 src/demo.js 自動展示，語言固定）
+        run: |
+          npm ci
+          VITE_SCREENSHOT=1 VITE_SHOT_LANG=${{ matrix.lang }} npx vite build --outDir dist-shots
+          tar -xzf app.tgz
+          rm -rf App.app/public && cp -R dist-shots App.app/public
+
+      - name: 拍 5 個畫面
+        env:
+          TAG: ${{ matrix.device }}-${{ matrix.lang }}
+        run: |
+          if [ "${{ matrix.device }}" = iphone69 ]; then PATTERN='^iPhone 1[6-9] Pro Max'; else PATTERN='^iPad Pro 13'; fi
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
           import json, re, sys
           devs = json.load(sys.stdin)['devices']
           for rt in sorted(devs, reverse=True):
@@ -122,48 +171,58 @@ jobs:
                   for d in devs[rt]:
                       if re.match(sys.argv[1], d['name']):
                           print(d['udid']); sys.exit()
-          " "$1"
-          }
-          # shoot <裝置名稱規則> <裝置代號>：開機一次，依序安裝四種語言的截圖版並拍 5 個畫面
-          shoot() {
-            UDID=$(find_dev "$1")
-            xcrun simctl list devices | grep "$UDID" | sed "s/^/$2: /" >> ci-out/shots/devices.txt
-            xcrun simctl boot "$UDID" || true
-            xcrun simctl bootstatus "$UDID" -b
-            for L in $LANGS; do
-              TAG="$2-$L"
-              xcrun simctl install "$UDID" App-shots-$L.app
-              xcrun simctl ui "$UDID" appearance light
-              MODE=light
-              LOG="ci-out/shots/$TAG-log.txt"
-              bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$TAG: /" >> ci-out/shots/devices.txt
-              # src/demo.js 每個畫面準備好就停住，截完圖再切換淺色／深色模式通知它換下一個
-              # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜；自訂網址會被 iOS 確認框擋住）
-              # 數字是送出通知後，等下一個畫面準備好的秒數
-              sleep 15
-              for shot in select:6 intro:12 play:9 result:6 daily:0; do
-                name=${shot%%:*}; settle=${shot##*:}
-                xcrun simctl io "$UDID" screenshot "ci-out/shots/$TAG-$name.png"
-                if [ "$MODE" = light ]; then MODE=dark; else MODE=light; fi
-                xcrun simctl ui "$UDID" appearance "$MODE"
-                sleep "$settle"
-              done
-              xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
-              grep -E "SHOT:|rror" "$LOG" | tr -d '\r' | head -40 > "$LOG.tmp"; mv "$LOG.tmp" "$LOG"
-            done
-            xcrun simctl shutdown "$UDID" || true
-          }
-          shoot '^iPhone 1[6-9] Pro Max' iphone69
-          shoot '^iPad Pro 13' ipad13
+          " "$PATTERN")
+          mkdir -p ci-out/shots
+          xcrun simctl list devices | grep "$UDID" | sed "s/^/$TAG: /" >> ci-out/shots/devices-$TAG.txt
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b > /dev/null
+          xcrun simctl install "$UDID" App.app
+          xcrun simctl ui "$UDID" appearance light
+          MODE=light
+          LOG="ci-out/shots/$TAG-log.txt"
+          bash scripts/ci-launch-app.sh "$UDID" "$LOG" | sed "s/^/$TAG: /" >> ci-out/shots/devices-$TAG.txt
+          # src/demo.js 每個畫面準備好就停住，截完圖再切換淺色／深色模式通知它換下一個
+          # （模擬器的紀錄會延遲、iPad 截圖本身又很慢，所以不靠時間猜；自訂網址會被 iOS 確認框擋住）
+          # 數字是送出通知後，等下一個畫面準備好的秒數
+          sleep 15
+          for shot in select:6 intro:12 play:9 result:6 daily:0; do
+            name=${shot%%:*}; settle=${shot##*:}
+            xcrun simctl io "$UDID" screenshot "ci-out/shots/$TAG-$name.png"
+            if [ "$MODE" = light ]; then MODE=dark; else MODE=light; fi
+            xcrun simctl ui "$UDID" appearance "$MODE"
+            sleep "$settle"
+          done
+          xcrun simctl terminate "$UDID" com.austin410203.planetlostfound || true
+          grep -E "SHOT:|rror" "$LOG" | tr -d '\r' | head -40 > "$LOG.tmp"; mv "$LOG.tmp" "$LOG"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shots-${{ matrix.device }}-${{ matrix.lang }}
+          path: ci-out
+          if-no-files-found: ignore
+
+  publish:
+    # 編譯結果與 8 組截圖彙整後推到 ci-results 分支
+    needs: [build, shots]
+    if: always() && needs.build.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: parts
 
       - name: 推送結果到 ci-results 分支
-        if: always()
         run: |
-          mkdir -p ci-out && cd ci-out
+          mkdir -p ci-out
+          [ -d parts/ci-base ] && cp -R parts/ci-base/. ci-out/
+          for d in parts/shots-*; do [ -d "$d" ] && cp -R "$d/." ci-out/; done
+          cd ci-out
           {
             echo "sha: $GITHUB_SHA"
             echo "run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "build-status: $(cat build-status.txt 2>/dev/null || echo 未執行)"
+            echo "shots: ${{ needs.shots.result }}"
             cat xcode.txt 2>/dev/null
             cat simulator.txt 2>/dev/null
           } > summary.txt
@@ -172,7 +231,3 @@ jobs:
           git add -A
           git -c user.name=ios-ci -c user.email=ios-ci@users.noreply.github.com commit -qm "iOS CI ${GITHUB_SHA::7}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-results
-
-      - name: 編譯失敗時讓工作失敗
-        if: steps.build.outputs.status != '0'
-        run: exit 1
