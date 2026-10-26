@@ -9,7 +9,7 @@
 |---|---|
 | **Name** | `星球失物招領所 完整版 Lost & Found in Space Full Version` |
 | **Pricing** | Single payment |
-| **Price** | `90`（NT$90，約 US$2.99；與 iOS 內購建議價相同） |
+| **Price** | `90`（NT$90，約 US$2.99；與 iOS 內購建議價相同；老闆 2026-10-26 確認） |
 | **Tax category** | Video games（沒有就選 Digital goods or services） |
 | **Files** | 留空（賣的是序號） |
 | **Variants** | 不用加 |
