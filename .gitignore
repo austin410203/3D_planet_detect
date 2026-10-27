@@ -3,3 +3,4 @@ dist
 .vercel
 builds/
 store-shots/raw/
+store-shots/upload/

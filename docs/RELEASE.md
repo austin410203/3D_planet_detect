@@ -6,10 +6,12 @@
 ## 目前狀態（2026-10-27）
 - ✅ Bundle ID `com.austin410203.planetlostfound` 已註冊（Game Center、In-App Purchase），Team ID `M3FNV67WZ3`
 - ✅ App 記錄：星球失物招領所，Apple ID **6827234202**，SKU `planet-lost-found-001`，主要語言繁中
-- ✅ 價格免費（基準國家台灣）；供應 148 國，**排除歐盟 27 國**（DSA 申報為非交易者）
-- ✅ 內購「完整版」Apple ID **6827238278**：NT$90、148 國、家人共享、中英日韓名稱與描述、審查備註；還缺審查截圖
-- ❌ 付費 App 協議已過期，要重新簽；銀行帳戶要補持有人地址與類型（老闆）
+- ✅ 價格免費（基準國家台灣）；供應 146 國，**排除歐盟 27 國**（DSA 申報為非交易者）與中國大陸、越南（遊戲版號／審批）
+- ✅ 內購「完整版」Apple ID **6827238278**：NT$90、146 國、家人共享、中英日韓名稱與描述、審查備註、審查截圖（iOS 樣式的購買視窗）
+- ✅ 版本頁：四語系文案、App 審查聯絡資訊、四語系 iPhone／iPad 截圖各 5 張
+- ✅ 付費 App 協議、銀行帳戶已生效
 - ❌ GitHub secrets 還沒設定；Game Center 排行榜等 API 金鑰後用 API 批次建立
+- ❌ 還沒有 build（TestFlight 上傳後要在版本頁選 build）；上傳完再把 repo 改回私人
 
 ## A. 一次性準備（老闆）
 
@@ -55,6 +57,6 @@
 
 ## E. 送審（老闆按送出，Claude 準備內容）
 - 商店頁文案、關鍵字、年齡分級、隱私權標籤、審查備註：`docs/app-store-listing.md`
-- 截圖：`store-shots/iphone69/<語言>/`（6.9 吋）、`store-shots/ipad13/<語言>/`（13 吋），各 5 張
+- 截圖：`node scripts/local-shots.mjs <裝置> <語言>` 拍原圖 → `npm run store-shots` 合成 → `python scripts/store_upload_prep.py` 轉成上傳用（去透明、iPhone 縮成 6.3 吋 1206×2622），上傳 `store-shots/upload/iphone63|ipad13/<語言>/`，各 5 張。App Store Connect 的 iPhone 主要欄位現在是 6.1／6.3 吋，6.9 吋尺寸會被拒
 - 版本頁勾選內購「完整版」一起送審；發布方式選「手動發布」
 - 審查聯絡 email：hello@emptyoffice.app
