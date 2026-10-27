@@ -30,7 +30,7 @@ const BOARDS = [
   {
     vendorIdentifier: 'plf.daily', referenceName: 'Daily Challenge', defaultFormatter: 'ELAPSED_TIME_CENTISECOND',
     submissionType: 'BEST_SCORE', scoreSortType: 'ASC',
-    recurrenceStartDate: next16.toISOString().replace(/\.\d{3}Z$/, 'Z'), recurrenceDuration: 'P1D', recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+    recurrenceStartDate: next16.toISOString().replace(/\.\d{3}Z$/, 'Z'), recurrenceDuration: 'P1DT0H0M', recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
     names: { 'zh-Hant': '每日挑戰', 'en-US': 'Daily Challenge', ja: 'デイリーチャレンジ', ko: '데일리 챌린지' },
   },
   {
@@ -44,7 +44,8 @@ const BOARDS = [
     return {
       vendorIdentifier: `plf.best.${lv.id}`, referenceName: `Best ${String(i + 1).padStart(2, '0')} ${EN[lv.id]?.name ?? lv.id}`,
       defaultFormatter: 'ELAPSED_TIME_CENTISECOND', submissionType: 'BEST_SCORE', scoreSortType: 'ASC',
-      names: Object.fromEntries(LOCALES.map((l) => [l, `${n[l]} ${BEST_SUFFIX[l]}`])),
+      // Apple 限制名稱最多 30 字：太長就只放星球名稱
+      names: Object.fromEntries(LOCALES.map((l) => { const full = `${n[l]} ${BEST_SUFFIX[l]}`; return [l, [...full].length <= 30 ? full : n[l].slice(0, 30)]; })),
     };
   }),
 ];
