@@ -1,6 +1,7 @@
 # TestFlight 上傳：在 GitHub 的 macOS 機器上 Archive、簽章、上傳到 App Store Connect
 # 觸發：GitHub → Actions → 「TestFlight 上傳」→ Run workflow，或 commit 訊息含 [testflight]
-# 需要的 repo secrets（App Store Connect → 使用者與存取權限 → 整合 → App Store Connect API，角色「App 管理」）：
+# 需要的 repo secrets（App Store Connect → 使用者與存取權限 → 整合 → App Store Connect API，角色必須是「管理」Admin：
+#   匯出時要用 Apple 雲端管理的發布憑證，App 管理（App Manager）角色的金鑰會出現 Cloud signing permission error）：
 #   ASC_ISSUER_ID、ASC_KEY_ID、ASC_KEY_P8（.p8 檔的完整內容）、APPLE_TEAM_ID（developer.apple.com → Membership）
 # 簽章用 Xcode 自動管理（-allowProvisioningUpdates + API 金鑰），不用手動處理憑證與描述檔。
 # build 號用 github.run_number，每次上傳自動遞增；行銷版本（1.0）在 project.pbxproj 的 MARKETING_VERSION。

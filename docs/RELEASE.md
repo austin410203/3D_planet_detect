@@ -10,7 +10,8 @@
 - ✅ 內購「完整版」Apple ID **6827238278**：NT$90、146 國、家人共享、中英日韓名稱與描述、審查備註、審查截圖（iOS 樣式的購買視窗）
 - ✅ 版本頁：四語系文案、App 審查聯絡資訊、四語系 iPhone／iPad 截圖各 5 張
 - ✅ 付費 App 協議、銀行帳戶已生效
-- ❌ GitHub secrets 還沒設定；Game Center 排行榜等 API 金鑰後用 API 批次建立
+- ✅ Game Center 30 個排行榜已用 API 建立（`gamecenter.yml`）
+- ⚠️ GitHub secrets 已設定，但 API 金鑰「planet」（R6WTMY32BU）是 App 管理角色：TestFlight 的 Archive 成功、匯出失敗（Cloud signing permission error），要換成「管理」Admin 角色的金鑰
 - ❌ 還沒有 build（TestFlight 上傳後要在版本頁選 build）；上傳完再把 repo 改回私人
 
 ## A. 一次性準備（老闆）

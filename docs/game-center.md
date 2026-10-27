@@ -10,7 +10,9 @@ App 端程式：`ios/App/App/GameCenterPlugin.swift`（原生外掛）、`src/ga
 
 ## App Store Connect：要建立的排行榜
 
-在 App Store Connect →（App）→ **Game Center** → 排行榜，依下表建立。
+已用 App Store Connect API 建好（2026-10-27，30 個，中英日韓名稱）：`scripts/gamecenter-setup.mjs`，在 GitHub Actions 跑（`.github/workflows/gamecenter.yml`，手動或 commit 訊息含 `[gamecenter]`；可重複執行，已存在的會略過）。新增星球時把 id 加進 levels 檔後重跑即可。
+
+- API 限制：名稱最多 30 字（太長自動改成只放星球名稱）；循環長度要寫 `PT24H`（`P1D` 會被拒）。
 
 | 排行榜 ID | 類型 | 分數格式 | 排序 | 說明 |
 |---|---|---|---|---|
