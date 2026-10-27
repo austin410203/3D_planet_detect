@@ -30,7 +30,7 @@ const BOARDS = [
   {
     vendorIdentifier: 'plf.daily', referenceName: 'Daily Challenge', defaultFormatter: 'ELAPSED_TIME_CENTISECOND',
     submissionType: 'BEST_SCORE', scoreSortType: 'ASC',
-    recurrenceStartDate: next16.toISOString().replace(/\.\d{3}Z$/, 'Z'), recurrenceDuration: 'P1DT0H0M', recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+    recurrenceStartDate: next16.toISOString().replace(/\.\d{3}Z$/, 'Z'), recurrenceDuration: 'PT24H', recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
     names: { 'zh-Hant': '每日挑戰', 'en-US': 'Daily Challenge', ja: 'デイリーチャレンジ', ko: '데일리 챌린지' },
   },
   {
@@ -55,6 +55,8 @@ if (DRY) {
   console.log(`共 ${BOARDS.length} 個`);
   process.exit(0);
 }
+
+const DURATIONS = ['PT24H', 'P1DT0H0M0S', 'P0Y0M1DT0H0M0S', 'PT1440M', 'P1DT0H', 'PT86400S'];
 
 // ---------- API ----------
 const { ASC_ISSUER_ID, ASC_KEY_ID, ASC_KEY_P8 } = process.env;
@@ -110,10 +112,22 @@ for (const b of BOARDS) {
     let id = existing.get(b.vendorIdentifier);
     if (!id) {
       const attributes = Object.fromEntries(Object.entries(b).filter(([k]) => !['names', 'suffix'].includes(k)));
-      id = (await api('POST', '/v1/gameCenterLeaderboards', {
-        type: 'gameCenterLeaderboards', attributes,
-        relationships: { gameCenterDetail: { data: { type: 'gameCenterDetails', id: detailId } } },
-      })).data.id;
+      // 循環長度的寫法 Apple 沒寫清楚，依序試幾種 ISO 8601 寫法
+      const durations = attributes.recurrenceDuration ? DURATIONS : [undefined];
+      for (const [i, d] of durations.entries()) {
+        try {
+          if (d) attributes.recurrenceDuration = d;
+          id = (await api('POST', '/v1/gameCenterLeaderboards', {
+            type: 'gameCenterLeaderboards', attributes,
+            relationships: { gameCenterDetail: { data: { type: 'gameCenterDetails', id: detailId } } },
+          })).data.id;
+          if (d) console.log('  循環長度寫法：', d);
+          break;
+        } catch (e) {
+          if (!d || i === durations.length - 1 || !/recurrenceDuration/.test(e.message)) throw e;
+          console.log('  不接受', d);
+        }
+      }
       made++;
       console.log('＋ 排行榜', b.vendorIdentifier);
     }
