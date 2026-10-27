@@ -11,8 +11,10 @@
 - ✅ 版本頁：四語系文案、App 審查聯絡資訊、四語系 iPhone／iPad 截圖各 5 張
 - ✅ 付費 App 協議、銀行帳戶已生效
 - ✅ Game Center 30 個排行榜已用 API 建立（`gamecenter.yml`）
-- ⚠️ GitHub secrets 已設定，但 API 金鑰「planet」（R6WTMY32BU）是 App 管理角色：TestFlight 的 Archive 成功、匯出失敗（Cloud signing permission error），要換成「管理」Admin 角色的金鑰
-- ❌ 還沒有 build（TestFlight 上傳後要在版本頁選 build）；上傳完再把 repo 改回私人
+- ✅ GitHub secrets：API 金鑰「planet lost」（Key ID 4RZZ6LD53H，**Admin** 角色；App 管理角色的金鑰匯出時會 Cloud signing permission error）
+- ✅ TestFlight build 10 已上傳（GitHub Actions run #10）、已處理完，並已加到版本 1.0
+- ⏳ 老闆用 TestFlight 實機測試 → 按「提交以供審查」：送審時要把內購「完整版」一起加進同一個送審項目（內購頁或送審畫面的 Add for Review）
+- ⏳ repo 目前公開（GitHub Actions 的 macOS 分鐘數），審查通過、不再需要重新建置後改回私人
 
 ## A. 一次性準備（老闆）
 
