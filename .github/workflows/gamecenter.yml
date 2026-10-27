@@ -1,0 +1,26 @@
+# Game Center 排行榜：用 App Store Connect API 建立 docs/game-center.md 的 30 個排行榜（可重複執行，已存在的會略過）
+# 觸發：GitHub → Actions → 「Game Center 排行榜」→ Run workflow，或 commit 訊息含 [gamecenter]
+# 需要的 repo secrets：ASC_ISSUER_ID、ASC_KEY_ID、ASC_KEY_P8（與 TestFlight 上傳共用）
+name: Game Center 排行榜
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  leaderboards:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[gamecenter]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 建立排行榜
+        env:
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: node scripts/gamecenter-setup.mjs
