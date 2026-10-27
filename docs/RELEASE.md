@@ -15,6 +15,7 @@
 - ✅ TestFlight build 10 已上傳（GitHub Actions run #10）、已處理完，並已加到版本 1.0
 - ✅ TestFlight 內部測試群組「內部測試」（自動發布新 build），老闆實機測試正常
 - ✅ 2026-10-27 已送審：版本 1.0（build 10）＋內購「完整版」同一個送審項目，狀態 Waiting for Review；手動發布
+- ⏳ 2026-10-27 已申請 App Store Small Business Program（15% 抽成），等 Apple 通知
 - ⏳ 審查通過後老闆按「發布此版本」；之後換 AdMob 正式廣告 ID 發 1.0.1
 - ⏳ repo 目前公開（GitHub Actions 的 macOS 分鐘數），審查通過、不再需要重新建置後改回私人
 
@@ -22,7 +23,7 @@
 
 1. **加入 Apple Developer Program**：developer.apple.com/programs/enroll，用**個人**身分、本名，年費 US$99。付款後審核約 1～2 天。
 2. **協議、稅務和銀行業務**（App Store Connect）：簽「付費 App 協議」（有內購就必須簽）、填 W-8BEN 與台灣銀行帳戶（SWIFT）。沒完成的話內購商品抓不到價格。
-3. **申請 App Store Small Business Program**：抽成從 30% 降到 15%。
+3. **申請 App Store Small Business Program**：抽成從 30% 降到 15%。✅ 2026-10-27 已送出申請（整個開發者帳號適用，關聯帳號四題皆「否」），等 Apple 寄信通知結果。
 4. **建立 App**：App Store Connect → App → ＋ → 新增 App
    - 平台 iOS、名稱「星球失物招領所」、主要語言繁體中文、Bundle ID `com.austin410203.planetlostfound`（第一次上傳 build 時 Xcode 也會自動註冊；清單裡沒有就先到 developer.apple.com → Identifiers 新增，勾 Game Center、In-App Purchase）、SKU `planet-lost-found-001`、完整存取權。
 5. **App Store Connect API 金鑰**：使用者與存取權限 → 整合 → App Store Connect API → 產生金鑰，角色「App 管理」。記下 Issuer ID、Key ID，下載 `.p8`（只能下載一次，存到密碼管理器）。
