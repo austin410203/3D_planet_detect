@@ -13,7 +13,9 @@
 - ✅ Game Center 30 個排行榜已用 API 建立（`gamecenter.yml`）
 - ✅ GitHub secrets：API 金鑰「planet lost」（Key ID 4RZZ6LD53H，**Admin** 角色；App 管理角色的金鑰匯出時會 Cloud signing permission error）
 - ✅ TestFlight build 10 已上傳（GitHub Actions run #10）、已處理完，並已加到版本 1.0
-- ⏳ 老闆用 TestFlight 實機測試 → 按「提交以供審查」：送審時要把內購「完整版」一起加進同一個送審項目（內購頁或送審畫面的 Add for Review）
+- ✅ TestFlight 內部測試群組「內部測試」（自動發布新 build），老闆實機測試正常
+- ✅ 2026-10-27 已送審：版本 1.0（build 10）＋內購「完整版」同一個送審項目，狀態 Waiting for Review；手動發布
+- ⏳ 審查通過後老闆按「發布此版本」；之後換 AdMob 正式廣告 ID 發 1.0.1
 - ⏳ repo 目前公開（GitHub Actions 的 macOS 分鐘數），審查通過、不再需要重新建置後改回私人
 
 ## A. 一次性準備（老闆）
