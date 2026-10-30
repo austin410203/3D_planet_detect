@@ -611,8 +611,8 @@ if (!import.meta.env.VITE_SCREENSHOT) loadAds(); // 免費版廣告（iOS：AdMo
   const native = Capacitor.isNativePlatform();
   // 網頁版全部免費：不放完整版說明，改放贊助連結
   const pages = ['terms', 'privacy', 'contact'];
-  const html = (native ? '' : `<a href="${DONATE}" target="_blank" rel="noopener">${t('supportRow')}</a>`)
-    + pages.map((k) => `<a href="${k}.html?lang=${lang}${native ? '&app=1' : ''}">${t(`legal${k[0].toUpperCase()}${k.slice(1)}`)}</a>`).join('');
+  if (!native) { $('titleDonate').href = DONATE; $('titleDonate').hidden = false; $('titleDonate').addEventListener('click', (e) => e.stopPropagation()); }
+  const html = pages.map((k) => `<a href="${k}.html?lang=${lang}${native ? '&app=1' : ''}">${t(`legal${k[0].toUpperCase()}${k.slice(1)}`)}</a>`).join('');
   for (const id of ['titleLegal', 'settingsLegal']) $(id).innerHTML = html;
   $('titleLegal').addEventListener('click', (e) => e.stopPropagation()); // 不要觸發「點一下開始」
 }

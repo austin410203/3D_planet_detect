@@ -82,6 +82,7 @@ html, body {
 /* 條款頁連結（標題畫面底部、設定視窗）；頁面由 scripts/legal_gen.py 產生 */
 .legal-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; font-size: 12.5px; font-weight: 700; }
 .legal-links a { color: inherit; opacity: .8; text-decoration: underline; text-underline-offset: 3px; }
+.title-donate { display: inline-block; margin-bottom: 14px; padding: 8px 20px; border-radius: 999px; background: #ffd84d; color: var(--ink); font-weight: 800; font-size: 14px; text-decoration: none; border: 2px solid var(--ink); box-shadow: 0 3px 0 var(--ink); }
 .title-bottom .legal-links { color: #fff; text-shadow: 0 2px 0 var(--ink); }
 #settingsLegal { color: var(--ink); margin: -6px 0 14px; }
 @keyframes titleIn { from { transform: rotate(-3deg) scale(.4); opacity: 0; } to { transform: rotate(-3deg) scale(1); opacity: 1; } }
