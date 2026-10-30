@@ -17,5 +17,5 @@
     "run_worker_first": ["/api/*"]
   },
   // Lemon Squeezy 商店 Empty Office 與「星球失物招領所 完整版」商品；商店正式收款後把 LS_LIVE 改成 "1"
-  "vars": { "LS_STORE_ID": "507523", "LS_PRODUCT_ID": "1474126", "LS_LIVE": "0" }
+  "vars": { "LS_STORE_ID": "507523", "LS_PRODUCT_ID": "1485748", "LS_LIVE": "1" }
 }

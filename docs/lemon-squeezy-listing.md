@@ -80,7 +80,7 @@ To activate: open Lost & Found in Space → tap a locked planet or ⚙️ Settin
 ```
 
 ## 6. 目前狀態（2026-10-26）
-- 商品已建立：**Product ID 1474126**（`wrangler.jsonc` 的 `vars`），Store ID 507523，`LS_LIVE` 為 `"0"`（測試模式）。
+- 商品已建立：**Product ID 1485748**（`wrangler.jsonc` 的 `vars`），Store ID 507523，`LS_LIVE` 為 `"0"`（測試模式）。
 - 網頁版已上鎖：第 5～28 顆需要完整版，不用依序過關（`src/store.js` 的 `FREE_LEVELS = 4`）。
 - Worker `worker/index.js`：`/api/license/activate|validate` 代呼叫 Lemon Squeezy 授權 API，並確認序號屬於這個商品。
 - 完整版視窗（網頁版）：購買 NT$90（開結帳頁）、序號輸入與啟用、完整版說明連結；App 內不顯示。
