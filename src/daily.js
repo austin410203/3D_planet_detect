@@ -3,9 +3,9 @@
  * --------------------------------------------------
  * - 每天（以 UTC+8 的日期為準）由日期算出固定的星球與 seed：全世界同一天玩到同一張地圖
  * - 只有當天第一次完成的成績會記錄並上傳排行榜，之後重玩是練習模式（避免背答案刷榜）
- * - 記錄連續挑戰天數，結果存在 Capacitor Preferences（只保留最近 60 天）
+ * - 記錄連續挑戰天數，結果存在目前的存檔欄位（saves.js；只保留最近 60 天）
  */
-import { Preferences } from '@capacitor/preferences';
+import { slotGet, slotSet } from './saves.js';
 
 const KEY = 'planetLostFound.daily';
 const DAY = 86400e3;
@@ -30,7 +30,7 @@ export function dailyPick(levels, key = todayKey()) {
 
 export async function loadDaily() {
   try {
-    const { value } = await Preferences.get({ key: KEY });
+    const value = await slotGet(KEY);
     if (value) results = JSON.parse(value) || {};
   } catch { results = {}; }
 }
@@ -43,7 +43,7 @@ export const daily = {
     results[key] = { time, stars };
     const keep = Object.keys(results).sort().slice(-60);
     results = Object.fromEntries(keep.map((k) => [k, results[k]]));
-    Preferences.set({ key: KEY, value: JSON.stringify(results) }).catch(() => {});
+    slotSet(KEY, JSON.stringify(results));
     return true;
   },
   /** 連續挑戰天數：今天還沒玩就從昨天往回算，不會因為今天還沒玩就歸零 */

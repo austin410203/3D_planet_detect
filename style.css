@@ -399,3 +399,6 @@ img.gi { height: 1.2em; width: auto; vertical-align: -0.25em; pointer-events: no
   .side-btns { top: calc(10px + var(--sa-t)); left: calc(8px + var(--sa-l)); gap: 8px; }
   .icon-btn { width: 48px; height: 48px; font-size: 20px; border-radius: 14px; }
 }
+
+/* 存檔（src/saves.js）：結算畫面的「已自動存檔」 */
+.result-saved { margin: 4px 0 0; font: 600 12px var(--font); opacity: .6; }

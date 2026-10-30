@@ -34,6 +34,7 @@ import { runTutorial } from './src/tutorial.js';
 import { t, lang, LANGS, initLang, applyStaticText, localizeLevels } from './src/i18n.js';
 import { UI } from './src/locales/ui.js';
 import { SPOTS } from './src/props.js';
+import { saves, saveUI } from './src/saves.js';
 
 const $ = (id) => document.getElementById(id);
 const isMobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
@@ -237,6 +238,7 @@ function leaveTitle() {
 $('title').onclick = leaveTitle;
 
 function showSelect() {
+  $('savesShort').textContent = saveUI.t('slotN', { n: saves.slot }); $('savesBtn').setAttribute('aria-label', saveUI.t('saves'));
   teardown();
   mode = 'select';
   $('title').hidden = true;
@@ -290,7 +292,7 @@ function startLevel(i, dailyKey = null, { tutorial = false } = {}) {
     onFinish: (r) => showResult(r),
     onSearch: (found) => searchHook?.(found),
   });
-  window.__dbg = { world, game, camera, controls, previews }; // 除錯用
+  window.__dbg = { world, game, camera, controls, previews, showResult }; // 除錯用（showResult：存檔測試直接結算）
 
   // 相機從第一個地標的方向看過去
   const first = world.landmarks.values().next().value.dir;
@@ -357,6 +359,8 @@ function showResult({ time, stars }) {
     submitScore(LEADERBOARD.stars, progress.totalStars(LEVELS));
     $('resultBest').textContent = isBest ? t('newBest') : t('bestTime', { time: fmtTime(progress.get(lv.id).best) });
   }
+  if (!tutorialRun) saves.log({ lv: lv.id, time: Math.round(time * 10) / 10, stars, daily: !!dailyRun });   // 遊玩紀錄（存檔畫面）
+  $('resultSaved').textContent = saveUI.savedText();
   $('resultTime').textContent = fmtTime(time);
   $('resultOutro').textContent = `${lv.npc.emoji} ${lv.outro}`;
   sfx.fanfare();
@@ -508,6 +512,7 @@ function renderSettings() {
 for (const k of TOGGLES) $(`set-${k}`).onclick = () => { setSetting(k, !settings[k]); renderSettings(); };
 $('hapticsRow').hidden = !hasHaptics;
 $('restoreRow').hidden = !(hasStore || isWeb);
+$('savesBtn').onclick = () => saveUI.open('slots');
 $('settingsBtn').onclick = () => {
   renderSettings();
   $('restoreBtn2').textContent = t(store.owned ? 'owned' : isWeb ? 'enterKey' : 'restore');

@@ -1,0 +1,11 @@
+{
+ "CapacitorStorage.planetLostFound.v1": "{\"verdant\":{\"stars\":3,\"best\":41.2},\"dune\":{\"stars\":1,\"best\":130}}",
+ "CapacitorStorage.planetLostFound.daily": "{\"2026-10-29\":{\"time\":55,\"stars\":2}}",
+ "__settings": {
+  "CapacitorStorage.planetLostFound.settings": "{\"music\":false,\"sfx\":true,\"tutorialDone\":true}"
+ },
+ "__map": {
+  "CapacitorStorage.planetLostFound.v1": "planetLostFound.v1",
+  "CapacitorStorage.planetLostFound.daily": "planetLostFound.daily"
+ }
+}

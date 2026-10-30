@@ -43,7 +43,8 @@ Three.js + Vite 的 3D 星球解謎遊戲：讀線索、在星球上找出藏起
 - `src/planet.js`：依主題生成地形、海面、大氣層；`getSurfaceRadius()`／`getBiome()` 以目前主題計算。
 - `src/props.js`、`src/props-extra.js`：藏匿點（`SPOTS`）、地標（`LANDMARKS`）、裝飾（`DECOR`）模型庫。
 - `src/game.js`：計時、搜尋、提示、線索手冊、評星。翻錯 +3 秒、提示 +15 秒。
-- `src/progress.js`：進度存在 Capacitor Preferences（iOS 為 UserDefaults，網頁為 localStorage），啟動時需先 `await loadProgress()`；舊版 localStorage 進度會自動搬移。
+- `src/progress.js`：關卡進度，啟動時需先 `await loadProgress()`；讀寫都經過 `src/saves.js`（`slotGet`／`slotSet`）。
+- `src/saves.js`＋`src/save.js`／`src/saveui.js`（共用，`Company/playbooks/save-system.md`）：3 個存檔欄位。關卡進度 `planetLostFound.v1`、每日挑戰 `planetLostFound.daily` 存在 localStorage `eosv_pl_s{N}_<key>`，App 另外備份到原生 Preferences（同 key；刪除／匯入欄位時同步）；設定、試玩、購買全欄位共用。舊版存在 Preferences（網頁＝`CapacitorStorage.<key>`）或 localStorage 的進度第一次讀取時搬進存檔 1。選關畫面左側「💾 存檔 N」開存檔畫面（切換、匯出 .json、匯入、刪除按兩次、遊玩紀錄）；結算畫面 `#resultSaved` 顯示「已自動存檔」，每局一筆紀錄（新手教學不記）。測試：`node scripts/save_test.mjs`；`npm run build` 後 `python ../Company/playbooks/templates/save_system/save_e2e.py dist shots/saves scripts/save_legacy.json --play "…__dbg.showResult({ time: 47.3, stars: 2 })…"`。
 - `src/settings.js`：配樂／音效／震動開關、語言、是否看過教學（Preferences）。
 - `src/tutorial.js`：新手教學三步驟（拖曳旋轉 → 打開線索手冊 → 點地標旁的藏匿點），期間暫停計時、翻錯不加秒；設定裡可「再看一次」。
 - `src/audio.js`：Web Audio 即時合成音效與配樂，不使用音檔。配樂依星球 id 產生固定的 8 小節循環，`MINOR` 清單裡的星球用小調；第一次觸控才解鎖發聲（iOS 規定）。
