@@ -17,6 +17,8 @@ export const FULL_UNLOCK_ID = 'com.austin410203.planetlostfound.fullunlock';
 export const FREE_LEVELS = 4;
 export const hasStore = Capacitor.getPlatform() === 'ios';
 export const isWeb = !Capacitor.isNativePlatform();
+/** 2026-10-30 起網頁版 28 顆星球全部免費，改成自由贊助（Lemon Squeezy 支持者桌布包）；App 照舊內購，App 內不放贊助連結（3.1.1） */
+export const DONATE = 'https://emptyofficex.lemonsqueezy.com/checkout/buy/6f5e4472-6317-44ac-b8f4-f35ac635d2d7?checkout%5Bcustom%5D%5Bgame%5D=planet';
 
 /** 網頁版：Lemon Squeezy 結帳連結（商品建好後填入）。商店還在測試模式時只有網址加 ?lstest 才看得到購買按鈕 */
 const LIVE = true;
@@ -98,7 +100,7 @@ export const store = {
   /** 價格字串：iOS 用 App Store 的當地價格（還沒查到時為 null），網頁版固定 NT$90 */
   get price() { return isWeb ? WEB_PASS.price : product?.displayPrice ?? null; },
   /** 第 index 關（從 0 起算）是否需要完整版 */
-  needsPurchase: (index) => index >= FREE_LEVELS && !owned,
+  needsPurchase: (index) => !isWeb && index >= FREE_LEVELS && !owned,
 };
 
 /** 購買完整版（iOS），回傳 purchased | cancelled | pending | failed | unavailable */

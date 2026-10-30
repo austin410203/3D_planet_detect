@@ -27,7 +27,7 @@ import { sfx, playMusic, setAudioPaused } from './src/audio.js';
 import { haptic, hasHaptics } from './src/haptics.js';
 import { hasGameCenter, signInGameCenter, showLeaderboard, submitTime, submitScore, LEADERBOARD } from './src/gamecenter.js';
 import { daily, loadDaily, dailyPick, todayKey } from './src/daily.js';
-import { store, hasStore, isWeb, WEB_PASS, loadStore, purchaseFull, restorePurchases, activateKey, passInfo, onStoreChange } from './src/store.js';
+import { store, hasStore, isWeb, DONATE, WEB_PASS, loadStore, purchaseFull, restorePurchases, activateKey, passInfo, onStoreChange } from './src/store.js';
 import { loadAds, adsAvailable, watchForTrial, consumeTrial, trialsLeft, levelFinished, maybeInterstitial } from './src/ads.js';
 import { startIconSwap } from './src/icons.js';
 import { runTutorial } from './src/tutorial.js';
@@ -486,7 +486,7 @@ $('keyForm').onsubmit = async (e) => {
 };
 // 設定裡的恢復購買（按鈕空間小，只顯示簡短結果）；網頁版改成打開完整版視窗輸入序號
 $('restoreBtn2').onclick = async () => {
-  if (isWeb) { $('settings').hidden = true; openStore(); return; }
+  if (isWeb) { window.open(DONATE, '_blank', 'noopener'); return; }
   const b = $('restoreBtn2');
   b.textContent = t('checking');
   const ok = await restorePurchases();
@@ -512,11 +512,13 @@ function renderSettings() {
 for (const k of TOGGLES) $(`set-${k}`).onclick = () => { setSetting(k, !settings[k]); renderSettings(); };
 $('hapticsRow').hidden = !hasHaptics;
 $('restoreRow').hidden = !(hasStore || isWeb);
+// 網頁版全部免費：設定裡的「完整版」那一列改成贊助
+if (isWeb) $('restoreRow').querySelector('[data-i18n]').dataset.i18n = 'supportRow';
 $('savesBtn').onclick = () => saveUI.open('slots');
 $('settingsBtn').onclick = () => {
   renderSettings();
-  $('restoreBtn2').textContent = t(store.owned ? 'owned' : isWeb ? 'enterKey' : 'restore');
-  $('restoreBtn2').classList.toggle('on', store.owned);
+  $('restoreBtn2').textContent = t(isWeb ? 'donateBtn' : store.owned ? 'owned' : 'restore');
+  $('restoreBtn2').classList.toggle('on', !isWeb && store.owned);
   $('settings').hidden = false;
 };
 $('settingsClose').onclick = () => { $('settings').hidden = true; };
@@ -607,8 +609,10 @@ if (!import.meta.env.VITE_SCREENSHOT) loadAds(); // 免費版廣告（iOS：AdMo
 // 條款頁連結：App 內不放完整版介紹（避免連到網頁付款說明，審查指南 3.1.1），並帶 ?app=1 讓條款頁隱藏網頁付款段落
 {
   const native = Capacitor.isNativePlatform();
-  const pages = native ? ['terms', 'privacy', 'contact'] : ['pass', 'terms', 'privacy', 'contact'];
-  const html = pages.map((k) => `<a href="${k}.html?lang=${lang}${native ? '&app=1' : ''}">${t(`legal${k[0].toUpperCase()}${k.slice(1)}`)}</a>`).join('');
+  // 網頁版全部免費：不放完整版說明，改放贊助連結
+  const pages = ['terms', 'privacy', 'contact'];
+  const html = (native ? '' : `<a href="${DONATE}" target="_blank" rel="noopener">${t('supportRow')}</a>`)
+    + pages.map((k) => `<a href="${k}.html?lang=${lang}${native ? '&app=1' : ''}">${t(`legal${k[0].toUpperCase()}${k.slice(1)}`)}</a>`).join('');
   for (const id of ['titleLegal', 'settingsLegal']) $(id).innerHTML = html;
   $('titleLegal').addEventListener('click', (e) => e.stopPropagation()); // 不要觸發「點一下開始」
 }
