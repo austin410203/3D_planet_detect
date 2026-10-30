@@ -4,6 +4,7 @@
  * 流程：選關（星球輪播） → 委託說明 → 3-2-1 倒數 → 解謎 → 結算（1~3 星）
  * 共用：Renderer、Bloom 後處理、星空、燈光（依星球主題變色）、OrbitControls
  */
+import './lock.js'; // domain lock first, before anything else runs
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
