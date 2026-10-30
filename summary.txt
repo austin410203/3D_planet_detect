@@ -1,0 +1,4 @@
+sha: 1cd8a81f3052cb27bf874150c5d1e22e8cf9e6d9
+run: https://github.com/austin410203/3D_planet_detect/actions/runs/41036268682
+build-status: 0
+-rw-r--r-- 1 runner runner 14822985 Oct 30 09:52 planet-lost-found-debug.apk

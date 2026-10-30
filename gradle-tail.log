@@ -1,0 +1,80 @@
+> Task :capacitor-android:mergeDebugConsumerProguardFiles
+> Task :capacitor-android:prepareDebugArtProfile
+> Task :capacitor-android:prepareLintJarForPublish
+> Task :capacitor-android:mergeDebugJavaResource
+> Task :capacitor-app:checkDebugAarMetadata
+> Task :capacitor-android:syncDebugLibJars
+> Task :capacitor-android:bundleDebugAar
+> Task :capacitor-android:assembleDebug
+> Task :capacitor-app:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-app:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-app:extractDebugAnnotations
+> Task :capacitor-app:extractDeepLinksForAarDebug
+> Task :capacitor-app:mergeDebugGeneratedProguardFiles
+> Task :capacitor-app:mergeDebugConsumerProguardFiles
+> Task :capacitor-app:prepareDebugArtProfile
+> Task :capacitor-app:prepareLintJarForPublish
+> Task :capacitor-app:mergeDebugJavaResource
+> Task :capacitor-community-admob:checkDebugAarMetadata
+> Task :capacitor-app:syncDebugLibJars
+> Task :capacitor-app:bundleDebugAar
+> Task :capacitor-app:assembleDebug
+> Task :capacitor-community-admob:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-community-admob:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-community-admob:extractDebugAnnotations
+> Task :capacitor-community-admob:extractDeepLinksForAarDebug
+> Task :capacitor-community-admob:mergeDebugGeneratedProguardFiles
+> Task :capacitor-community-admob:mergeDebugConsumerProguardFiles
+> Task :capacitor-community-admob:prepareDebugArtProfile
+> Task :capacitor-community-admob:prepareLintJarForPublish
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+> Task :capacitor-community-admob:mergeDebugJavaResource
+> Task :capacitor-cordova-android-plugins:checkDebugAarMetadata
+> Task :capacitor-community-admob:syncDebugLibJars
+> Task :capacitor-community-admob:bundleDebugAar
+> Task :capacitor-community-admob:assembleDebug
+> Task :capacitor-cordova-android-plugins:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-cordova-android-plugins:extractDebugAnnotations
+> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarDebug
+> Task :capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles
+> Task :capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles
+> Task :capacitor-cordova-android-plugins:prepareDebugArtProfile
+> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish
+> Task :capacitor-cordova-android-plugins:mergeDebugJavaResource
+> Task :capacitor-haptics:checkDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:syncDebugLibJars
+> Task :capacitor-cordova-android-plugins:bundleDebugAar
+> Task :capacitor-cordova-android-plugins:assembleDebug
+> Task :capacitor-haptics:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-haptics:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-haptics:extractDebugAnnotations
+> Task :capacitor-haptics:extractDeepLinksForAarDebug
+> Task :capacitor-haptics:mergeDebugGeneratedProguardFiles
+> Task :capacitor-haptics:mergeDebugConsumerProguardFiles
+> Task :capacitor-haptics:prepareDebugArtProfile
+> Task :capacitor-haptics:prepareLintJarForPublish
+> Task :capacitor-haptics:mergeDebugJavaResource
+> Task :capacitor-preferences:checkDebugAarMetadata
+> Task :capacitor-haptics:syncDebugLibJars
+> Task :capacitor-haptics:bundleDebugAar
+> Task :capacitor-haptics:assembleDebug
+> Task :capacitor-preferences:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-preferences:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-preferences:extractDebugAnnotations
+> Task :capacitor-preferences:extractDeepLinksForAarDebug
+> Task :capacitor-preferences:mergeDebugGeneratedProguardFiles
+> Task :capacitor-preferences:mergeDebugConsumerProguardFiles
+> Task :capacitor-preferences:prepareDebugArtProfile
+> Task :capacitor-preferences:prepareLintJarForPublish
+> Task :capacitor-preferences:mergeDebugJavaResource
+> Task :capacitor-preferences:syncDebugLibJars
+> Task :capacitor-preferences:bundleDebugAar
+> Task :capacitor-preferences:assembleDebug
+
+[Incubating] Problems report is available at: file:///home/runner/work/3D_planet_detect/3D_planet_detect/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 1m 42s
+215 actionable tasks: 215 executed
